@@ -1,59 +1,63 @@
-import React from 'react';
-import { Card as CardType } from '../types/card';
+import React, { useState } from 'react';
+import { Card as CardType, AgeVariant } from '../types/card';
 
 interface CardProps {
   card: CardType;
 }
 
 const Card: React.FC<CardProps> = ({ card }) => {
-  const {
-    name,
-    description,
-    production,
-    playerCount,
-    upgradeCard,
-    cost,
-    age,
-    color,
-    ageVariant,
-  } = card;
+  const { name, description, production, upgradeCard, color, variants } = card;
+  const [currentVariant, setCurrentVariant] = useState<AgeVariant>(variants[0]);
 
   const renderPlayerCount = () => {
-    return playerCount.map((count, index) => (
-      <span key={index}>
-        {count.minPlayers}-{count.maxPlayers ?? '+'}: {count.copies} {index < playerCount.length - 1 ? ', ' : ''}
+    return (
+      <span>
+        {card.minPlayers}-{currentVariant.maxPlayers}: {currentVariant.copies ?? ''}
       </span>
-    ));
+    );
   };
 
   const renderCost = () => {
-    if (!cost) return 'Free';
-    return Object.entries(cost).map(([resource, amount]) => 
+    if (!currentVariant.cost) return 'Free';
+    return Object.entries(currentVariant.cost).map(([resource, amount]) => 
       `${resource}: ${amount}`
     ).join(', ');
   };
 
+  const handleAgeChange = (age: number) => {
+    const selectedVariant = variants.find(v => v.age === age);
+    if (selectedVariant) {
+      setCurrentVariant(selectedVariant);
+    }
+  };
+
   return (
-    <div className={`card age-${age} category-${color.toLowerCase()}`}>
-      <h3>{name}</h3>
-      <p>{description}</p>
-      <div className="production">
-        {Object.entries(production).map(([resource, amount]) => (
-          <span key={resource} className="resource">
-            {resource}: {amount}
-          </span>
-        ))}
+    <div className={`card age-${currentVariant.age} category-${color.toLowerCase()}`}>
+      <img 
+        src={`/images/cards/${name}.jpg`} 
+        alt={name} 
+        className="card-image"
+      />
+      <div className="card-overlay">
+        <h2>{name}</h2>
+        <p>{description}</p>
+        <p>Players: {renderPlayerCount()}</p>
+        <p>Cost: {renderCost()}</p>
+        <p>Age: {currentVariant.age}</p>
+        {variants.length > 1 && (
+          <div>
+            {variants.map(variant => (
+              <button
+                key={variant.age}
+                onClick={() => handleAgeChange(variant.age)}
+                disabled={currentVariant.age === variant.age}
+              >
+                Age {variant.age}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
-      <p>Players: {renderPlayerCount()}</p>
-      {upgradeCard && <p>Can be upgraded in a later Age</p>}
-      <div className="cost">
-        Cost: {renderCost()}
-      </div>
-      <p>Age: {age}</p>
-      <p>Category: {color}</p>
-      {ageVariant && (
-        <p>Age Variant: Age {ageVariant.age}, Max Players: {ageVariant.maxPlayers}</p>
-      )}
     </div>
   );
 };

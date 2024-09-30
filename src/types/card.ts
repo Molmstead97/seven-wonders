@@ -1,6 +1,5 @@
 export interface PlayerCountThreshold {
     minPlayers: number;
-    maxPlayers: number | null;  // null means no upper limit
     copies: number;
   }
   
@@ -16,13 +15,11 @@ export interface PlayerCountThreshold {
   export interface Card {
     name: string;
     description: string;
-    resources: Resource;
-    playerCount: PlayerCountThreshold[];
+    production: Resource | null
+    playerCount: PlayerCountThreshold[] | null;
     upgradeCard: boolean;
     cost: Resource | null;
     age: 1 | 2 | 3;
     color: 'Brown' | 'Grey' | 'Blue' | 'Yellow' | 'Red' | 'Green' | 'Purple';
     ageVariant?: AgeVariant;  // Optional, only for cards that change based on age
-  }
-
-  
+  } 
