@@ -1046,8 +1046,6 @@ export const cards: Card[] = [
     name: "Workers Guild",
     description:
       "Grants 1 Victory Point per brown card built in neighboring cities at the end of the game.",
-
-    playerCount: null,
     upgradeCard: false,
     cost: { Ore: 2, Clay: 1, Stone: 1, Wood: 1 },
     age: 3,
@@ -1058,8 +1056,6 @@ export const cards: Card[] = [
     name: "Craftsmen Guild",
     description:
       "Grants 2 Victory Points per grey card built in both neighboring cities at the end of the game.",
-
-    playerCount: null,
     upgradeCard: false,
     cost: { Ore: 2, Stone: 2 },
     age: 3,
@@ -1070,8 +1066,6 @@ export const cards: Card[] = [
     name: "Traders Guild",
     description:
       "Grants 1 Victory Point per yellow card built in neighboring cities at the end of the game.",
-
-    playerCount: null,
     upgradeCard: false,
     cost: { Cloth: 1, Glass: 1, Papyrus: 1 },
     age: 3,
@@ -1082,8 +1076,6 @@ export const cards: Card[] = [
     name: "Philosophers Guild",
     description:
       "Grants 1 Victory Point per green card built in neighboring cities at the end of the game.",
-
-    playerCount: null,
     upgradeCard: false,
     cost: { Clay: 3, Cloth: 1, Papyrus: 3 },
     age: 3,
@@ -1094,8 +1086,6 @@ export const cards: Card[] = [
     name: "Spy Guild",
     description:
       "Grants 1 Victory Point per red card built in neighboring cities at the end of the game.",
-
-    playerCount: null,
     upgradeCard: false,
     cost: { Clay: 3, Glass: 1 },
     age: 3,
@@ -1106,8 +1096,6 @@ export const cards: Card[] = [
     name: "Strategy Guild",
     description:
       "Grants 1 Victory Point for each conflict loss in neighboring cities at the end of the game.",
-
-    playerCount: null,
     upgradeCard: false,
     cost: { Ore: 2, Stone: 1, Cloth: 1 },
     age: 3,
@@ -1118,8 +1106,6 @@ export const cards: Card[] = [
     name: "Shipowners Guild",
     description:
       "Grants 1 Victory Point for each brown, grey, and guild card you've built at the end of the game.",
-
-    playerCount: null,
     upgradeCard: false,
     cost: { Wood: 3, Papyrus: 1, Glass: 1 },
     age: 3,
@@ -1130,8 +1116,6 @@ export const cards: Card[] = [
     name: "Magistrates Guild",
     description:
       "Grants 1 Victory Point per blue card built by neighboring cities at the end of the game.",
-
-    playerCount: null,
     upgradeCard: false,
     cost: { Wood: 3, Stone: 1, Cloth: 1 },
     age: 3,
@@ -1142,8 +1126,6 @@ export const cards: Card[] = [
     name: "Scientists Guild",
     description:
       "Grants either 1 Compass, Cog, or Tablet at the end of the game.",
-
-    playerCount: null,
     upgradeCard: false,
     cost: { Wood: 2, Ore: 2, Papyrus: 1 },
     age: 3,
@@ -1154,8 +1136,6 @@ export const cards: Card[] = [
     name: "Builders Guild",
     description:
       "Grants 1 Victory Point per Wonder stage you and neighboring cities have constructed at the end of the game.",
-
-    playerCount: null,
     upgradeCard: false,
     cost: { Stone: 2, Clay: 2, Glass: 1 },
     age: 3,
