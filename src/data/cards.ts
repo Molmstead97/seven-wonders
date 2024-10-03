@@ -876,7 +876,7 @@ export const cards: Card[] = [
   {
     name: "Apothecary",
     description: "Grants 1 Compass symbol upon acquisition.",
-    science: { type: "Compass" },
+    science: { Compass: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -890,7 +890,7 @@ export const cards: Card[] = [
   {
     name: "Workshop",
     description: "Grants 1 Cog symbol upon acquisition.",
-    science: { type: "Cog" },
+    science: { Cog: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -904,7 +904,7 @@ export const cards: Card[] = [
   {
     name: "Scriptorium",
     description: "Grants 1 Tablet symbol upon acquisition.",
-    science: { type: "Tablet" },
+    science: { Tablet: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -918,7 +918,7 @@ export const cards: Card[] = [
   {
     name: "Dispensary",
     description: "Grants 1 Compass symbol upon acquisition.",
-    science: { type: "Compass" },
+    science: { Compass: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -932,7 +932,7 @@ export const cards: Card[] = [
   {
     name: "Library",
     description: "Grants 1 Tablet symbol upon acquisition.",
-    science: { type: "Tablet" },
+    science: { Tablet: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -946,7 +946,7 @@ export const cards: Card[] = [
   {
     name: "School",
     description: "Grants 1 Tablet symbol upon acquisition.",
-    science: { type: "Tablet" },
+    science: { Tablet: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -960,7 +960,7 @@ export const cards: Card[] = [
   {
     name: "Laboratory",
     description: "Grants 1 Cog symbol upon acquisition.",
-    science: { type: "Cog" },
+    science: { Cog: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -974,7 +974,7 @@ export const cards: Card[] = [
   {
     name: "Lodge",
     description: "Grants 1 Compass symbol upon acquisition.",
-    science: { type: "Compass" },
+    science: { Compass: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -988,7 +988,7 @@ export const cards: Card[] = [
   {
     name: "Observatory",
     description: "Grants 1 Cog symbol upon acquisition.",
-    science: { type: "Cog" },
+    science: { Cog: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -1002,7 +1002,7 @@ export const cards: Card[] = [
   {
     name: "University",
     description: "Grants 1 Tablet symbol upon acquisition.",
-    science: { type: "Tablet" },
+    science: { Tablet: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -1015,7 +1015,7 @@ export const cards: Card[] = [
   {
     name: "Academy",
     description: "Grants 1 Compass symbol upon acquisition.",
-    science: { type: "Compass" },
+    science: { Compass: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -1029,7 +1029,7 @@ export const cards: Card[] = [
   {
     name: "Study",
     description: "Grants 1 Cog symbol upon acquisition.",
-    science: { type: "Cog" },
+    science: { Cog: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },

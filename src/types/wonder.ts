@@ -1,5 +1,5 @@
 import { Resource, Production } from "./resource";
-import { Gold, Science, VictoryPoints } from "./resource"
+import { Gold, Science, Shields, VictoryPoints } from "./resource"
 
 export interface WonderStage {
     stage: number;
@@ -7,7 +7,8 @@ export interface WonderStage {
     production?: Production;
     victoryPoints?: VictoryPoints;
     gold?: Gold;
-    science?: Science
+    science?: Science;
+    shields?: Shields;
 }
 
 export interface Wonder {

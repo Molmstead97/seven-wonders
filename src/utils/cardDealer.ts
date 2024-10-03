@@ -2,7 +2,8 @@ import { Card } from "../types/card";
 import { cards } from "../data/cards";
 
 export function dealCards(numPlayers: number, age: number): Card[] {
-  // Filter purple cards
+  
+    // Filter purple cards
   const purpleCards = cards.filter((card) => card.color === "Purple");
 
   // Shuffle purple cards
