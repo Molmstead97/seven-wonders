@@ -13,6 +13,6 @@ export interface Player {
   victoryPoints: VictoryPoints;
   science: Science;
   military: Shields;
-  leftPlayer: Player | null;
-  rightPlayer: Player | null;
+  leftPlayer: Player;
+  rightPlayer: Player;
 }

@@ -1,35 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { Card } from '../types/card';
-import { Resource, ResourceType, Gold, VictoryPoints, Science, Shields, Production } from '../types/resource';
-import { Wonder } from '../types/wonder';
-import { Player } from '../types/player';
-import GameBoard from './GameBoard';
-import PlayerArea from './PlayerArea';
-import PlayerHand from './PlayerHand';
-import ActionPanel from './components/ActionPanel';
-import { dealCards } from '../utils/cardDealer';
-import { setupPlayers } from '../utils/setupPlayers';
+import React, { useState, useEffect } from "react";
+import { Card } from "../types/card";
+import { Player } from "../types/player";
+import { playCard } from "../utils/cardActions";
+//import GameBoard from "./GameBoard";
+//import PlayerArea from "./PlayerArea";
+//import PlayerHand from "./PlayerHand";
+//import ActionPanel from "./components/ActionPanel";
+import { dealCards } from "../utils/cardDealer";
+import { setupPlayers } from "../utils/setupPlayers";
 
 interface InitialGameState {
   age: number;
   players: Player[];
-  deck: Card[];
   discardPile: Card[];
 }
 
 const Game: React.FC = () => {
   const [gameState, setGameState] = useState<InitialGameState | null>(null);
-  
-  const initializeGame = (numPlayers: number, age: number): InitialGameState => {
+
+  const initializeGame = (
+    numPlayers: number,
+    age: number
+  ): InitialGameState => {
     const players = setupPlayers();
-    
-    
-    const initialCards: Card[] = dealCards(numPlayers, age);
+    dealCards(numPlayers, age);
+    const discardPile = [];
 
     return {
       age: 1,
       players,
-      deck: initialCards,
       discardPile: [],
       // ... other game state properties
     };
@@ -40,104 +39,101 @@ const Game: React.FC = () => {
     setGameState(gameState);
   }, []);
 
-  /*const handleCardPlay = (card: Card) => {
-    function playCard(player: Player, card: Card) {
-        // Add the card to the player's board
-        player.playerBoard.push(card);
-        
-        // Apply the effects of the card
-        applyCardEffects(player, card);
-        
-        // Remove the card from the player's hand
-        const index = player.playerHand.indexOf(card);
-        if (index > -1) {
-          player.playerHand.splice(index, 1);
-        }
-      }
-      
-      function applyCardEffects(player: Player, card: Card) {
-        // Apply resource production
-        if (card.production) {
-          applyProduction(player, card.production);
-        }
-      
-        // Apply victory points
-        if (card.victoryPoints) {
-          player.victoryPoints.victoryPoints += card.victoryPoints.victoryPoints;
-        }
-      
-        // Apply gold
-        if (card.gold) {
-          player.coin.gold += card.gold.gold;
-        }
-      
-        // Apply science
-        if (card.science) {
-          player.science[card.science.type]++;
-        }
-      
-        // Apply shields
-        if (card.shields) {
-          player.military.shields += card.shields.shields;
-        }
-      }
-      
-      function applyProduction(player: Player, production: Production) {
-        // Handle resource production based on card effects
-        Object.entries(production).forEach(([resource, amount]) => {
-          if (amount !== undefined) {
-            player.resources[resource as ResourceType] = 
-              (player.resources[resource as ResourceType] || 0) + amount;
-          }
-        });
-      }
-      
-  }; */
+  const handleCardPlay = (playerId: number, cardIndex: number) => {
+    if (gameState) {
+      setGameState((prevState) => {
+        const newState = { ...prevState! };
+        const player = newState.players[playerId];
+        const card = player.playerHand[cardIndex];
 
-  const handleWonderBuild = () => {
-    // Logic for building a wonder stage
-  };
+        const updatedPlayer = playCard(player, card);
+        newState.players[playerId] = updatedPlayer;
 
-  const handleCardDiscard = (card: Card) => {
-    const index = this.playerHand.indexOf(card);
-    if (index > -1) {
-      this.playerHand.splice(index, 1);
+        return newState;
+      });
     }
-    this.coin.gold += 3;
   };
 
-  const handleResourceTrade = () => {
+  /*const handleWonderBuild = () => {
+    // Logic for building a wonder stage
+  };*/
+
+  /*const handleCardDiscard = (card: Card) => {
+    // Logic for discarding a card
+  };*/
+
+  /*const handleResourceTrade = () => {
     // Logic for trading with players
-  };
+  };*/
 
   const handlePassHand = () => {
-    // Logic for passing the hand
+    if (gameState) {
+      const { age, players } = gameState; // Destructure 'age' and 'players' from 'gameState'
+      const direction = age === 2 ? -1 : 1; // Determine the direction of hand passing: left (-1) for Age 2, right (1) for Ages 1 and 3
+
+      const newHands = players.map((_, index) => {
+        const nextPlayerIndex =
+          (index + direction + players.length) % players.length; // Calculate the index of the next player
+
+        return players[nextPlayerIndex].playerHand; // Return the hand of the next player (in the determined direction) to be passed to the current player
+      });
+
+      setGameState((prevState) => ({
+        ...prevState!,
+        players: prevState!.players.map((player, index) => ({
+          ...player,
+          playerHand: newHands[index],
+        })),
+      }));
+    }
   };
 
-  const regenerateResources = () => {
+  /*const regenerateResources = () => {
     // Logic for regenerating resources at the start of the round
-  };
+  };*/
 
   const handleAgeEnd = () => {
-    // Logic for ending the age
-  };
+    if (gameState) {
+      const { age, players } = gameState; // Destructure age and players from gameState
 
-  const handleEndGame = () => {
+      for (const player of players) {
+        if (
+          player.military.shields > player.rightPlayer.military.shields ??
+          0
+        ) {
+          player.victoryPoints.victoryPoints += 1;
+        } else if (
+          player.military.shields < player.rightPlayer.military.shields ??
+          0
+        ) {
+          player.victoryPoints.victoryPoints -= 1;
+        }
+
+        // Compare shields with left neighbor
+        if (player.military.shields > player.leftPlayer.military.shields) {
+          player.victoryPoints.victoryPoints += 1;
+        } else if (
+          player.military.shields < player.leftPlayer.military.shields
+        ) {
+          player.victoryPoints.victoryPoints -= 1;
+        }
+
+        // Adjust victory points based on age
+        if (age === 2) {
+          player.victoryPoints.victoryPoints +=
+            player.victoryPoints.victoryPoints * 3;
+        } else if (age === 3) {
+          player.victoryPoints.victoryPoints +=
+            player.victoryPoints.victoryPoints * 5;
+        }
+      }
+    }
+  };
+  /*const handleEndGame = () => {
     // Logic for ending the game
-  };
+  };*/
 
-  return (
-    <>
-      
-    </>
-  );
+  return <div>{/* Render your game state or other components here */}</div>;
 };
 
 export default Game;
-
-
-
-
-
-
-
