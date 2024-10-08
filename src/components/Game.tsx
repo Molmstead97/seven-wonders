@@ -6,38 +6,37 @@ import { playCard } from "../utils/cardActions";
 //import PlayerArea from "./PlayerArea";
 //import PlayerHand from "./PlayerHand";
 //import ActionPanel from "./components/ActionPanel";
-import { dealCards } from "../utils/cardDealer";
+import { dealCards } from "../utils/dealCards";
 import { setupPlayers } from "../utils/setupPlayers";
 
-interface InitialGameState {
+export interface InitialGameState {
   age: number;
   players: Player[];
   discardPile: Card[];
 }
 
-const Game: React.FC = () => {
-  const [gameState, setGameState] = useState<InitialGameState | null>(null);
+export const initializeGame = (
+  numPlayers: number,
+  age: number
+): InitialGameState => {
+  const players = setupPlayers();
+  dealCards(numPlayers, age);
+  const discardPile = [];
 
-  const initializeGame = (
-    numPlayers: number,
-    age: number
-  ): InitialGameState => {
-    const players = setupPlayers();
-    dealCards(numPlayers, age);
-    const discardPile = [];
-
-    return {
-      age: 1,
-      players,
-      discardPile: [],
-      // ... other game state properties
-    };
+  return {
+    age: 1,
+    players,
+    discardPile: [],
+    // ... other game state properties
   };
+};
 
-  useEffect(() => {
-    const gameState = initializeGame(4, 1); // Example with 4 players, age 1
-    setGameState(gameState);
-  }, []);
+interface GameProps {
+  initialGameState: InitialGameState;
+}
+
+const Game: React.FC<GameProps> = ({ initialGameState }) => {
+  const [gameState, setGameState] = useState<InitialGameState>(initialGameState);
 
   const handleCardPlay = (playerId: number, cardIndex: number) => {
     if (gameState) {
@@ -98,13 +97,12 @@ const Game: React.FC = () => {
 
       for (const player of players) {
         if (
-          player.military.shields > player.rightPlayer.military.shields ??
-          0
+          player.military.shields > player.rightPlayer.military.shields
+          
         ) {
           player.victoryPoints.victoryPoints += 1;
         } else if (
-          player.military.shields < player.rightPlayer.military.shields ??
-          0
+          player.military.shields < player.rightPlayer.military.shields
         ) {
           player.victoryPoints.victoryPoints -= 1;
         }

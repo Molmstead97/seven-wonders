@@ -1,6 +1,6 @@
 import { Player } from "../types/player";
 import { Card } from "../types/card";
-import { pickWonders } from "./wonderPicker";
+import { pickWonders } from "./pickWonders";
 import { Resource } from "../types/resource";
 
 export const setupPlayers = () => {
