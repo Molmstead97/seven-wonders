@@ -9,10 +9,12 @@ export interface WonderStage {
     gold?: Gold;
     science?: Science;
     shields?: Shields;
+    //specialEffect?: SpecialEffect; // TODO: Figure out how the heck to do this
 }
 
 export interface Wonder {
     name: string;
     production: Production;
     wonderStages: WonderStage[];
+    builtStages: WonderStage[];
 }

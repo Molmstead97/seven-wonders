@@ -1,5 +1,7 @@
 import { Wonder } from "../types/wonder";
 
+// TODO: Add special effects to wonders
+
 export const wonders: Wonder[] = [
   {
     name: "Alexandria A",
@@ -29,6 +31,7 @@ export const wonders: Wonder[] = [
         victoryPoints: { victoryPoints: 7 },
       },
     ],
+    builtStages: [],
   },
   {
     name: "Alexandria B",
@@ -65,6 +68,7 @@ export const wonders: Wonder[] = [
         victoryPoints: { victoryPoints: 7 },
       },
     ],
+    builtStages: [],
   },
   {
     name: "Babylon A",
@@ -85,6 +89,7 @@ export const wonders: Wonder[] = [
         victoryPoints: { victoryPoints: 7 },
       },
     ],
+    builtStages: [],
   },
   {
     name: "Babylon B",
@@ -113,6 +118,7 @@ export const wonders: Wonder[] = [
         },
       },
     ],
+    builtStages: [],
   },
   {
     name: "Éphesos A",
@@ -134,6 +140,7 @@ export const wonders: Wonder[] = [
         victoryPoints: { victoryPoints: 7 },
       },
     ],
+    builtStages: [],
   },
   {
     name: "Éphesos B",
@@ -162,6 +169,7 @@ export const wonders: Wonder[] = [
         gold: { gold: 4 },
       },
     ],
+    builtStages: [],
   },
   {
     name: "Gizah A",
@@ -183,6 +191,7 @@ export const wonders: Wonder[] = [
         victoryPoints: { victoryPoints: 7 },
       },
     ],
+    builtStages: [],
   },
   {
     name: "Gizah B",
@@ -209,6 +218,7 @@ export const wonders: Wonder[] = [
         victoryPoints: { victoryPoints: 7 },
       },
     ],
+    builtStages: [],
   },
   {
     name: "Halikarnassós A",
@@ -230,6 +240,7 @@ export const wonders: Wonder[] = [
         victoryPoints: { victoryPoints: 7 },
       },
     ],
+    builtStages: [],
   },
   {
     name: "Halikarnassós B",
@@ -253,6 +264,7 @@ export const wonders: Wonder[] = [
         /* Add special effect here */
       },
     ],
+    builtStages: [],
   },
   {
     name: "Olympía A",
@@ -274,6 +286,7 @@ export const wonders: Wonder[] = [
         victoryPoints: { victoryPoints: 7 },
       },
     ],
+    builtStages: [],
   },
   {
     name: "Olympía B",
@@ -295,6 +308,7 @@ export const wonders: Wonder[] = [
         /* Add special effect here */
       },
     ],
+    builtStages: [],
   },
   {
     name: "Rhódos A",
@@ -316,6 +330,7 @@ export const wonders: Wonder[] = [
         victoryPoints: { victoryPoints: 7 },
       },
     ],
+    builtStages: [],
   },
   {
     name: "Rhódos B",
@@ -336,5 +351,6 @@ export const wonders: Wonder[] = [
         shields: { shields: 1 },
       },
     ],
+    builtStages: [],
   },
 ];

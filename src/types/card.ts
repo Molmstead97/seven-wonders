@@ -20,6 +20,7 @@ export interface Card {
   gold?: Gold;
   science?: Science;
   shields?: Shields;
+  //specialEffect?: SpecialEffect;
   playerCount?: PlayerCountThreshold[];
   upgradeCard: boolean;
   cost: Resource | Gold | null;

@@ -3,6 +3,8 @@ import { Card } from "../types/card";
 import { pickWonders } from "./pickWonders";
 import { Resource } from "../types/resource";
 
+// NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET, MAKE SURE TO DOUBLE CHECK LEFT AND RIGHT PLAYER ASSIGNMENTS
+
 export const setupPlayers = () => {
   let howManyAIPlayers;
   let players: Player[] = []; // Initialize players array
@@ -35,6 +37,15 @@ export const setupPlayers = () => {
     playerBoard: new Set<Card>(),
     playerHand: [],
     resources: {
+      Wood: 0,
+      Stone: 0,
+      Ore: 0,
+      Clay: 0,
+      Glass: 0,
+      Papyrus: 0,
+      Cloth: 0,
+    },
+    tempResources: {
       Wood: 0,
       Stone: 0,
       Ore: 0,
@@ -86,6 +97,15 @@ export const setupPlayers = () => {
         Papyrus: 0,
         Cloth: 0,
       },
+      tempResources: {
+        Wood: 0,
+        Stone: 0,
+        Ore: 0,
+        Clay: 0,
+        Glass: 0,
+        Papyrus: 0,
+        Cloth: 0,
+      },
       coin: { gold: 3 },
       victoryPoints: { victoryPoints: 0 },
       science: {
@@ -113,6 +133,7 @@ export const setupPlayers = () => {
     players.push(aiPlayer);
   }
 
+  // Initialize leftPlayer and rightPlayer for each player
   for (let i = 0; i < players.length; i++) {
     const currentPlayer = players[i];
     const leftIndex = (i - 1 + players.length) % players.length; // Handles wrap-around

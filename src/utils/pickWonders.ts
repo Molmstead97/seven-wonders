@@ -1,6 +1,9 @@
 import { Wonder } from "../types/wonder";
 import { wonders } from "../data/wonders";
 
+
+// NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
+
 // Function to shuffle an array (Fisher-Yates Shuffle)
 function shuffleArray<T>(array: T[]): T[] {
   return array

@@ -9,6 +9,7 @@ export interface Player {
   playerBoard: Set<Card>;
   playerHand: Card[];
   resources: Resource;
+  tempResources: Resource;
   coin: Gold;
   victoryPoints: VictoryPoints;
   science: Science;

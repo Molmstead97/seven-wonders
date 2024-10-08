@@ -1,6 +1,8 @@
 import { Card } from "../types/card";
 import { cards } from "../data/cards";
 
+// NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
+
 export function dealCards(numPlayers: number, age: number): Card[] {
   
     // Filter purple cards
