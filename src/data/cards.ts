@@ -1,5 +1,7 @@
 import { Card } from "../types/card";
 
+// TODO: Add special effects to cards
+
 export const cards: Card[] = [
   {
     /* ALL BROWN CARDS */
@@ -13,7 +15,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: null,
     age: 1,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
@@ -27,7 +29,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: null,
     age: 1,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
@@ -41,7 +43,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: null,
     age: 1,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
@@ -55,145 +57,90 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: null,
     age: 1,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
     name: "Tree Farm",
     description: "Produces 1 Wood or Clay per turn.",
     production: {
-      type: "option",
-      options: [
-        {
-          resource: "Wood",
-          amount: 1,
-        },
-        {
-          resource: "Clay",
-          amount: 1,
-        },
-      ],
+      resources: ["Wood", "Clay"],
     },
+
     playerCount: [{ minPlayers: 6, copies: 1 }],
     upgradeCard: false,
     cost: { gold: 1 },
     age: 1,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
     name: "Excavation",
     description: "Produces 1 Stone or Clay per turn.",
     production: {
-      type: "option",
-      options: [
-        {
-          resource: "Stone",
-          amount: 1,
-        },
-        {
-          resource: "Clay",
-          amount: 1,
-        },
-      ],
+      resources: ["Stone", "Clay"],
     },
+
     playerCount: [{ minPlayers: 4, copies: 1 }],
     upgradeCard: false,
     cost: { gold: 1 },
     age: 1,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
     name: "Clay Pit",
     description: "Produces 1 Clay or Ore per turn.",
     production: {
-      type: "option",
-      options: [
-        {
-          resource: "Clay",
-          amount: 1,
-        },
-        {
-          resource: "Ore",
-          amount: 1,
-        },
-      ],
+      resources: ["Clay", "Ore"],
     },
+
     playerCount: [{ minPlayers: 3, copies: 1 }],
     upgradeCard: false,
     cost: { gold: 1 },
     age: 1,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
     name: "Timber Yard",
     description: "Produces 1 Stone or Wood per turn.",
     production: {
-      type: "option",
-      options: [
-        {
-          resource: "Stone",
-          amount: 1,
-        },
-        {
-          resource: "Wood",
-          amount: 1,
-        },
-      ],
+      resources: ["Stone", "Wood"],
     },
     playerCount: [{ minPlayers: 3, copies: 1 }],
     upgradeCard: false,
     cost: { gold: 1 },
     age: 1,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
     name: "Forest Cave",
     description: "Produces 1 Wood or Ore per turn.",
     production: {
-      type: "option",
-      options: [
-        {
-          resource: "Wood",
-          amount: 1,
-        },
-        {
-          resource: "Ore",
-          amount: 1,
-        },
-      ],
+      resources: ["Wood", "Ore"],
     },
+
     playerCount: [{ minPlayers: 5, copies: 1 }],
     upgradeCard: false,
     cost: { gold: 1 },
     age: 1,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
     name: "Mine",
     description: "Produces 1 Ore or Stone per turn.",
     production: {
-      type: "option",
-      options: [
-        {
-          resource: "Ore",
-          amount: 1,
-        },
-        {
-          resource: "Stone",
-          amount: 1,
-        },
-      ],
+      resources: ["Ore", "Stone"],
     },
+
     playerCount: [{ minPlayers: 5, copies: 1 }],
     upgradeCard: false,
     cost: { gold: 1 },
     age: 1,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
@@ -207,7 +154,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { gold: 1 },
     age: 2,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
@@ -221,7 +168,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { gold: 1 },
     age: 2,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
@@ -235,7 +182,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { gold: 1 },
     age: 2,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   {
@@ -249,7 +196,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { gold: 1 },
     age: 2,
-    color: "Brown",
+    cardColor: "Brown",
   },
 
   /* ALL GRAY CARDS */
@@ -257,7 +204,7 @@ export const cards: Card[] = [
   {
     name: "Loom",
     description: "Produces 1 Cloth per turn.",
-    production: { Cloth: 1 },
+    production: { Textile: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -265,7 +212,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: null,
     age: 1,
-    color: "Grey",
+    cardColor: "Grey",
     ageVariant: { age: 2, maxPlayers: 5 },
   },
 
@@ -280,7 +227,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: null,
     age: 1,
-    color: "Grey",
+    cardColor: "Grey",
     ageVariant: { age: 2, maxPlayers: 5 },
   },
 
@@ -295,7 +242,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: null,
     age: 1,
-    color: "Grey",
+    cardColor: "Grey",
     ageVariant: { age: 2, maxPlayers: 5 },
   },
 
@@ -312,7 +259,7 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: null,
     age: 1,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   {
@@ -326,7 +273,7 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: { Stone: 1 },
     age: 1,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   {
@@ -340,7 +287,7 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: null,
     age: 1,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   {
@@ -354,7 +301,7 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: null,
     age: 1,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   {
@@ -368,7 +315,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Stone: 3 },
     age: 2,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   {
@@ -382,7 +329,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Wood: 1, Clay: 1, Glass: 1 },
     age: 2,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   {
@@ -396,7 +343,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Ore: 2, Wood: 1 },
     age: 2,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   {
@@ -408,9 +355,9 @@ export const cards: Card[] = [
       { minPlayers: 5, copies: 2 },
     ],
     upgradeCard: false,
-    cost: { Clay: 2, Cloth: 1 },
+    cost: { Clay: 2, Textile: 1 },
     age: 2,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   {
@@ -422,9 +369,9 @@ export const cards: Card[] = [
       { minPlayers: 6, copies: 2 },
     ],
     upgradeCard: false,
-    cost: { Clay: 2, Ore: 1, Glass: 1, Cloth: 1, Papyrus: 1 },
+    cost: { Clay: 2, Ore: 1, Glass: 1, Textile: 1, Papyrus: 1 },
     age: 3,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   {
@@ -438,7 +385,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Clay: 2, Wood: 1 },
     age: 3,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   {
@@ -453,7 +400,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Stone: 2, Ore: 1, Glass: 1 },
     age: 3,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   {
@@ -471,11 +418,11 @@ export const cards: Card[] = [
       Ore: 1,
       Wood: 1,
       Glass: 1,
-      Cloth: 1,
+      Textile: 1,
       Papyrus: 1,
     },
     age: 3,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   {
@@ -490,7 +437,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Wood: 2, Ore: 1, Stone: 1 },
     age: 3,
-    color: "Blue",
+    cardColor: "Blue",
   },
 
   /* ALL YELLOW CARDS */
@@ -507,13 +454,18 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: null,
     age: 1,
-    color: "Yellow",
+    cardColor: "Yellow",
   },
 
   {
     name: "East Trading Post",
     description:
       "You may purchase raw materials from the neighboring city to your right for 1 coin instead of 2.",
+    specialEffect: {
+      type: "trade",
+      neighbor: "right",
+      resource: ["Wood", "Stone", "Clay", "Ore"],
+    },
 
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -522,14 +474,18 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: null,
     age: 1,
-    color: "Yellow",
+    cardColor: "Yellow",
   },
 
   {
     name: "West Trading Post",
     description:
       "You may purchase raw materials from the neighboring city to your left for 1 coin instead of 2.",
-
+    specialEffect: {
+      type: "trade",
+      neighbor: "left",
+      resource: ["Wood", "Stone", "Clay", "Ore"],
+    },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -537,14 +493,18 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: null,
     age: 1,
-    color: "Yellow",
+    cardColor: "Yellow",
   },
 
   {
     name: "Marketplace",
     description:
       "You may purchase manufactured goods from either neighboring city for 1 coin instead of 2.",
-
+    specialEffect: {
+      type: "trade",
+      neighbor: "both",
+      resource: ["Glass", "Textile", "Papyrus"],
+    },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -552,29 +512,16 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: null,
     age: 1,
-    color: "Yellow",
+    cardColor: "Yellow",
   },
 
   {
     name: "Forum",
     description: "Produces 1 Glass, Cloth, or Papyrus per turn.",
     production: {
-      type: "option",
-      options: [
-        {
-          resource: "Glass",
-          amount: 1,
-        },
-        {
-          resource: "Cloth",
-          amount: 1,
-        },
-        {
-          resource: "Papyrus",
-          amount: 1,
-        },
-      ],
+      resources: ["Glass", "Textile", "Papyrus"],
     },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -583,32 +530,14 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: { Clay: 2 },
     age: 2,
-    color: "Yellow",
+    cardColor: "Yellow",
   },
 
   {
     name: "Caravansery",
     description: "Produces 1 Wood, Ore, Clay, or Stone per turn.",
     production: {
-      type: "option",
-      options: [
-        {
-          resource: "Wood",
-          amount: 1,
-        },
-        {
-          resource: "Ore",
-          amount: 1,
-        },
-        {
-          resource: "Clay",
-          amount: 1,
-        },
-        {
-          resource: "Stone",
-          amount: 1,
-        },
-      ],
+      resources: ["Wood", "Ore", "Clay", "Stone"],
     },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -618,14 +547,19 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: { Wood: 2 },
     age: 2,
-    color: "Yellow",
+    cardColor: "Yellow",
   },
 
   {
     name: "Vineyard",
     description:
       "Upon acquisition, grants gold per brown card built by you and neighboring cities.",
-
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Brown"],
+      gold: { gold: 1 },
+      scope: "all",
+    },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -633,14 +567,39 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: null,
     age: 2,
-    color: "Yellow",
+    cardColor: "Yellow",
+  },
+
+  {
+    name: "Vineyard",
+    description:
+      "Upon acquisition, grants gold per brown card built by you and neighboring cities.",
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Brown"],
+      gold: { gold: 1 },
+      scope: "all",
+    },
+    playerCount: [
+      { minPlayers: 3, copies: 1 },
+      { minPlayers: 6, copies: 2 },
+    ],
+    upgradeCard: false,
+    cost: null,
+    age: 2,
+    cardColor: "Yellow",
   },
 
   {
     name: "Bazaar",
     description:
       "Upon acquisition, grants 2 gold per grey card built by you and neighboring cities.",
-
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Grey"],
+      gold: { gold: 2 },
+      scope: "all",
+    },
     playerCount: [
       { minPlayers: 4, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -648,29 +607,41 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: null,
     age: 2,
-    color: "Yellow",
+    cardColor: "Yellow",
   },
 
   {
     name: "Haven",
     description:
       "Upon acquisition, grants gold per brown card you've built. Worth 1 Victory Point per brown card you've built at the end of the game.",
-
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Brown"],
+      gold: { gold: 1 },
+      victoryPoints: { victoryPoints: 1 },
+      scope: "self",
+    },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
     ],
     upgradeCard: false,
-    cost: { Ore: 1, Wood: 1, Cloth: 1 },
+    cost: { Ore: 1, Wood: 1, Textile: 1 },
     age: 3,
-    color: "Yellow",
+    cardColor: "Yellow",
   },
 
   {
     name: "Lighthouse",
     description:
       "Upon acquisition, grants gold per yellow card you've built. Worth 1 Victory Point per yellow card you've built at the end of the game.",
-
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Yellow"],
+      gold: { gold: 1 },
+      victoryPoints: { victoryPoints: 1 },
+      scope: "self",
+    },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -678,14 +649,20 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Stone: 1, Glass: 1 },
     age: 3,
-    color: "Yellow",
+    cardColor: "Yellow",
   },
 
   {
     name: "Chamber of Commerce",
     description:
       "Upon acquisition, grants 2 gold per grey card you've built. Worth 2 Victory Points per grey card you've built at the end of the game.",
-
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Grey"],
+      gold: { gold: 2 },
+      victoryPoints: { victoryPoints: 2 },
+      scope: "self",
+    },
     playerCount: [
       { minPlayers: 4, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -693,14 +670,14 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Clay: 2, Papyrus: 1 },
     age: 3,
-    color: "Yellow",
+    cardColor: "Yellow",
   },
 
   {
     name: "Arena",
     description:
       "Upon acquisition, grants 3 gold per Wonder stage you've constructed. Worth 1 Victory Point per Wonder stage you've constructed at the end of the game.",
-
+    // TODO: ADD THIS EFFECT LATER
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -709,7 +686,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Stone: 2, Ore: 1 },
     age: 3,
-    color: "Yellow",
+    cardColor: "Yellow",
   },
 
   /* ALL RED CARDS */
@@ -725,7 +702,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Wood: 1 },
     age: 1,
-    color: "Red",
+    cardColor: "Red",
   },
 
   {
@@ -739,7 +716,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Ore: 1 },
     age: 1,
-    color: "Red",
+    cardColor: "Red",
   },
 
   {
@@ -753,7 +730,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Clay: 1 },
     age: 1,
-    color: "Red",
+    cardColor: "Red",
   },
 
   {
@@ -767,7 +744,7 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: { Stone: 3 },
     age: 2,
-    color: "Red",
+    cardColor: "Red",
   },
 
   {
@@ -782,7 +759,7 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: { Ore: 2, Wood: 1 },
     age: 2,
-    color: "Red",
+    cardColor: "Red",
   },
 
   {
@@ -796,7 +773,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Ore: 1, Clay: 1, Wood: 1 },
     age: 2,
-    color: "Red",
+    cardColor: "Red",
   },
 
   {
@@ -810,7 +787,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Wood: 3 },
     age: 2,
-    color: "Red",
+    cardColor: "Red",
   },
 
   {
@@ -824,7 +801,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Ore: 3, Stone: 1 },
     age: 3,
-    color: "Red",
+    cardColor: "Red",
   },
 
   {
@@ -839,7 +816,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Stone: 3, Ore: 1 },
     age: 3,
-    color: "Red",
+    cardColor: "Red",
   },
 
   {
@@ -852,9 +829,9 @@ export const cards: Card[] = [
       { minPlayers: 7, copies: 3 },
     ],
     upgradeCard: false,
-    cost: { Ore: 1, Wood: 2, Cloth: 1 },
+    cost: { Ore: 1, Wood: 2, Textile: 1 },
     age: 3,
-    color: "Red",
+    cardColor: "Red",
   },
 
   {
@@ -868,7 +845,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Wood: 1, Clay: 3 },
     age: 3,
-    color: "Red",
+    cardColor: "Red",
   },
 
   /* ALL GREEN CARDS */
@@ -884,7 +861,7 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: null,
     age: 1,
-    color: "Green",
+    cardColor: "Green",
   },
 
   {
@@ -898,7 +875,7 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: null,
     age: 1,
-    color: "Green",
+    cardColor: "Green",
   },
 
   {
@@ -912,7 +889,7 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: null,
     age: 1,
-    color: "Green",
+    cardColor: "Green",
   },
 
   {
@@ -926,7 +903,7 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: { Ore: 2, Glass: 1 },
     age: 2,
-    color: "Green",
+    cardColor: "Green",
   },
 
   {
@@ -938,9 +915,9 @@ export const cards: Card[] = [
       { minPlayers: 6, copies: 2 },
     ],
     upgradeCard: true,
-    cost: { Stone: 2, Cloth: 1 },
+    cost: { Stone: 2, Textile: 1 },
     age: 2,
-    color: "Green",
+    cardColor: "Green",
   },
 
   {
@@ -954,7 +931,7 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: { Wood: 1, Papyrus: 1 },
     age: 2,
-    color: "Green",
+    cardColor: "Green",
   },
 
   {
@@ -968,7 +945,7 @@ export const cards: Card[] = [
     upgradeCard: true,
     cost: { Clay: 2, Papyrus: 1 },
     age: 2,
-    color: "Green",
+    cardColor: "Green",
   },
 
   {
@@ -980,9 +957,9 @@ export const cards: Card[] = [
       { minPlayers: 6, copies: 2 },
     ],
     upgradeCard: false,
-    cost: { Clay: 2, Cloth: 1, Papyrus: 1 },
+    cost: { Clay: 2, Textile: 1, Papyrus: 1 },
     age: 3,
-    color: "Green",
+    cardColor: "Green",
   },
 
   {
@@ -994,9 +971,9 @@ export const cards: Card[] = [
       { minPlayers: 7, copies: 2 },
     ],
     upgradeCard: false,
-    cost: { Ore: 2, Glass: 1, Cloth: 1 },
+    cost: { Ore: 2, Glass: 1, Textile: 1 },
     age: 3,
-    color: "Green",
+    cardColor: "Green",
   },
 
   {
@@ -1010,7 +987,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Wood: 2, Papyrus: 1, Glass: 1 },
     age: 3,
-    color: "Green",
+    cardColor: "Green",
   },
   {
     name: "Academy",
@@ -1023,7 +1000,7 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Stone: 3, Glass: 1 },
     age: 3,
-    color: "Green",
+    cardColor: "Green",
   },
 
   {
@@ -1035,9 +1012,9 @@ export const cards: Card[] = [
       { minPlayers: 5, copies: 2 },
     ],
     upgradeCard: false,
-    cost: { Wood: 1, Papyrus: 1, Cloth: 1 },
+    cost: { Wood: 1, Papyrus: 1, Textile: 1 },
     age: 3,
-    color: "Green",
+    cardColor: "Green",
   },
 
   /* ALL PURPLE CARDS */
@@ -1046,90 +1023,134 @@ export const cards: Card[] = [
     name: "Workers Guild",
     description:
       "Grants 1 Victory Point per brown card built in neighboring cities at the end of the game.",
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Brown"],
+      victoryPoints: { victoryPoints: 1 },
+      scope: "neighbors",
+    },
     upgradeCard: false,
     cost: { Ore: 2, Clay: 1, Stone: 1, Wood: 1 },
     age: 3,
-    color: "Purple",
+    cardColor: "Purple",
   },
 
   {
     name: "Craftsmen Guild",
     description:
-      "Grants 2 Victory Points per grey card built in both neighboring cities at the end of the game.",
+      "Grants 2 Victory Points per grey card built in neighboring cities at the end of the game.",
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Grey"],
+      victoryPoints: { victoryPoints: 2 },
+      scope: "neighbors",
+    },
     upgradeCard: false,
     cost: { Ore: 2, Stone: 2 },
     age: 3,
-    color: "Purple",
+    cardColor: "Purple",
   },
 
   {
     name: "Traders Guild",
     description:
       "Grants 1 Victory Point per yellow card built in neighboring cities at the end of the game.",
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Yellow"],
+      victoryPoints: { victoryPoints: 1 },
+      scope: "neighbors",
+    },
     upgradeCard: false,
-    cost: { Cloth: 1, Glass: 1, Papyrus: 1 },
+    cost: { Textile: 1, Glass: 1, Papyrus: 1 },
     age: 3,
-    color: "Purple",
+    cardColor: "Purple",
   },
 
   {
     name: "Philosophers Guild",
     description:
       "Grants 1 Victory Point per green card built in neighboring cities at the end of the game.",
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Green"],
+      victoryPoints: { victoryPoints: 1 },
+      scope: "neighbors",
+    },
     upgradeCard: false,
-    cost: { Clay: 3, Cloth: 1, Papyrus: 3 },
+    cost: { Clay: 3, Textile: 1, Papyrus: 3 },
     age: 3,
-    color: "Purple",
+    cardColor: "Purple",
   },
 
   {
     name: "Spy Guild",
     description:
       "Grants 1 Victory Point per red card built in neighboring cities at the end of the game.",
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Red"],
+      victoryPoints: { victoryPoints: 1 },
+      scope: "neighbors",
+    },
     upgradeCard: false,
     cost: { Clay: 3, Glass: 1 },
     age: 3,
-    color: "Purple",
+    cardColor: "Purple",
   },
 
   {
     name: "Strategy Guild",
     description:
       "Grants 1 Victory Point for each conflict loss in neighboring cities at the end of the game.",
+    // TODO: Add this effect later
     upgradeCard: false,
-    cost: { Ore: 2, Stone: 1, Cloth: 1 },
+    cost: { Ore: 2, Stone: 1, Textile: 1 },
     age: 3,
-    color: "Purple",
+    cardColor: "Purple",
   },
 
   {
     name: "Shipowners Guild",
     description:
       "Grants 1 Victory Point for each brown, grey, and guild card you've built at the end of the game.",
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Brown", "Grey", "Purple"],
+      victoryPoints: { victoryPoints: 1 },
+      scope: "self",
+    },
     upgradeCard: false,
     cost: { Wood: 3, Papyrus: 1, Glass: 1 },
     age: 3,
-    color: "Purple",
+    cardColor: "Purple",
   },
 
   {
     name: "Magistrates Guild",
     description:
       "Grants 1 Victory Point per blue card built by neighboring cities at the end of the game.",
+    specialEffect: {
+      type: "goldVictoryBonus",
+      cardColor: ["Blue"],
+      victoryPoints: { victoryPoints: 1 },
+      scope: "neighbors",
+    },
     upgradeCard: false,
-    cost: { Wood: 3, Stone: 1, Cloth: 1 },
+    cost: { Wood: 3, Stone: 1, Textile: 1 },
     age: 3,
-    color: "Purple",
+    cardColor: "Purple",
   },
 
   {
     name: "Scientists Guild",
     description:
       "Grants either 1 Compass, Cog, or Tablet at the end of the game.",
+    specialEffect: { type: "science", symbol: ["Compass", "Cog", "Tablet"] },
     upgradeCard: false,
     cost: { Wood: 2, Ore: 2, Papyrus: 1 },
     age: 3,
-    color: "Purple",
+    cardColor: "Purple",
   },
 
   {
@@ -1139,6 +1160,6 @@ export const cards: Card[] = [
     upgradeCard: false,
     cost: { Stone: 2, Clay: 2, Glass: 1 },
     age: 3,
-    color: "Purple",
+    cardColor: "Purple",
   },
 ];

@@ -5,8 +5,8 @@ import { Player } from "../types/player";
 export function ageEnd(players: Player[], age: number): Player[] {
     const getMilitaryPoints = (player: Player, neighbor: Player): number => {
       const basePoints = age === 1 ? 1 : age === 2 ? 3 : 5;
-      if (player.military.shields > neighbor.military.shields) return basePoints; // Add points if player has more shields
-      if (player.military.shields < neighbor.military.shields) return -1; // Subtract points if player has less shields
+      if (player.military.shields > neighbor.military.shields) return basePoints;
+      if (player.military.shields < neighbor.military.shields) return -1; 
       return 0; // No points if shields are equal
     };
   

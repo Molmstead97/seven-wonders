@@ -1,6 +1,6 @@
 import { Wonder } from "./wonder";
 import { Card } from "./card";
-import { Resource, Gold, VictoryPoints, Science, Shields } from "./resource";
+import { Gold, Resource, Science, Shields, VictoryPoints } from "./resource";
 
 export interface Player {
   id: number;
@@ -10,10 +10,11 @@ export interface Player {
   playerHand: Card[];
   resources: Resource;
   tempResources: Resource;
-  coin: Gold;
+  gold: Gold;
   victoryPoints: VictoryPoints;
   science: Science;
   military: Shields;
   leftPlayer: Player;
   rightPlayer: Player;
+  hasTradeDiscount: boolean;
 }

@@ -43,7 +43,7 @@ export const setupPlayers = () => {
       Clay: 0,
       Glass: 0,
       Papyrus: 0,
-      Cloth: 0,
+      Textile: 0,
     },
     tempResources: {
       Wood: 0,
@@ -52,9 +52,9 @@ export const setupPlayers = () => {
       Clay: 0,
       Glass: 0,
       Papyrus: 0,
-      Cloth: 0,
+      Textile: 0,
     },
-    coin: { gold: 3 },
+    gold: { gold: 3 },
     victoryPoints: { victoryPoints: 0 },
     science: {
       Cog: 0,
@@ -64,6 +64,7 @@ export const setupPlayers = () => {
     military: { shields: 0 },
     leftPlayer: null as unknown as Player, // Temporarily assign null
     rightPlayer: null as unknown as Player, // Temporarily assign null
+    hasTradeDiscount: false,
   };
 
   // Apply initial production from the wonder
@@ -95,7 +96,7 @@ export const setupPlayers = () => {
         Clay: 0,
         Glass: 0,
         Papyrus: 0,
-        Cloth: 0,
+        Textile: 0,
       },
       tempResources: {
         Wood: 0,
@@ -104,9 +105,9 @@ export const setupPlayers = () => {
         Clay: 0,
         Glass: 0,
         Papyrus: 0,
-        Cloth: 0,
+        Textile: 0,
       },
-      coin: { gold: 3 },
+      gold: { gold: 3 },
       victoryPoints: { victoryPoints: 0 },
       science: {
         Cog: 0,
@@ -116,6 +117,7 @@ export const setupPlayers = () => {
       military: { shields: 0 },
       leftPlayer: null as unknown as Player, // Temporarily assign null
       rightPlayer: null as unknown as Player, // Temporarily assign null
+      hasTradeDiscount: false,
     };
 
     // Apply initial production from the wonder

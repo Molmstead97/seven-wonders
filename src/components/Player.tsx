@@ -1,4 +1,4 @@
-import React from 'react';
+/* import React from 'react';
 import { Card } from '../types/card';
 import { Player } from '../types/player';
 
@@ -20,3 +20,4 @@ interface PlayerHandProps {
   };
 
 export default PlayerHand;
+*/

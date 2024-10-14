@@ -6,7 +6,7 @@ import { cards } from "../data/cards";
 export function dealCards(numPlayers: number, age: number): Card[] {
   
     // Filter purple cards
-  const purpleCards = cards.filter((card) => card.color === "Purple");
+  const purpleCards = cards.filter((card) => card.cardColor === "Purple");
 
   // Shuffle purple cards
   const shuffledPurpleCards = purpleCards.sort(() => Math.random() - 0.5);

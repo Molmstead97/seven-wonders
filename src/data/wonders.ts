@@ -11,27 +11,23 @@ export const wonders: Wonder[] = [
         stage: 1,
         cost: { Stone: 2 },
         victoryPoints: { victoryPoints: 3 },
+        isBuilt: false,
       },
       {
         stage: 2,
         cost: { Ore: 2 },
         production: {
-          type: "option",
-          options: [
-            { resource: "Clay", amount: 1 },
-            { resource: "Ore", amount: 1 },
-            { resource: "Wood", amount: 1 },
-            { resource: "Stone", amount: 1 },
-          ],
+          resources: ["Clay", "Ore", "Wood", "Stone"],
         },
+        isBuilt: false,
       },
       {
         stage: 3,
         cost: { Glass: 2 },
         victoryPoints: { victoryPoints: 7 },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Alexandria B",
@@ -41,34 +37,25 @@ export const wonders: Wonder[] = [
         stage: 1,
         cost: { Clay: 2 },
         production: {
-          type: "option",
-          options: [
-            { resource: "Wood", amount: 1 },
-            { resource: "Stone", amount: 1 },
-            { resource: "Ore", amount: 1 },
-            { resource: "Clay", amount: 1 },
-          ],
+          resources: ["Wood", "Stone", "Ore", "Clay"],
         },
+        isBuilt: false,
       },
       {
         stage: 2,
         cost: { Wood: 2 },
         production: {
-          type: "option",
-          options: [
-            { resource: "Glass", amount: 1 },
-            { resource: "Cloth", amount: 1 },
-            { resource: "Papyrus", amount: 1 },
-          ],
+          resources: ["Glass", "Textile", "Papyrus"],
         },
+        isBuilt: false,
       },
       {
         stage: 3,
-        cost: { Stone: 3 },
+        cost: { Glass: 2 },
         victoryPoints: { victoryPoints: 7 },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Babylon A",
@@ -78,18 +65,21 @@ export const wonders: Wonder[] = [
         stage: 1,
         cost: { Clay: 2 },
         victoryPoints: { victoryPoints: 3 },
+        isBuilt: false,
       },
       {
         stage: 2,
         cost: { Wood: 3 },
+        specialEffect: { type: 'freeScience', scienceType: ['Cog', 'Compass', 'Tablet'] },
+        isBuilt: false,
       },
       {
         stage: 3,
         cost: { Clay: 4 },
         victoryPoints: { victoryPoints: 7 },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Babylon B",
@@ -98,10 +88,11 @@ export const wonders: Wonder[] = [
       {
         stage: 1,
         cost: {
-          Cloth: 1,
+          Textile: 1,
           Clay: 1,
         },
         victoryPoints: { victoryPoints: 3 },
+        isBuilt: false,
       },
       {
         stage: 2,
@@ -109,6 +100,8 @@ export const wonders: Wonder[] = [
           Glass: 1,
           Wood: 2,
         },
+        specialEffect: { type: 'playSeventhCard' },
+        isBuilt: false,
       },
       {
         stage: 3,
@@ -116,9 +109,9 @@ export const wonders: Wonder[] = [
           Papyrus: 1,
           Clay: 3,
         },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Éphesos A",
@@ -128,19 +121,21 @@ export const wonders: Wonder[] = [
         stage: 1,
         cost: { Stone: 2 },
         victoryPoints: { victoryPoints: 3 },
+        isBuilt: false,
       },
       {
         stage: 2,
         cost: { Wood: 2 },
         gold: { gold: 9 },
+        isBuilt: false,
       },
       {
         stage: 3,
         cost: { Papyrus: 2 },
         victoryPoints: { victoryPoints: 7 },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Éphesos B",
@@ -151,25 +146,27 @@ export const wonders: Wonder[] = [
         cost: { Stone: 2 },
         victoryPoints: { victoryPoints: 2 },
         gold: { gold: 4 },
+        isBuilt: false,
       },
       {
         stage: 2,
         cost: { Wood: 2 },
         victoryPoints: { victoryPoints: 3 },
         gold: { gold: 4 },
+        isBuilt: false,
       },
       {
         stage: 3,
         cost: {
           Papyrus: 1,
-          Cloth: 1,
+          Textile: 1,
           Glass: 1,
         },
         victoryPoints: { victoryPoints: 5 },
         gold: { gold: 4 },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Gizah A",
@@ -179,19 +176,21 @@ export const wonders: Wonder[] = [
         stage: 1,
         cost: { Stone: 2 },
         victoryPoints: { victoryPoints: 3 },
+        isBuilt: false,
       },
       {
         stage: 2,
         cost: { Wood: 3 },
         victoryPoints: { victoryPoints: 5 },
+        isBuilt: false,
       },
       {
         stage: 3,
         cost: { Stone: 4 },
         victoryPoints: { victoryPoints: 7 },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Gizah B",
@@ -201,70 +200,77 @@ export const wonders: Wonder[] = [
         stage: 1,
         cost: { Wood: 2 },
         victoryPoints: { victoryPoints: 3 },
+        isBuilt: false,
       },
       {
         stage: 2,
         cost: { Stone: 3 },
         victoryPoints: { victoryPoints: 5 },
+        isBuilt: false,
       },
       {
         stage: 3,
         cost: { Clay: 3 },
         victoryPoints: { victoryPoints: 5 },
+        isBuilt: false,
       },
       {
         stage: 4,
         cost: { Papyrus: 1, Stone: 4 },
         victoryPoints: { victoryPoints: 7 },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Halikarnassós A",
-    production: { Cloth: 1 },
+    production: { Textile: 1 },
     wonderStages: [
       {
         stage: 1,
         cost: { Clay: 2 },
         victoryPoints: { victoryPoints: 3 },
+        isBuilt: false,
       },
       {
         stage: 2,
         cost: { Ore: 3 },
-        /* Add special effect here */
+        specialEffect: { type: 'cardFromDiscard' },
+        isBuilt: false,
       },
       {
         stage: 3,
-        cost: { Cloth: 2 },
+        cost: { Textile: 2 },
         victoryPoints: { victoryPoints: 7 },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Halikarnassós B",
-    production: { Cloth: 1 },
+    production: { Textile: 1 },
     wonderStages: [
       {
         stage: 1,
         cost: { Ore: 2 },
         victoryPoints: { victoryPoints: 2 },
-        /* Add special effect here */
+        specialEffect: { type: 'cardFromDiscard' },
+        isBuilt: false,
       },
       {
         stage: 2,
         cost: { Clay: 3 },
         victoryPoints: { victoryPoints: 1 },
-        /* Add special effect here */
+        specialEffect: { type: 'cardFromDiscard' },
+        isBuilt: false,
       },
       {
         stage: 3,
-        cost: { Glass: 1, Papyrus: 1, Cloth: 1 },
-        /* Add special effect here */
+        cost: { Glass: 1, Papyrus: 1, Textile: 1 },
+        specialEffect: { type: 'cardFromDiscard' },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Olympía A",
@@ -274,19 +280,21 @@ export const wonders: Wonder[] = [
         stage: 1,
         cost: { Wood: 2 },
         victoryPoints: { victoryPoints: 3 },
+        isBuilt: false,
       },
       {
         stage: 2,
         cost: { Stone: 2 },
-        /* Add special effect here */
+        specialEffect: { type: 'freeBuildPerAge' },
+        isBuilt: false,
       },
       {
         stage: 3,
         cost: { Ore: 2 },
         victoryPoints: { victoryPoints: 7 },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Olympía B",
@@ -295,20 +303,22 @@ export const wonders: Wonder[] = [
       {
         stage: 1,
         cost: { Wood: 2 },
-        /* Add special effect here */
+        specialEffect: { type: 'tradeDiscount' },
+        isBuilt: false,
       },
       {
         stage: 2,
         cost: { Stone: 2 },
         victoryPoints: { victoryPoints: 5 },
+        isBuilt: false,
       },
       {
         stage: 3,
-        cost: { Cloth: 1, Ore: 2 },
-        /* Add special effect here */
+        cost: { Textile: 1, Ore: 2 },
+        specialEffect: { type: 'copyGuild' },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Rhódos A",
@@ -318,19 +328,21 @@ export const wonders: Wonder[] = [
         stage: 1,
         cost: { Wood: 2 },
         victoryPoints: { victoryPoints: 3 },
+        isBuilt: false,
       },
       {
         stage: 2,
         cost: { Clay: 3 },
         shields: { shields: 2 },
+        isBuilt: false,
       },
       {
         stage: 3,
         cost: { Ore: 4 },
         victoryPoints: { victoryPoints: 7 },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
   {
     name: "Rhódos B",
@@ -342,6 +354,7 @@ export const wonders: Wonder[] = [
         victoryPoints: { victoryPoints: 3 },
         gold: { gold: 3 },
         shields: { shields: 1 },
+        isBuilt: false,
       },
       {
         stage: 2,
@@ -349,8 +362,8 @@ export const wonders: Wonder[] = [
         victoryPoints: { victoryPoints: 4 },
         gold: { gold: 4 },
         shields: { shields: 1 },
+        isBuilt: false,
       },
     ],
-    builtStages: [],
   },
 ];

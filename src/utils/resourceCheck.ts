@@ -22,7 +22,7 @@ export function checkResources(
       }
     }
   } else if ("gold" in cost) {
-    if (player.coin.gold < cost.gold) {
+    if (player.gold.gold < cost.gold) {
       return false;
     }
   }

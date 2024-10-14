@@ -1,9 +1,10 @@
 import { useState } from "react";
-import Game, { initializeGame, InitialGameState } from "../components/Game";
+import Game from "./Game";
+import { initializeGame, GameState } from "../gameLogic/gameState";
 
 const HomePage = () => {
   const [gameStarted, setGameStarted] = useState(false);
-  const [gameState, setGameState] = useState<InitialGameState | null>(null);
+  const [gameState, setGameState] = useState<GameState | null>(null);
 
   const startGame = () => {
     const initialGameState = initializeGame(4, 1);
@@ -12,7 +13,11 @@ const HomePage = () => {
   };
 
   if (gameStarted && gameState) {
-    return <Game initialGameState={gameState} />;
+    return <Game 
+      initialGameState={gameState}
+      numPlayers={gameState.players.length}
+      initialAge={gameState.age}
+    />;
   }
 
   return (

@@ -1,12 +1,15 @@
 import { GameState } from './gameState';
-import { Player } from '../types/player';
-import { Resource, ResourceType } from '../types/resource';
+
+import { ResourceType } from '../types/resource';
 import { Card } from '../types/card';
 import { Wonder } from '../types/wonder';
-import { playCard } from '../utils/cardFunctions';
+
+import { playCard } from '../utils/cardActions';
+import { discardCard } from '../utils/cardActions';
 import { buildWonder } from '../utils/buildWonder';
 import { tradeResource } from '../utils/tradeResource';
 import { ageEnd } from '../utils/ageEnd'
+
 
 export function handleCardPlay(gameState: GameState, playerId: number, cardIndex: number): GameState {
   const newState = { ...gameState };
@@ -19,11 +22,22 @@ export function handleCardPlay(gameState: GameState, playerId: number, cardIndex
   return newState;
 }
 
+export function handleDiscardCard(gameState: GameState, playerId: number, cardIndex: number): GameState {
+  const newState = { ...gameState };
+  const player = newState.players[playerId];
+  const card = player.playerHand[cardIndex];
+
+    const updatedPlayer = discardCard(player, card, newState);
+    newState.players[playerId] = updatedPlayer.player;
+    newState.discardPile = updatedPlayer.gameState.discardPile; 
+    return newState;
+}
+
 export function handleBuildWonder(gameState: GameState, playerId: number, wonder: Wonder, card: Card): GameState {
   const newState = { ...gameState };
   const player = newState.players[playerId];
 
-  const updatedPlayer = buildWonder(player, wonder, card);
+  const updatedPlayer = buildWonder(player, wonder, card, newState);
   newState.players[playerId] = updatedPlayer;
 
   return newState;
@@ -63,6 +77,7 @@ export function handleAgeEnd(gameState: GameState): GameState {
   return {
     ...gameState,
     players: updatedPlayers,
+    age: gameState.age + 1,
   };
 }
 
