@@ -1,5 +1,5 @@
-import { Resource, Production, Gold, VictoryPoints } from "./resource";
-import { Science, Shields } from "./resource";
+import { Resource, Production } from "./resource";
+import { Science } from "./resource";
 import { SpecialEffect } from "./cardSpecialEffects";
 
 export interface PlayerCountThreshold {
@@ -18,15 +18,15 @@ export interface Card {
   name: string;
   description: string;
   production?: Production
-  victoryPoints?: VictoryPoints;
-  gold?: Gold;
+  victoryPoints?: number;
+  gold?: number;
   science?: Science;
-  shields?: Shields;
+  shields?: number;
   specialEffect?: SpecialEffect;
   playerCount?: PlayerCountThreshold[];
   upgradeCard: boolean;
-  cost: Resource | Gold | null;
+  cost: Resource | number | null; // The number is the cost in gold.
   age: 1 | 2 | 3;
   cardColor: CardColor | CardColor[];
-  ageVariant?: AgeVariant; // Optional, only for cards that change based on age
+  ageVariant?: AgeVariant; // This is only for the Grey cards, they're a little weird.
 }

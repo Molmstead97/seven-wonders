@@ -1,6 +1,4 @@
-import { Card } from "../types/card";
-
-// TODO: Add special effects to cards
+import { Card } from "../gameLogic/types/card";
 
 export const cards: Card[] = [
   {
@@ -69,7 +67,7 @@ export const cards: Card[] = [
 
     playerCount: [{ minPlayers: 6, copies: 1 }],
     upgradeCard: false,
-    cost: { gold: 1 },
+    cost: 1,
     age: 1,
     cardColor: "Brown",
   },
@@ -83,7 +81,7 @@ export const cards: Card[] = [
 
     playerCount: [{ minPlayers: 4, copies: 1 }],
     upgradeCard: false,
-    cost: { gold: 1 },
+    cost: 1,
     age: 1,
     cardColor: "Brown",
   },
@@ -97,7 +95,7 @@ export const cards: Card[] = [
 
     playerCount: [{ minPlayers: 3, copies: 1 }],
     upgradeCard: false,
-    cost: { gold: 1 },
+    cost: 1,
     age: 1,
     cardColor: "Brown",
   },
@@ -110,7 +108,7 @@ export const cards: Card[] = [
     },
     playerCount: [{ minPlayers: 3, copies: 1 }],
     upgradeCard: false,
-    cost: { gold: 1 },
+    cost: 1,
     age: 1,
     cardColor: "Brown",
   },
@@ -124,7 +122,7 @@ export const cards: Card[] = [
 
     playerCount: [{ minPlayers: 5, copies: 1 }],
     upgradeCard: false,
-    cost: { gold: 1 },
+    cost: 1,
     age: 1,
     cardColor: "Brown",
   },
@@ -138,7 +136,7 @@ export const cards: Card[] = [
 
     playerCount: [{ minPlayers: 5, copies: 1 }],
     upgradeCard: false,
-    cost: { gold: 1 },
+    cost: 1,
     age: 1,
     cardColor: "Brown",
   },
@@ -152,7 +150,7 @@ export const cards: Card[] = [
       { minPlayers: 4, copies: 2 },
     ],
     upgradeCard: false,
-    cost: { gold: 1 },
+    cost: 1,
     age: 2,
     cardColor: "Brown",
   },
@@ -166,7 +164,7 @@ export const cards: Card[] = [
       { minPlayers: 4, copies: 2 },
     ],
     upgradeCard: false,
-    cost: { gold: 1 },
+    cost: 1,
     age: 2,
     cardColor: "Brown",
   },
@@ -180,7 +178,7 @@ export const cards: Card[] = [
       { minPlayers: 4, copies: 2 },
     ],
     upgradeCard: false,
-    cost: { gold: 1 },
+    cost: 1,
     age: 2,
     cardColor: "Brown",
   },
@@ -194,7 +192,7 @@ export const cards: Card[] = [
       { minPlayers: 4, copies: 2 },
     ],
     upgradeCard: false,
-    cost: { gold: 1 },
+    cost: 1,
     age: 2,
     cardColor: "Brown",
   },
@@ -203,7 +201,7 @@ export const cards: Card[] = [
 
   {
     name: "Loom",
-    description: "Produces 1 Cloth per turn.",
+    description: "Produces 1 Textile per turn.",
     production: { Textile: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -251,7 +249,7 @@ export const cards: Card[] = [
   {
     name: "Pawnshop",
     description: "Grants 3 Victory Points upon acquisition.",
-    victoryPoints: { victoryPoints: 3 },
+    victoryPoints: 3,
     playerCount: [
       { minPlayers: 4, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -265,7 +263,7 @@ export const cards: Card[] = [
   {
     name: "Baths",
     description: "Grants 3 Victory Points upon acquisition.",
-    victoryPoints: { victoryPoints: 3 },
+    victoryPoints: 3,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -279,7 +277,7 @@ export const cards: Card[] = [
   {
     name: "Altar",
     description: "Grants 2 Victory Points upon acquisition.",
-    victoryPoints: { victoryPoints: 2 },
+    victoryPoints: 2,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -293,7 +291,7 @@ export const cards: Card[] = [
   {
     name: "Theater",
     description: "Grants 2 Victory Points upon acquisition.",
-    victoryPoints: { victoryPoints: 3 },
+    victoryPoints: 2,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -307,7 +305,7 @@ export const cards: Card[] = [
   {
     name: "Aqueduct",
     description: "Grants 5 Victory Points upon acquisition.",
-    victoryPoints: { victoryPoints: 5 },
+    victoryPoints: 5,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -321,7 +319,7 @@ export const cards: Card[] = [
   {
     name: "Temple",
     description: "Grants 3 Victory Points upon acquisition.",
-    victoryPoints: { victoryPoints: 3 },
+    victoryPoints: 3,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -335,7 +333,7 @@ export const cards: Card[] = [
   {
     name: "Statue",
     description: "Grants 4 Victory Points upon acquisition.",
-    victoryPoints: { victoryPoints: 4 },
+    victoryPoints: 4,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -349,7 +347,7 @@ export const cards: Card[] = [
   {
     name: "Courthouse",
     description: "Grants 4 Victory Points upon acquisition.",
-    victoryPoints: { victoryPoints: 4 },
+    victoryPoints: 4,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -363,7 +361,7 @@ export const cards: Card[] = [
   {
     name: "Pantheon",
     description: "Grants 7 Victory Points upon acquisition.",
-    victoryPoints: { victoryPoints: 7 },
+    victoryPoints: 7,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -377,7 +375,7 @@ export const cards: Card[] = [
   {
     name: "Gardens",
     description: "Grants 5 Victory Points upon acquisition.",
-    victoryPoints: { victoryPoints: 5 },
+    victoryPoints: 5,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -391,7 +389,7 @@ export const cards: Card[] = [
   {
     name: "Town Hall",
     description: "Grants 6 Victory Points upon acquisition.",
-    victoryPoints: { victoryPoints: 6 },
+    victoryPoints: 6,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -406,7 +404,7 @@ export const cards: Card[] = [
   {
     name: "Palace",
     description: "Grants 8 Victory Points upon acquisition.",
-    victoryPoints: { victoryPoints: 8 },
+    victoryPoints: 8,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -428,8 +426,7 @@ export const cards: Card[] = [
   {
     name: "Senate",
     description: "Grants 6 Victory Points upon acquisition.",
-
-    victoryPoints: { victoryPoints: 6 },
+    victoryPoints: 6,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -445,7 +442,7 @@ export const cards: Card[] = [
   {
     name: "Tavern",
     description: "Grants 5 gold upon acquisition.",
-    gold: { gold: 5 },
+    gold: 5,
     playerCount: [
       { minPlayers: 4, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -462,7 +459,7 @@ export const cards: Card[] = [
     description:
       "You may purchase raw materials from the neighboring city to your right for 1 coin instead of 2.",
     specialEffect: {
-      type: "trade",
+      type: "tradeDiscount",
       neighbor: "right",
       resource: ["Wood", "Stone", "Clay", "Ore"],
     },
@@ -482,7 +479,7 @@ export const cards: Card[] = [
     description:
       "You may purchase raw materials from the neighboring city to your left for 1 coin instead of 2.",
     specialEffect: {
-      type: "trade",
+      type: "tradeDiscount",
       neighbor: "left",
       resource: ["Wood", "Stone", "Clay", "Ore"],
     },
@@ -501,7 +498,7 @@ export const cards: Card[] = [
     description:
       "You may purchase manufactured goods from either neighboring city for 1 coin instead of 2.",
     specialEffect: {
-      type: "trade",
+      type: "tradeDiscount",
       neighbor: "both",
       resource: ["Glass", "Textile", "Papyrus"],
     },
@@ -517,7 +514,7 @@ export const cards: Card[] = [
 
   {
     name: "Forum",
-    description: "Produces 1 Glass, Cloth, or Papyrus per turn.",
+    description: "Produces 1 manufactured good of your choice per turn.",
     production: {
       resources: ["Glass", "Textile", "Papyrus"],
     },
@@ -535,7 +532,7 @@ export const cards: Card[] = [
 
   {
     name: "Caravansery",
-    description: "Produces 1 Wood, Ore, Clay, or Stone per turn.",
+    description: "Produces 1 raw material of your choice per turn.",
     production: {
       resources: ["Wood", "Ore", "Clay", "Stone"],
     },
@@ -556,28 +553,8 @@ export const cards: Card[] = [
       "Upon acquisition, grants gold per brown card built by you and neighboring cities.",
     specialEffect: {
       type: "goldVictoryBonus",
-      cardColor: ["Brown"],
-      gold: { gold: 1 },
-      scope: "all",
-    },
-    playerCount: [
-      { minPlayers: 3, copies: 1 },
-      { minPlayers: 6, copies: 2 },
-    ],
-    upgradeCard: false,
-    cost: null,
-    age: 2,
-    cardColor: "Yellow",
-  },
-
-  {
-    name: "Vineyard",
-    description:
-      "Upon acquisition, grants gold per brown card built by you and neighboring cities.",
-    specialEffect: {
-      type: "goldVictoryBonus",
-      cardColor: ["Brown"],
-      gold: { gold: 1 },
+      cardColor: "Brown",
+      gold: 1,
       scope: "all",
     },
     playerCount: [
@@ -596,8 +573,8 @@ export const cards: Card[] = [
       "Upon acquisition, grants 2 gold per grey card built by you and neighboring cities.",
     specialEffect: {
       type: "goldVictoryBonus",
-      cardColor: ["Grey"],
-      gold: { gold: 2 },
+      cardColor: "Grey",
+      gold: 2,
       scope: "all",
     },
     playerCount: [
@@ -616,9 +593,9 @@ export const cards: Card[] = [
       "Upon acquisition, grants gold per brown card you've built. Worth 1 Victory Point per brown card you've built at the end of the game.",
     specialEffect: {
       type: "goldVictoryBonus",
-      cardColor: ["Brown"],
-      gold: { gold: 1 },
-      victoryPoints: { victoryPoints: 1 },
+      cardColor: "Brown",
+      gold: 1,
+      victoryPoints: 1,
       scope: "self",
     },
     playerCount: [
@@ -637,9 +614,9 @@ export const cards: Card[] = [
       "Upon acquisition, grants gold per yellow card you've built. Worth 1 Victory Point per yellow card you've built at the end of the game.",
     specialEffect: {
       type: "goldVictoryBonus",
-      cardColor: ["Yellow"],
-      gold: { gold: 1 },
-      victoryPoints: { victoryPoints: 1 },
+      cardColor: "Yellow",
+      gold: 1,
+      victoryPoints: 1,
       scope: "self",
     },
     playerCount: [
@@ -658,9 +635,9 @@ export const cards: Card[] = [
       "Upon acquisition, grants 2 gold per grey card you've built. Worth 2 Victory Points per grey card you've built at the end of the game.",
     specialEffect: {
       type: "goldVictoryBonus",
-      cardColor: ["Grey"],
-      gold: { gold: 2 },
-      victoryPoints: { victoryPoints: 2 },
+      cardColor: "Grey",
+      gold: 2,
+      victoryPoints: 2,
       scope: "self",
     },
     playerCount: [
@@ -677,7 +654,13 @@ export const cards: Card[] = [
     name: "Arena",
     description:
       "Upon acquisition, grants 3 gold per Wonder stage you've constructed. Worth 1 Victory Point per Wonder stage you've constructed at the end of the game.",
-    // TODO: ADD THIS EFFECT LATER
+    specialEffect: {
+      type: "goldVictoryBonus",
+      gold: 3,
+      victoryPoints: 1,
+      scope: "self",
+      name: "Arena",
+    },
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -693,8 +676,8 @@ export const cards: Card[] = [
 
   {
     name: "Stockade",
-    description: "Grants 1 Military upon acquisition.",
-    shields: { shields: 1 },
+    description: "Grants 1 Shield upon acquisition.",
+    shields: 1,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -707,8 +690,8 @@ export const cards: Card[] = [
 
   {
     name: "Barracks",
-    description: "Grants 1 Military upon acquisition.",
-    shields: { shields: 1 },
+    description: "Grants 1 Shield upon acquisition.",
+    shields: 1,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -722,7 +705,7 @@ export const cards: Card[] = [
   {
     name: "Guard Tower",
     description: "Grants 1 Shield upon acquisition.",
-    shields: { shields: 1 },
+    shields: 1,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -736,7 +719,7 @@ export const cards: Card[] = [
   {
     name: "Walls",
     description: "Grants 2 Shields upon acquisition.",
-    shields: { shields: 2 },
+    shields: 2,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -750,7 +733,7 @@ export const cards: Card[] = [
   {
     name: "Training Ground",
     description: "Grants 2 Shields upon acquisition.",
-    shields: { shields: 2 },
+    shields: 2,
     playerCount: [
       { minPlayers: 4, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -765,7 +748,7 @@ export const cards: Card[] = [
   {
     name: "Stables",
     description: "Grants 2 Shields upon acquisition.",
-    shields: { shields: 2 },
+    shields: 2,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -779,7 +762,7 @@ export const cards: Card[] = [
   {
     name: "Archery Range",
     description: "Grants 2 Shields upon acquisition.",
-    shields: { shields: 2 },
+    shields: 2,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -793,7 +776,7 @@ export const cards: Card[] = [
   {
     name: "Fortifications",
     description: "Grants 3 Shields upon acquisition.",
-    shields: { shields: 3 },
+    shields: 3,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -807,7 +790,7 @@ export const cards: Card[] = [
   {
     name: "Circus",
     description: "Grants 3 Shields upon acquisition.",
-    shields: { shields: 3 },
+    shields: 3,
     playerCount: [
       { minPlayers: 4, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -822,7 +805,7 @@ export const cards: Card[] = [
   {
     name: "Arsenal",
     description: "Grants 3 Shields upon acquisition.",
-    shields: { shields: 3 },
+    shields: 3,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -837,7 +820,7 @@ export const cards: Card[] = [
   {
     name: "Siege Workshop",
     description: "Grants 3 Shields upon acquisition.",
-    shields: { shields: 3 },
+    shields: 3,
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -852,7 +835,7 @@ export const cards: Card[] = [
 
   {
     name: "Apothecary",
-    description: "Grants 1 Compass symbol upon acquisition.",
+    description: "Grants 1 Compass upon acquisition.",
     science: { Compass: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -866,7 +849,7 @@ export const cards: Card[] = [
 
   {
     name: "Workshop",
-    description: "Grants 1 Cog symbol upon acquisition.",
+    description: "Grants 1 Cog upon acquisition.",
     science: { Cog: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -880,7 +863,7 @@ export const cards: Card[] = [
 
   {
     name: "Scriptorium",
-    description: "Grants 1 Tablet symbol upon acquisition.",
+    description: "Grants 1 Tablet upon acquisition.",
     science: { Tablet: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -894,7 +877,7 @@ export const cards: Card[] = [
 
   {
     name: "Dispensary",
-    description: "Grants 1 Compass symbol upon acquisition.",
+    description: "Grants 1 Compass upon acquisition.",
     science: { Compass: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -908,7 +891,7 @@ export const cards: Card[] = [
 
   {
     name: "Library",
-    description: "Grants 1 Tablet symbol upon acquisition.",
+    description: "Grants 1 Tablet upon acquisition.",
     science: { Tablet: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -922,7 +905,7 @@ export const cards: Card[] = [
 
   {
     name: "School",
-    description: "Grants 1 Tablet symbol upon acquisition.",
+    description: "Grants 1 Tablet upon acquisition.",
     science: { Tablet: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -936,7 +919,7 @@ export const cards: Card[] = [
 
   {
     name: "Laboratory",
-    description: "Grants 1 Cog symbol upon acquisition.",
+    description: "Grants 1 Cog upon acquisition.",
     science: { Cog: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -950,7 +933,7 @@ export const cards: Card[] = [
 
   {
     name: "Lodge",
-    description: "Grants 1 Compass symbol upon acquisition.",
+    description: "Grants 1 Compass upon acquisition.",
     science: { Compass: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -964,7 +947,7 @@ export const cards: Card[] = [
 
   {
     name: "Observatory",
-    description: "Grants 1 Cog symbol upon acquisition.",
+    description: "Grants 1 Cog upon acquisition.",
     science: { Cog: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -978,7 +961,7 @@ export const cards: Card[] = [
 
   {
     name: "University",
-    description: "Grants 1 Tablet symbol upon acquisition.",
+    description: "Grants 1 Tablet upon acquisition.",
     science: { Tablet: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -991,7 +974,7 @@ export const cards: Card[] = [
   },
   {
     name: "Academy",
-    description: "Grants 1 Compass symbol upon acquisition.",
+    description: "Grants 1 Compass upon acquisition.",
     science: { Compass: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -1005,7 +988,7 @@ export const cards: Card[] = [
 
   {
     name: "Study",
-    description: "Grants 1 Cog symbol upon acquisition.",
+    description: "Grants 1 Cog upon acquisition.",
     science: { Cog: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -1025,8 +1008,8 @@ export const cards: Card[] = [
       "Grants 1 Victory Point per brown card built in neighboring cities at the end of the game.",
     specialEffect: {
       type: "goldVictoryBonus",
-      cardColor: ["Brown"],
-      victoryPoints: { victoryPoints: 1 },
+      cardColor: "Brown",
+      victoryPoints: 1,
       scope: "neighbors",
     },
     upgradeCard: false,
@@ -1041,8 +1024,8 @@ export const cards: Card[] = [
       "Grants 2 Victory Points per grey card built in neighboring cities at the end of the game.",
     specialEffect: {
       type: "goldVictoryBonus",
-      cardColor: ["Grey"],
-      victoryPoints: { victoryPoints: 2 },
+      cardColor: "Grey",
+      victoryPoints: 2,
       scope: "neighbors",
     },
     upgradeCard: false,
@@ -1057,8 +1040,8 @@ export const cards: Card[] = [
       "Grants 1 Victory Point per yellow card built in neighboring cities at the end of the game.",
     specialEffect: {
       type: "goldVictoryBonus",
-      cardColor: ["Yellow"],
-      victoryPoints: { victoryPoints: 1 },
+      cardColor: "Yellow",
+      victoryPoints: 1,
       scope: "neighbors",
     },
     upgradeCard: false,
@@ -1073,8 +1056,8 @@ export const cards: Card[] = [
       "Grants 1 Victory Point per green card built in neighboring cities at the end of the game.",
     specialEffect: {
       type: "goldVictoryBonus",
-      cardColor: ["Green"],
-      victoryPoints: { victoryPoints: 1 },
+      cardColor: "Green",
+      victoryPoints: 1,
       scope: "neighbors",
     },
     upgradeCard: false,
@@ -1089,8 +1072,8 @@ export const cards: Card[] = [
       "Grants 1 Victory Point per red card built in neighboring cities at the end of the game.",
     specialEffect: {
       type: "goldVictoryBonus",
-      cardColor: ["Red"],
-      victoryPoints: { victoryPoints: 1 },
+      cardColor: "Red",
+      victoryPoints: 1,
       scope: "neighbors",
     },
     upgradeCard: false,
@@ -1103,7 +1086,12 @@ export const cards: Card[] = [
     name: "Strategy Guild",
     description:
       "Grants 1 Victory Point for each conflict loss in neighboring cities at the end of the game.",
-    // TODO: Add this effect later
+    specialEffect: {
+      type: "goldVictoryBonus",
+      victoryPoints: 1,
+      scope: "neighbors",
+      name: "Strategy Guild",
+    },
     upgradeCard: false,
     cost: { Ore: 2, Stone: 1, Textile: 1 },
     age: 3,
@@ -1117,7 +1105,7 @@ export const cards: Card[] = [
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: ["Brown", "Grey", "Purple"],
-      victoryPoints: { victoryPoints: 1 },
+      victoryPoints: 1,
       scope: "self",
     },
     upgradeCard: false,
@@ -1132,8 +1120,8 @@ export const cards: Card[] = [
       "Grants 1 Victory Point per blue card built by neighboring cities at the end of the game.",
     specialEffect: {
       type: "goldVictoryBonus",
-      cardColor: ["Blue"],
-      victoryPoints: { victoryPoints: 1 },
+      cardColor: "Blue",
+      victoryPoints: 1,
       scope: "neighbors",
     },
     upgradeCard: false,
@@ -1146,7 +1134,10 @@ export const cards: Card[] = [
     name: "Scientists Guild",
     description:
       "Grants either 1 Compass, Cog, or Tablet at the end of the game.",
-    specialEffect: { type: "science", symbol: ["Compass", "Cog", "Tablet"] },
+    specialEffect: {
+      type: "freeScience",
+      scienceType: ["Compass", "Cog", "Tablet"],
+    },
     upgradeCard: false,
     cost: { Wood: 2, Ore: 2, Papyrus: 1 },
     age: 3,
@@ -1157,6 +1148,12 @@ export const cards: Card[] = [
     name: "Builders Guild",
     description:
       "Grants 1 Victory Point per Wonder stage you and neighboring cities have constructed at the end of the game.",
+    specialEffect: {
+      type: "goldVictoryBonus",
+      victoryPoints: 1,
+      scope: "all",
+      name: "Builders Guild",
+    },
     upgradeCard: false,
     cost: { Stone: 2, Clay: 2, Glass: 1 },
     age: 3,

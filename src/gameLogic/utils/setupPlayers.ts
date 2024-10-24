@@ -12,14 +12,14 @@ export const setupPlayers = () => {
   while (true) {
     howManyAIPlayers = prompt("How many AI players are playing?");
 
-    // Check if input is valid
+    
     if (
       howManyAIPlayers !== null &&
       howManyAIPlayers !== "" &&
       Number(howManyAIPlayers) >= 2 &&
       Number(howManyAIPlayers) <= 6
     ) {
-      break; // Exit the loop if valid
+      break;
     }
 
     alert(
@@ -54,18 +54,24 @@ export const setupPlayers = () => {
       Papyrus: 0,
       Textile: 0,
     },
-    gold: { gold: 3 },
-    victoryPoints: { victoryPoints: 0 },
+    gold: 3,
+    victoryPoints: 0,
     science: {
       Cog: 0,
       Compass: 0,
       Tablet: 0,
     },
-    military: { shields: 0 },
+    shields: 0,
+    conflictLossTokens: 0, // Only used for Strategy Guild card
     leftPlayer: null as unknown as Player, // Temporarily assign null
     rightPlayer: null as unknown as Player, // Temporarily assign null
-    hasTradeDiscount: false,
+    canPlaySeventhCard: false, // Only used if Player is playing Babylon B
+    freeBuildPerAge: {},
   };
+
+  // Log the user's wonder and initial resources
+  console.log(`User Player Wonder: ${userPlayer.wonder.name}`);
+  console.log('User Player Initial Resources:', userPlayer.resources);
 
   // Apply initial production from the wonder
   if (userPlayer.wonder.production) {
@@ -107,18 +113,24 @@ export const setupPlayers = () => {
         Papyrus: 0,
         Textile: 0,
       },
-      gold: { gold: 3 },
-      victoryPoints: { victoryPoints: 0 },
+      gold: 3,
+      victoryPoints: 0,
       science: {
         Cog: 0,
         Compass: 0,
         Tablet: 0,
       },
-      military: { shields: 0 },
+      shields: 0,
+      conflictLossTokens: 0, // Only used for Strategy Guild card
       leftPlayer: null as unknown as Player, // Temporarily assign null
       rightPlayer: null as unknown as Player, // Temporarily assign null
-      hasTradeDiscount: false,
+      canPlaySeventhCard: false, // Only used if Player is playing Babylon B
+      freeBuildPerAge: {}, // Only used if Player is playing Olympia A. // TODO: Might make sense to move this to the wonder struct. Or make this optional as well as other special effects.
     };
+
+    // Log each AI player's wonder and initial resources
+    console.log(`AI Player ${i} Wonder: ${aiPlayer.wonder.name}`);
+    console.log(`AI Player ${i} Initial Resources:`, aiPlayer.resources);
 
     // Apply initial production from the wonder
     if (aiPlayer.wonder.production) {

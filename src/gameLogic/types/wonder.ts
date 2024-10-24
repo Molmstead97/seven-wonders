@@ -1,14 +1,14 @@
 import { Resource, Production } from "./resource";
-import { Gold, Science, Shields, VictoryPoints } from "./resource"
+import { Science } from "./resource"
 import { SpecialEffect } from "./wonderSpecialEffects";
 export interface WonderStage {
     stage: number;
-    cost: Resource | Gold | null
+    cost: Resource | number | null; // The number provides gold to player
     production?: Production;
-    victoryPoints?: VictoryPoints;
-    gold?: Gold;
+    victoryPoints?: number;
+    gold?: number;
     science?: Science;
-    shields?: Shields;
+    shields?: number;
     specialEffect?: SpecialEffect;
     isBuilt: boolean;
 }

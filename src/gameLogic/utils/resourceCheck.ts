@@ -17,12 +17,13 @@ export function checkResources(
 
   if (typeof cost === "object" && !Array.isArray(cost)) {
     for (const [resource, amount] of Object.entries(cost)) {
-      if ((player.resources[resource as keyof Resource] || 0) < amount) {
+      const totalAvailable = (player.resources[resource as keyof Resource] || 0) + (player.tempResources[resource as keyof Resource] || 0);
+      if (totalAvailable < amount) {
         return false;
       }
     }
-  } else if ("gold" in cost) {
-    if (player.gold.gold < cost.gold) {
+  } else if (typeof cost === "number") {
+    if (player.gold < cost) {
       return false;
     }
   }

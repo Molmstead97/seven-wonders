@@ -1,5 +1,5 @@
 import { Wonder } from "../types/wonder";
-import { wonders } from "../data/wonders";
+import { wonders } from "../../data/wonders";
 
 
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
@@ -13,7 +13,7 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 // Function to group wonders by base name (without A/B suffix)
-function groupWondersByBaseName(wonders: Wonder[]): Record<string, Wonder[]> {
+function groupWondersByName(wonders: Wonder[]): Record<string, Wonder[]> {
   return wonders.reduce((acc: Record<string, Wonder[]>, wonder) => {
     const baseName = wonder.name.slice(0, -1);  // Remove the last character (A or B)
     if (!acc[baseName]) {
@@ -26,10 +26,10 @@ function groupWondersByBaseName(wonders: Wonder[]): Record<string, Wonder[]> {
 
 export function pickWonders(numPlayers: number): Wonder[] {
   // Prompt user for choice
-  const userChoice = prompt("Would you like to choose a wonder or randomize? (c/r)");
+  const userChoice = prompt("Would you like to choose a wonder or randomize? (c/r)"); // TODO: Replace with UI
 
   // Group wonders by base name
-  const groupedWonders = groupWondersByBaseName(wonders);
+  const groupedWonders = groupWondersByName(wonders);
 
   if (userChoice?.toLowerCase() === 'c') {
     // Display available wonders (unique base names)
@@ -37,16 +37,16 @@ export function pickWonders(numPlayers: number): Wonder[] {
     const chosenWonderName = prompt(`Choose your wonder from the following: ${wonderNames}`);
 
     if (chosenWonderName == null) {
-      throw new Error("Chosen wonder name cannot be null or undefined.");
+      throw new Error("Chosen wonder name cannot be null or undefined."); // TODO: Replace with UI
     }
     
     // Prompt for side selection
-    const sideChoice = prompt("Choose side A or B (a/b)");
+    const sideChoice = prompt("Choose side A or B (a/b)"); // TODO: Replace with UI
     const side = sideChoice?.toLowerCase() === 'b' ? 'B' : 'A';
 
     const chosenWonder = groupedWonders[chosenWonderName]?.[side === 'A' ? 0 : 1];
     if (!chosenWonder) {
-      throw new Error("Invalid wonder choice.");
+      throw new Error("Invalid wonder choice."); // TODO: Replace with UI 
     }
     
     return [chosenWonder];

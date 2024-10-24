@@ -2,7 +2,8 @@ import { Player } from "../types/player";
 import { Card } from "../types/card";
 import { Production, ResourceType, ScienceType } from "../types/resource";
 import { checkResources } from "./resourceCheck";
-import { GameState } from "../gameLogic/gameState";
+import { GameState } from "../gameState";
+import { applyGoldVictoryBonus } from "../types/cardSpecialEffects";
 
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
 
@@ -19,6 +20,9 @@ export function playCard(player: Player, card: Card) {
   if (checkResources(player, card)) {
     updatedPlayer.playerBoard = new Set([...updatedPlayer.playerBoard, card]);
     applyCardEffects(updatedPlayer, card);
+    if (typeof card.cost === "number") {
+      updatedPlayer.gold -= card.cost;
+    }
 
     const index = updatedPlayer.playerHand.indexOf(card);
     if (index > -1) {
@@ -27,6 +31,10 @@ export function playCard(player: Player, card: Card) {
         ...updatedPlayer.playerHand.slice(index + 1),
       ];
     }
+
+    // Log the card played and updated resources
+    console.log(`Played card: ${card.name}`);
+    console.log(`Updated resources:`, updatedPlayer.resources);
   } else {
     alert("Not enough resources to play this card"); // TODO: Replace with UI
     return updatedPlayer; // Return the player without modifying their hand
@@ -45,7 +53,7 @@ export function discardCard(player: Player, card: Card, gameState: GameState) {
       ...updatedPlayer.playerHand.slice(0, index),
       ...updatedPlayer.playerHand.slice(index + 1),
     ];
-    updatedPlayer.gold.gold += 3;
+    updatedPlayer.gold += 3;
     updatedGameState.discardPile = [...updatedGameState.discardPile, card];
   }
   
@@ -60,12 +68,12 @@ function applyCardEffects(player: Player, card: Card) {
 
   // Apply victory points
   if (card.victoryPoints) {
-    player.victoryPoints.victoryPoints += card.victoryPoints.victoryPoints;
+    player.victoryPoints += card.victoryPoints;
   }
 
   // Apply gold
   if (card.gold) {
-    player.gold.gold += card.gold.gold;
+    player.gold += card.gold;
   }
 
   // Apply science
@@ -80,12 +88,12 @@ function applyCardEffects(player: Player, card: Card) {
 
   // Apply shields
   if (card.shields) {
-    player.military.shields += card.shields.shields;
+    player.shields += card.shields;
   }
 
-  //if (card.specialEffect) {
-    // TODO: Apply special effects once I figure out what the heck to do. REMINDER that all these effects are applied at the end of the game
-  //}
+  if (card.specialEffect && card.specialEffect.type === "goldVictoryBonus") {
+    applyGoldVictoryBonus(player, card.specialEffect);
+  }
 }
 
 function applyProduction(player: Player, production: Production) {

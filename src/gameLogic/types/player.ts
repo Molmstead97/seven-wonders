@@ -1,6 +1,6 @@
 import { Wonder } from "./wonder";
 import { Card } from "./card";
-import { Gold, Resource, Science, Shields, VictoryPoints } from "./resource";
+import { Resource, Science } from "./resource";
 
 export interface Player {
   id: number;
@@ -10,11 +10,13 @@ export interface Player {
   playerHand: Card[];
   resources: Resource;
   tempResources: Resource;
-  gold: Gold;
-  victoryPoints: VictoryPoints;
+  gold: number;
+  victoryPoints: number;
   science: Science;
-  military: Shields;
+  shields: number;
+  conflictLossTokens: number; // Only used for Strategy Guild card
   leftPlayer: Player;
   rightPlayer: Player;
-  hasTradeDiscount: boolean;
+  freeBuildPerAge: Record<number, boolean>;
+  canPlaySeventhCard: boolean;
 }

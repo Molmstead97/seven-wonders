@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { GameState, initializeGame } from "../gameLogic/gameState";
+import { GameState, gameLoop } from "../gameLogic/gameState";
 import { handleCardPlay, handlePassHand, handleAgeEnd, handleBuildWonder } from "../gameLogic/gameActions";
 // import GameBoard from "./GameBoard";
 
-import { Card } from "../types/card";
-import { Wonder } from "../types/wonder";
+import { Card } from "../gameLogic/types/card";
+import { Wonder } from "../gameLogic/types/wonder";
 
 interface GameProps {
   numPlayers: number;
@@ -12,8 +12,8 @@ interface GameProps {
   initialGameState: GameState;
 }
 
-const Game: React.FC<GameProps> = ({ numPlayers, initialAge }) => {
-  const [gameState, setGameState] = useState<GameState>(() => initializeGame(numPlayers, initialAge));
+const Game: React.FC<GameProps> = ({ numPlayers, initialAge, initialGameState }) => {
+  const [gameState, setGameState] = useState<GameState>(() => gameLoop(initialGameState));
 
   const onCardPlay = (playerId: number, cardIndex: number) => {
     setGameState(prevState => handleCardPlay(prevState, playerId, cardIndex));
