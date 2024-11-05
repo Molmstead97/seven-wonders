@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { GameState, gameLoop } from "../gameLogic/gameState";
-import { handleCardPlay, handlePassHand, handleAgeEnd, handleBuildWonder } from "../gameLogic/gameActions";
-// import GameBoard from "./GameBoard";
+import { GameState, gameLoop } from "../game-logic/gameState";
+import { handleCardPlay, handlePassHand, handleAgeEnd, handleBuildWonder } from "../game-logic/gameActions";
 
-import { Card } from "../gameLogic/types/card";
-import { Wonder } from "../gameLogic/types/wonder";
+import { Card } from "../game-logic/types/card";
+import { Wonder } from "../game-logic/types/wonder";
+import GameBoard from "./GameBoard";
 
 interface GameProps {
   numPlayers: number;
@@ -33,13 +33,7 @@ const Game: React.FC<GameProps> = ({ numPlayers, initialAge, initialGameState })
 
   return (
     <div>
-      {/* <GameBoard 
-        gameState={gameState}
-        onCardPlay={onCardPlay}
-        onBuildWonder={onBuildWonder}
-        onPassHand={onPassHand}
-        onAgeEnd={onAgeEnd}
-      /> */}
+      <GameBoard />
     </div>
   );
 };

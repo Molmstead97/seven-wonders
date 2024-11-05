@@ -1,7 +1,14 @@
 import { Player } from "./types/player";
 import { Card } from "./types/card";
+import { Wonder } from "./types/wonder";
+import { ResourceType, Resource } from "./types/resource";
+
 import { setupPlayers } from "./utils/setupPlayers";
 import { dealCards } from "./utils/dealCards";
+import { ageEnd } from "./utils/ageEnd";
+import { tradeResource } from "./utils/tradeResource";
+import { checkResources } from "./utils/resourceCheck";
+
 import {
   handleBuildWonder,
   handleCardPlay,
@@ -9,12 +16,7 @@ import {
   handleEndGame,
   handlePassHand,
 } from "./gameActions";
-import { handleAgeEnd } from "./gameActions";
-import { Wonder } from "./types/wonder";
-import { lastTwoCards } from "./utils/passHand";
-import { tradeResource } from "./utils/tradeResource";
-import { ResourceType } from "./types/resource";
-import { checkResources } from "./utils/resourceCheck";
+
 export interface GameState {
   age: number;
   players: Player[];
@@ -35,9 +37,16 @@ function initializeGame(): GameState {
 
   const dealtCards = dealCards(players.length, 1);
 
+  // Shuffle the dealt cards
+  const shuffledCards = dealtCards.sort(() => Math.random() - 0.5);
+
+  // Distribute 7 cards to each player
   players.forEach((player, index) => {
-    player.playerHand = dealtCards.slice(index * 7, (index + 1) * 7);
-    console.log(`Player ${player.name} has been dealt:`, player.playerHand.map(card => card.name));
+    player.playerHand = shuffledCards.slice(index * 7, (index + 1) * 7);
+    console.log(
+      `Player ${player.name} has been dealt:`,
+      player.playerHand.map((card) => card.name)
+    );
   });
 
   return {
@@ -49,31 +58,53 @@ function initializeGame(): GameState {
 }
 
 export function gameLoop(gameState: GameState): GameState {
-  gameState = initializeGame();
+  gameState = initializeGame(); // TODO: Remember to move this out of the loop
+  let turns = 0;
+  const TURNS_PER_AGE = 6;
 
   while (gameState.age < 4) {
-    // All players select their actions simultaneously
+    turns += 1;
+
+    // Regular turn actions (all turns including 6)
+    gameState.players.forEach((player) => {
+      addRandomResourceFromCards(player);
+    });
+
+    displayPlayerState(gameState.players[0]); // Only return the user
+
     const playerActions = gameState.players.map((player) =>
       getPlayerAction(player)
     );
 
-    displayPlayerState(gameState.players[0]);
-
-    // Handle resource trading (doesn't count as an action)
-    //gameState = handleAllTrades(gameState);
-
-    // Execute all player actions simultaneously
     gameState = executePlayerActions(gameState, playerActions);
 
-    // Pass hands
-    gameState = handlePassHand(gameState);
+    gameState.players.forEach((player) => {
+      player.tempResources = {};
+    });
 
-    // Check if the age has ended
-    if (gameState.players.every((player) => player.playerHand.length === 2)) {
-      gameState.players = gameState.players.map((player) =>
-        lastTwoCards(player, gameState)
+    // Pass hands (only for turns 1-5)
+    if (turns < TURNS_PER_AGE) {
+      gameState = handlePassHand(gameState);
+    }
+
+    // Handle Babylon B and end of age (turn 6)
+    if (turns === TURNS_PER_AGE) {
+      if (gameState.players.some((player) => player.wonder.name === "Babylon B")) {
+        // Babylon B logic
+      }
+
+      // Handle end of age
+      gameState.discardPile.push(
+        ...gameState.players.flatMap((player) => player.playerHand)
       );
-      gameState = handleAgeEnd(gameState);
+
+      gameState.players.forEach((player) => {
+        player.playerHand = [];
+      });
+
+      gameState = ageEnd(gameState.players, gameState);
+      dealCards(gameState.players.length, gameState.age);
+      turns = 0;
     }
   }
 
@@ -81,6 +112,7 @@ export function gameLoop(gameState: GameState): GameState {
   return handleEndGame(gameState);
 }
 
+// TODO: This is a function for TESTING PURPOSES ONLY, remove before finalizing
 function getPlayerAction(player: Player): PlayerAction {
   if (player.name === "User") {
     return getUserAction(player);
@@ -120,6 +152,7 @@ function getPlayerAction(player: Player): PlayerAction {
   return { type: "discardCard", playerId: player.id, cardIndex: 0 };
 }
 
+// TODO: This is a function for TESTING PURPOSES ONLY, remove before finalizing
 function getUserAction(player: Player): PlayerAction {
   const availableActions = getAvailableActions(player);
 
@@ -150,11 +183,17 @@ function getAvailableActions(player: Player): PlayerAction[] {
   player.playerHand.forEach((card, index) => {
     if (checkResources(player, card)) {
       actions.push({ type: "playCard", playerId: player.id, cardIndex: index });
+    } else if (!checkResources(player, card)) {
+      actions.push({
+        type: "discardCard",
+        playerId: player.id,
+        cardIndex: index,
+      });
     }
   });
 
   // Add 'buildWonder' action if wonder stage is available and resources are sufficient
-  const nextStage = player.wonder.wonderStages.find(stage => !stage.isBuilt);
+  const nextStage = player.wonder.wonderStages.find((stage) => !stage.isBuilt);
   if (nextStage && checkResources(player, nextStage)) {
     actions.push({
       type: "buildWonder",
@@ -164,20 +203,10 @@ function getAvailableActions(player: Player): PlayerAction[] {
     });
   }
 
-  // If no other actions are available, add 'discardCard' action
-  if (actions.length === 0) {
-    player.playerHand.forEach((_, index) => {
-      actions.push({
-        type: "discardCard",
-        playerId: player.id,
-        cardIndex: index,
-      });
-    });
-  }
-
   return actions;
 }
 
+// TODO: This is a function for TESTING PURPOSES ONLY, remove before finalizing
 function executePlayerActions(
   gameState: GameState,
   playerActions: PlayerAction[]
@@ -203,12 +232,42 @@ function executePlayerActions(
 
 //function handleAllTrades(gameState: GameState): GameState {} // TODO: Implement trading, will have to figure out AI decision making and everything so will do this much later
 
+// TODO: This is a function for TESTING PURPOSES ONLY, remove before finalizing
 function displayPlayerState(player: Player) {
   console.log(`\nPlayer: ${player.name}`);
   console.log(`Gold: ${player.gold}`);
+  console.log(`Shields: ${player.shields}`);
+  console.log(`Victory Points: ${player.victoryPoints}`);
+  console.log(`Science:`, player.science);
   console.log(`Resources:`, player.resources);
+  console.log(`Built Structures:`);
+  player.playerBoard.forEach((card) => {
+    console.log(`Structure: ${card.name}`);
+  });
   console.log(`Wonder Stages:`);
   player.wonder.wonderStages.forEach((stage, index) => {
-    console.log(`  Stage ${index + 1}: ${stage.isBuilt ? "Built" : "Not Built"}`);
+    console.log(
+      `  Stage ${index + 1}: ${stage.isBuilt ? "Built" : "Not Built"}`
+    );
+  });
+}
+
+// TODO: This is a function for TESTING PURPOSES ONLY, remove before finalizing
+function addRandomResourceFromCards(player: Player) {
+  player.playerBoard.forEach((card) => {
+    if (card.production) {
+      Object.entries(card.production).forEach(([resource, amount]) => {
+        if (typeof resource === "string" && resource.includes(",")) {
+          const choices = resource
+            .split(",")
+            .map((r) => r.trim()) as ResourceType[];
+          const randomChoice =
+            choices[Math.floor(Math.random() * choices.length)];
+
+          player.tempResources[randomChoice] =
+            (player.tempResources[randomChoice] || 0) + (amount as number);
+        }
+      });
+    }
   });
 }

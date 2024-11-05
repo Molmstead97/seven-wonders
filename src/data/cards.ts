@@ -1,10 +1,11 @@
-import { Card } from "../gameLogic/types/card";
+import { Card } from "../game-logic/types/card";
 
 export const cards: Card[] = [
   {
     /* ALL BROWN CARDS */
     name: "Lumber Yard",
     description: "Produces 1 Wood per turn.",
+    imagePath: "../assets/card-images/brown/lumber-yard.png",
     production: { Wood: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -19,6 +20,7 @@ export const cards: Card[] = [
   {
     name: "Stone Pit",
     description: "Produces 1 Stone per turn.",
+    imagePath: "../assets/card-images/brown/stone-pit.png",
     production: { Stone: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -33,6 +35,7 @@ export const cards: Card[] = [
   {
     name: "Clay Pool",
     description: "Produces 1 Clay per turn.",
+    imagePath: "../assets/card-images/brown/clay-pool.png",
     production: { Clay: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -47,6 +50,7 @@ export const cards: Card[] = [
   {
     name: "Ore Vein",
     description: "Produces 1 Ore per turn.",
+    imagePath: "../assets/card-images/brown/ore-vein.png",
     production: { Ore: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -61,8 +65,9 @@ export const cards: Card[] = [
   {
     name: "Tree Farm",
     description: "Produces 1 Wood or Clay per turn.",
+    imagePath: "../assets/card-images/brown/tree-farm.png",
     production: {
-      resources: ["Wood", "Clay"],
+      choice: [{ options: ["Wood", "Clay"], amount: 1 }],
     },
 
     playerCount: [{ minPlayers: 6, copies: 1 }],
@@ -75,8 +80,9 @@ export const cards: Card[] = [
   {
     name: "Excavation",
     description: "Produces 1 Stone or Clay per turn.",
+    imagePath: "../assets/card-images/brown/excavation.png",
     production: {
-      resources: ["Stone", "Clay"],
+      choice: [{ options: ["Stone", "Clay"], amount: 1 }],
     },
 
     playerCount: [{ minPlayers: 4, copies: 1 }],
@@ -89,8 +95,9 @@ export const cards: Card[] = [
   {
     name: "Clay Pit",
     description: "Produces 1 Clay or Ore per turn.",
+    imagePath: "../assets/card-images/brown/clay-pit.png",
     production: {
-      resources: ["Clay", "Ore"],
+      choice: [{ options: ["Clay", "Ore"], amount: 1 }],
     },
 
     playerCount: [{ minPlayers: 3, copies: 1 }],
@@ -103,8 +110,9 @@ export const cards: Card[] = [
   {
     name: "Timber Yard",
     description: "Produces 1 Stone or Wood per turn.",
+    imagePath: "../assets/card-images/brown/timber-yard.png",
     production: {
-      resources: ["Stone", "Wood"],
+      choice: [{ options: ["Stone", "Wood"], amount: 1 }],
     },
     playerCount: [{ minPlayers: 3, copies: 1 }],
     upgradeCard: false,
@@ -116,8 +124,9 @@ export const cards: Card[] = [
   {
     name: "Forest Cave",
     description: "Produces 1 Wood or Ore per turn.",
+    imagePath: "../assets/card-images/brown/forest-cave.png",
     production: {
-      resources: ["Wood", "Ore"],
+      choice: [{ options: ["Wood", "Ore"], amount: 1 }],
     },
 
     playerCount: [{ minPlayers: 5, copies: 1 }],
@@ -130,11 +139,12 @@ export const cards: Card[] = [
   {
     name: "Mine",
     description: "Produces 1 Ore or Stone per turn.",
+    imagePath: "../assets/card-images/brown/mine.png",
     production: {
-      resources: ["Ore", "Stone"],
+      choice: [{ options: ["Ore", "Stone"], amount: 1 }],
     },
 
-    playerCount: [{ minPlayers: 5, copies: 1 }],
+    playerCount: [{ minPlayers: 6, copies: 1 }],
     upgradeCard: false,
     cost: 1,
     age: 1,
@@ -144,6 +154,7 @@ export const cards: Card[] = [
   {
     name: "Sawmill",
     description: "Produces 2 Wood per turn.",
+    imagePath: "../assets/card-images/brown/sawmill.png",
     production: { Wood: 2 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -158,6 +169,7 @@ export const cards: Card[] = [
   {
     name: "Quarry",
     description: "Produces 2 Stone per turn.",
+    imagePath: "../assets/card-images/brown/quarry.png",
     production: { Stone: 2 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -172,6 +184,7 @@ export const cards: Card[] = [
   {
     name: "Brickyard",
     description: "Produces 2 Clay per turn.",
+    imagePath: "../assets/card-images/brown/brickyard.png",
     production: { Clay: 2 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -186,6 +199,7 @@ export const cards: Card[] = [
   {
     name: "Foundry",
     description: "Produces 2 Ore per turn.",
+    imagePath: "../assets/card-images/brown/foundry.png",
     production: { Ore: 2 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -197,11 +211,12 @@ export const cards: Card[] = [
     cardColor: "Brown",
   },
 
-  /* ALL GRAY CARDS */
+  /* ALL GREY CARDS */
 
   {
     name: "Loom",
     description: "Produces 1 Textile per turn.",
+    imagePath: "../assets/card-images/grey/loom.png",
     production: { Textile: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -211,12 +226,12 @@ export const cards: Card[] = [
     cost: null,
     age: 1,
     cardColor: "Grey",
-    ageVariant: { age: 2, maxPlayers: 5 },
   },
 
   {
     name: "Glassworks",
     description: "Produces 1 Glass per turn.",
+    imagePath: "../assets/card-images/grey/glassworks.png",
     production: { Glass: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -226,12 +241,12 @@ export const cards: Card[] = [
     cost: null,
     age: 1,
     cardColor: "Grey",
-    ageVariant: { age: 2, maxPlayers: 5 },
   },
 
   {
     name: "Press",
     description: "Produces 1 Papyrus per turn.",
+    imagePath: "../assets/card-images/grey/press.png",
     production: { Papyrus: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -241,7 +256,6 @@ export const cards: Card[] = [
     cost: null,
     age: 1,
     cardColor: "Grey",
-    ageVariant: { age: 2, maxPlayers: 5 },
   },
 
   /* ALL BLUE CARDS */
@@ -249,6 +263,7 @@ export const cards: Card[] = [
   {
     name: "Pawnshop",
     description: "Grants 3 Victory Points upon acquisition.",
+    imagePath: "../assets/card-images/blue/pawnshop.png",
     victoryPoints: 3,
     playerCount: [
       { minPlayers: 4, copies: 1 },
@@ -263,7 +278,9 @@ export const cards: Card[] = [
   {
     name: "Baths",
     description: "Grants 3 Victory Points upon acquisition.",
+    imagePath: "../assets/card-images/blue/baths.png",
     victoryPoints: 3,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -278,6 +295,7 @@ export const cards: Card[] = [
     name: "Altar",
     description: "Grants 2 Victory Points upon acquisition.",
     victoryPoints: 2,
+    imagePath: "../assets/card-images/blue/altar.png",
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -291,7 +309,9 @@ export const cards: Card[] = [
   {
     name: "Theater",
     description: "Grants 2 Victory Points upon acquisition.",
+    imagePath: "../assets/card-images/blue/theater.png",
     victoryPoints: 2,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -305,7 +325,9 @@ export const cards: Card[] = [
   {
     name: "Aqueduct",
     description: "Grants 5 Victory Points upon acquisition.",
+    imagePath: "../assets/card-images/blue/aqueduct.png",
     victoryPoints: 5,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -319,7 +341,9 @@ export const cards: Card[] = [
   {
     name: "Temple",
     description: "Grants 3 Victory Points upon acquisition.",
+    imagePath: "../assets/card-images/blue/temple.png",
     victoryPoints: 3,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -333,7 +357,9 @@ export const cards: Card[] = [
   {
     name: "Statue",
     description: "Grants 4 Victory Points upon acquisition.",
+    imagePath: "../assets/card-images/blue/statue.png",
     victoryPoints: 4,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -347,7 +373,9 @@ export const cards: Card[] = [
   {
     name: "Courthouse",
     description: "Grants 4 Victory Points upon acquisition.",
+    imagePath: "../assets/card-images/blue/courthouse.png",
     victoryPoints: 4,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -361,7 +389,9 @@ export const cards: Card[] = [
   {
     name: "Pantheon",
     description: "Grants 7 Victory Points upon acquisition.",
+    imagePath: "../assets/card-images/blue/pantheon.png",
     victoryPoints: 7,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -375,7 +405,9 @@ export const cards: Card[] = [
   {
     name: "Gardens",
     description: "Grants 5 Victory Points upon acquisition.",
+    imagePath: "../assets/card-images/blue/gardens.png",
     victoryPoints: 5,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -389,7 +421,9 @@ export const cards: Card[] = [
   {
     name: "Town Hall",
     description: "Grants 6 Victory Points upon acquisition.",
+    imagePath: "../assets/card-images/blue/town-hall.png",
     victoryPoints: 6,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -404,7 +438,9 @@ export const cards: Card[] = [
   {
     name: "Palace",
     description: "Grants 8 Victory Points upon acquisition.",
+    imagePath: "../assets/card-images/blue/palace.png",
     victoryPoints: 8,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -426,7 +462,9 @@ export const cards: Card[] = [
   {
     name: "Senate",
     description: "Grants 6 Victory Points upon acquisition.",
+    imagePath: "../assets/card-images/blue/senate.png",
     victoryPoints: 6,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -442,7 +480,9 @@ export const cards: Card[] = [
   {
     name: "Tavern",
     description: "Grants 5 gold upon acquisition.",
+    imagePath: "../assets/card-images/yellow/tavern.png",
     gold: 5,
+
     playerCount: [
       { minPlayers: 4, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -458,6 +498,7 @@ export const cards: Card[] = [
     name: "East Trading Post",
     description:
       "You may purchase raw materials from the neighboring city to your right for 1 coin instead of 2.",
+    imagePath: "../assets/card-images/yellow/east-trading-post.png",
     specialEffect: {
       type: "tradeDiscount",
       neighbor: "right",
@@ -478,11 +519,13 @@ export const cards: Card[] = [
     name: "West Trading Post",
     description:
       "You may purchase raw materials from the neighboring city to your left for 1 coin instead of 2.",
+    imagePath: "../assets/card-images/yellow/west-trading-post.png",
     specialEffect: {
       type: "tradeDiscount",
       neighbor: "left",
       resource: ["Wood", "Stone", "Clay", "Ore"],
     },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -497,11 +540,13 @@ export const cards: Card[] = [
     name: "Marketplace",
     description:
       "You may purchase manufactured goods from either neighboring city for 1 coin instead of 2.",
+    imagePath: "../assets/card-images/yellow/marketplace.png",
     specialEffect: {
       type: "tradeDiscount",
       neighbor: "both",
       resource: ["Glass", "Textile", "Papyrus"],
     },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -515,8 +560,9 @@ export const cards: Card[] = [
   {
     name: "Forum",
     description: "Produces 1 manufactured good of your choice per turn.",
+    imagePath: "../assets/card-images/yellow/forum.png",
     production: {
-      resources: ["Glass", "Textile", "Papyrus"],
+      choice: [{ options: ["Glass", "Textile", "Papyrus"], amount: 1 }],
     },
 
     playerCount: [
@@ -533,8 +579,9 @@ export const cards: Card[] = [
   {
     name: "Caravansery",
     description: "Produces 1 raw material of your choice per turn.",
+    imagePath: "../assets/card-images/yellow/caravansery.png",
     production: {
-      resources: ["Wood", "Ore", "Clay", "Stone"],
+      choice: [{ options: ["Wood", "Ore", "Clay", "Stone"], amount: 1 }],
     },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -551,12 +598,14 @@ export const cards: Card[] = [
     name: "Vineyard",
     description:
       "Upon acquisition, grants gold per brown card built by you and neighboring cities.",
+    imagePath: "../assets/card-images/yellow/vineyard.png",
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: "Brown",
       gold: 1,
       scope: "all",
     },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -571,12 +620,14 @@ export const cards: Card[] = [
     name: "Bazaar",
     description:
       "Upon acquisition, grants 2 gold per grey card built by you and neighboring cities.",
+    imagePath: "../assets/card-images/yellow/bazaar.png",
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: "Grey",
       gold: 2,
       scope: "all",
     },
+
     playerCount: [
       { minPlayers: 4, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -591,6 +642,7 @@ export const cards: Card[] = [
     name: "Haven",
     description:
       "Upon acquisition, grants gold per brown card you've built. Worth 1 Victory Point per brown card you've built at the end of the game.",
+    imagePath: "../assets/card-images/yellow/haven.png",
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: "Brown",
@@ -598,6 +650,7 @@ export const cards: Card[] = [
       victoryPoints: 1,
       scope: "self",
     },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -612,6 +665,7 @@ export const cards: Card[] = [
     name: "Lighthouse",
     description:
       "Upon acquisition, grants gold per yellow card you've built. Worth 1 Victory Point per yellow card you've built at the end of the game.",
+    imagePath: "../assets/card-images/yellow/lighthouse.png",
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: "Yellow",
@@ -619,6 +673,7 @@ export const cards: Card[] = [
       victoryPoints: 1,
       scope: "self",
     },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -633,6 +688,7 @@ export const cards: Card[] = [
     name: "Chamber of Commerce",
     description:
       "Upon acquisition, grants 2 gold per grey card you've built. Worth 2 Victory Points per grey card you've built at the end of the game.",
+    imagePath: "../assets/card-images/yellow/chamber-of-commerce.png",
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: "Grey",
@@ -640,6 +696,7 @@ export const cards: Card[] = [
       victoryPoints: 2,
       scope: "self",
     },
+
     playerCount: [
       { minPlayers: 4, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -654,6 +711,7 @@ export const cards: Card[] = [
     name: "Arena",
     description:
       "Upon acquisition, grants 3 gold per Wonder stage you've constructed. Worth 1 Victory Point per Wonder stage you've constructed at the end of the game.",
+    imagePath: "../assets/card-images/yellow/arena.png",
     specialEffect: {
       type: "goldVictoryBonus",
       gold: 3,
@@ -661,6 +719,7 @@ export const cards: Card[] = [
       scope: "self",
       name: "Arena",
     },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -677,6 +736,7 @@ export const cards: Card[] = [
   {
     name: "Stockade",
     description: "Grants 1 Shield upon acquisition.",
+    imagePath: "../assets/card-images/red/stockade.png",
     shields: 1,
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -691,6 +751,7 @@ export const cards: Card[] = [
   {
     name: "Barracks",
     description: "Grants 1 Shield upon acquisition.",
+    imagePath: "../assets/card-images/red/barracks.png",
     shields: 1,
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -705,7 +766,9 @@ export const cards: Card[] = [
   {
     name: "Guard Tower",
     description: "Grants 1 Shield upon acquisition.",
+    imagePath: "../assets/card-images/red/guard-tower.png",
     shields: 1,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -719,7 +782,9 @@ export const cards: Card[] = [
   {
     name: "Walls",
     description: "Grants 2 Shields upon acquisition.",
+    imagePath: "../assets/card-images/red/walls.png",
     shields: 2,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -733,7 +798,9 @@ export const cards: Card[] = [
   {
     name: "Training Ground",
     description: "Grants 2 Shields upon acquisition.",
+    imagePath: "../assets/card-images/red/training-ground.png",
     shields: 2,
+
     playerCount: [
       { minPlayers: 4, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -748,7 +815,9 @@ export const cards: Card[] = [
   {
     name: "Stables",
     description: "Grants 2 Shields upon acquisition.",
+    imagePath: "../assets/card-images/red/stables.png",
     shields: 2,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -762,7 +831,9 @@ export const cards: Card[] = [
   {
     name: "Archery Range",
     description: "Grants 2 Shields upon acquisition.",
+    imagePath: "../assets/card-images/red/archery-range.png",
     shields: 2,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -776,7 +847,9 @@ export const cards: Card[] = [
   {
     name: "Fortifications",
     description: "Grants 3 Shields upon acquisition.",
+    imagePath: "../assets/card-images/red/fortifications.png",
     shields: 3,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -790,7 +863,9 @@ export const cards: Card[] = [
   {
     name: "Circus",
     description: "Grants 3 Shields upon acquisition.",
+    imagePath: "../assets/card-images/red/circus.png",
     shields: 3,
+
     playerCount: [
       { minPlayers: 4, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -805,7 +880,9 @@ export const cards: Card[] = [
   {
     name: "Arsenal",
     description: "Grants 3 Shields upon acquisition.",
+    imagePath: "../assets/card-images/red/arsenal.png",
     shields: 3,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -820,7 +897,9 @@ export const cards: Card[] = [
   {
     name: "Siege Workshop",
     description: "Grants 3 Shields upon acquisition.",
+    imagePath: "../assets/card-images/red/siege-workshop.png",
     shields: 3,
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -836,7 +915,9 @@ export const cards: Card[] = [
   {
     name: "Apothecary",
     description: "Grants 1 Compass upon acquisition.",
+    imagePath: "../assets/card-images/green/apothecary.png",
     science: { Compass: 1 },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -850,7 +931,9 @@ export const cards: Card[] = [
   {
     name: "Workshop",
     description: "Grants 1 Cog upon acquisition.",
+    imagePath: "../assets/card-images/green/workshop.png",
     science: { Cog: 1 },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -864,7 +947,9 @@ export const cards: Card[] = [
   {
     name: "Scriptorium",
     description: "Grants 1 Tablet upon acquisition.",
+    imagePath: "../assets/card-images/green/scriptorium.png",
     science: { Tablet: 1 },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -878,7 +963,9 @@ export const cards: Card[] = [
   {
     name: "Dispensary",
     description: "Grants 1 Compass upon acquisition.",
+    imagePath: "../assets/card-images/green/dispensary.png",
     science: { Compass: 1 },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -892,7 +979,9 @@ export const cards: Card[] = [
   {
     name: "Library",
     description: "Grants 1 Tablet upon acquisition.",
+    imagePath: "../assets/card-images/green/library.png",
     science: { Tablet: 1 },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -906,7 +995,9 @@ export const cards: Card[] = [
   {
     name: "School",
     description: "Grants 1 Tablet upon acquisition.",
+    imagePath: "../assets/card-images/green/school.png",
     science: { Tablet: 1 },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -920,7 +1011,9 @@ export const cards: Card[] = [
   {
     name: "Laboratory",
     description: "Grants 1 Cog upon acquisition.",
+    imagePath: "../assets/card-images/green/laboratory.png",
     science: { Cog: 1 },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -934,7 +1027,9 @@ export const cards: Card[] = [
   {
     name: "Lodge",
     description: "Grants 1 Compass upon acquisition.",
+    imagePath: "../assets/card-images/green/lodge.png",
     science: { Compass: 1 },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 6, copies: 2 },
@@ -948,7 +1043,9 @@ export const cards: Card[] = [
   {
     name: "Observatory",
     description: "Grants 1 Cog upon acquisition.",
+    imagePath: "../assets/card-images/green/observatory.png",
     science: { Cog: 1 },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -962,7 +1059,9 @@ export const cards: Card[] = [
   {
     name: "University",
     description: "Grants 1 Tablet upon acquisition.",
+    imagePath: "../assets/card-images/green/university.png",
     science: { Tablet: 1 },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 4, copies: 2 },
@@ -975,7 +1074,9 @@ export const cards: Card[] = [
   {
     name: "Academy",
     description: "Grants 1 Compass upon acquisition.",
+    imagePath: "../assets/card-images/green/academy.png",
     science: { Compass: 1 },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 7, copies: 2 },
@@ -989,7 +1090,9 @@ export const cards: Card[] = [
   {
     name: "Study",
     description: "Grants 1 Cog upon acquisition.",
+    imagePath: "../assets/card-images/green/study.png",
     science: { Cog: 1 },
+
     playerCount: [
       { minPlayers: 3, copies: 1 },
       { minPlayers: 5, copies: 2 },
@@ -1006,6 +1109,7 @@ export const cards: Card[] = [
     name: "Workers Guild",
     description:
       "Grants 1 Victory Point per brown card built in neighboring cities at the end of the game.",
+    imagePath: "../assets/card-images/purple/workers-guild.png",
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: "Brown",
@@ -1022,6 +1126,7 @@ export const cards: Card[] = [
     name: "Craftsmen Guild",
     description:
       "Grants 2 Victory Points per grey card built in neighboring cities at the end of the game.",
+    imagePath: "../assets/card-images/purple/craftsmen-guild.png",
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: "Grey",
@@ -1038,6 +1143,7 @@ export const cards: Card[] = [
     name: "Traders Guild",
     description:
       "Grants 1 Victory Point per yellow card built in neighboring cities at the end of the game.",
+    imagePath: "../assets/card-images/purple/traders-guild.png",
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: "Yellow",
@@ -1054,6 +1160,7 @@ export const cards: Card[] = [
     name: "Philosophers Guild",
     description:
       "Grants 1 Victory Point per green card built in neighboring cities at the end of the game.",
+    imagePath: "../assets/card-images/purple/philosophers-guild.png",
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: "Green",
@@ -1070,6 +1177,7 @@ export const cards: Card[] = [
     name: "Spy Guild",
     description:
       "Grants 1 Victory Point per red card built in neighboring cities at the end of the game.",
+    imagePath: "../assets/card-images/purple/spy-guild.png",
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: "Red",
@@ -1086,6 +1194,7 @@ export const cards: Card[] = [
     name: "Strategy Guild",
     description:
       "Grants 1 Victory Point for each conflict loss in neighboring cities at the end of the game.",
+    imagePath: "../assets/card-images/purple/strategy-guild.png",
     specialEffect: {
       type: "goldVictoryBonus",
       victoryPoints: 1,
@@ -1102,6 +1211,7 @@ export const cards: Card[] = [
     name: "Shipowners Guild",
     description:
       "Grants 1 Victory Point for each brown, grey, and guild card you've built at the end of the game.",
+    imagePath: "../assets/card-images/purple/shipowners-guild.png",
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: ["Brown", "Grey", "Purple"],
@@ -1118,6 +1228,7 @@ export const cards: Card[] = [
     name: "Magistrates Guild",
     description:
       "Grants 1 Victory Point per blue card built by neighboring cities at the end of the game.",
+    imagePath: "../assets/card-images/purple/magistrates-guild.png",
     specialEffect: {
       type: "goldVictoryBonus",
       cardColor: "Blue",
@@ -1134,6 +1245,7 @@ export const cards: Card[] = [
     name: "Scientists Guild",
     description:
       "Grants either 1 Compass, Cog, or Tablet at the end of the game.",
+    imagePath: "../assets/card-images/purple/scientists-guild.png",
     specialEffect: {
       type: "freeScience",
       scienceType: ["Compass", "Cog", "Tablet"],
@@ -1148,6 +1260,7 @@ export const cards: Card[] = [
     name: "Builders Guild",
     description:
       "Grants 1 Victory Point per Wonder stage you and neighboring cities have constructed at the end of the game.",
+    imagePath: "../assets/card-images/purple/builders-guild.png",
     specialEffect: {
       type: "goldVictoryBonus",
       victoryPoints: 1,

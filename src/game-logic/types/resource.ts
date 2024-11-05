@@ -12,11 +12,13 @@ export type Resource = {
 };
 
 export type ProductionChoice = {
-  // This is used for cards that have multiple production options
-  resources: ResourceType[];
+  options: ResourceType[];
+  amount: number;
 };
 
-export type Production = Resource | ProductionChoice;
+export type Production = Resource & {
+  choice?: ProductionChoice[];
+};
 
 export type ScienceType = "Cog" | "Compass" | "Tablet";
 

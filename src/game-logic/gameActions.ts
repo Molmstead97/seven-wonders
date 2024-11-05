@@ -10,7 +10,7 @@ import { buildWonder } from './utils/buildWonder';
 import { tradeResource } from './utils/tradeResource';
 import { ageEnd } from './utils/ageEnd'
 import { gameEnd } from './utils/gameEnd'
-import { passHands, lastTwoCards } from "./utils/passHand";
+import { passHands } from "./utils/passHand";
 
 export function handleCardPlay(gameState: GameState, playerId: number, cardIndex: number): GameState {
   const newState = { ...gameState };
@@ -46,22 +46,6 @@ export function handleBuildWonder(gameState: GameState, playerId: number, wonder
 
 export function handlePassHand(gameState: GameState): GameState {
   let updatedGameState = gameState;
-
-  // Check if all players have two cards left
-  if (updatedGameState.players.every(player => player.playerHand.length === 2)) {
-    // Handle last two cards for all players
-    updatedGameState.players = updatedGameState.players.map(player => 
-      lastTwoCards(player, updatedGameState)
-    );
-
-    // After all players have played their last two cards, end the age
-    updatedGameState = handleAgeEnd(updatedGameState);
-
-    // Return here as we don't need to pass hands anymore
-    return updatedGameState;
-  }
-
-  // If not all players have two cards, pass hands normally
   updatedGameState = passHands(updatedGameState);
 
   return updatedGameState;

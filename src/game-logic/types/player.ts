@@ -18,5 +18,4 @@ export interface Player {
   leftPlayer: Player;
   rightPlayer: Player;
   freeBuildPerAge: Record<number, boolean>;
-  canPlaySeventhCard: boolean;
 }

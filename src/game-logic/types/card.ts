@@ -7,16 +7,12 @@ export interface PlayerCountThreshold {
   copies: number;
 }
 
-export interface AgeVariant {
-  age: 2 | 3; // Age variants only apply to Ages 2 or 3
-  maxPlayers: number;
-}
-
 export type CardColor = "Brown" | "Red" | "Yellow" | "Grey" | "Green" | "Blue" | "Purple";
 
 export interface Card {
   name: string;
   description: string;
+  imagePath: string;
   production?: Production
   victoryPoints?: number;
   gold?: number;
@@ -24,9 +20,8 @@ export interface Card {
   shields?: number;
   specialEffect?: SpecialEffect;
   playerCount?: PlayerCountThreshold[];
-  upgradeCard: boolean;
+  upgradeCard: string | string[] | null;
   cost: Resource | number | null; // The number is the cost in gold.
   age: 1 | 2 | 3;
   cardColor: CardColor | CardColor[];
-  ageVariant?: AgeVariant; // This is only for the Grey cards, they're a little weird.
 }

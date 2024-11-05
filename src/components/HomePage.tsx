@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Game from "./Game";
-import { gameLoop, GameState } from "../gameLogic/gameState";
+import { gameLoop, GameState } from "../game-logic/gameState";
 
 const HomePage = () => {
   const [gameStarted, setGameStarted] = useState(false);

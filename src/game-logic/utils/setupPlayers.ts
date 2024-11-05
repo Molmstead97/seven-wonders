@@ -1,7 +1,6 @@
 import { Player } from "../types/player";
 import { Card } from "../types/card";
 import { pickWonders } from "./pickWonders";
-import { Resource } from "../types/resource";
 
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET, MAKE SURE TO DOUBLE CHECK LEFT AND RIGHT PLAYER ASSIGNMENTS
 
@@ -12,7 +11,6 @@ export const setupPlayers = () => {
   while (true) {
     howManyAIPlayers = prompt("How many AI players are playing?");
 
-    
     if (
       howManyAIPlayers !== null &&
       howManyAIPlayers !== "" &&
@@ -69,21 +67,16 @@ export const setupPlayers = () => {
     freeBuildPerAge: {},
   };
 
+  userPlayer.resources = {
+    ...userPlayer.resources,
+    ...userPlayer.wonder.production,
+  };
+
   // Log the user's wonder and initial resources
   console.log(`User Player Wonder: ${userPlayer.wonder.name}`);
-  console.log('User Player Initial Resources:', userPlayer.resources);
+  console.log("User Player Initial Resources:", userPlayer.resources);
 
   // Apply initial production from the wonder
-  if (userPlayer.wonder.production) {
-    Object.entries(userPlayer.wonder.production).forEach(
-      ([resource, amount]) => {
-        if (amount !== undefined && resource in userPlayer.resources) {
-          userPlayer.resources[resource as keyof Resource] =
-            (userPlayer.resources[resource as keyof Resource] || 0) + amount;
-        }
-      }
-    );
-  }
 
   players.push(userPlayer);
 
@@ -128,21 +121,15 @@ export const setupPlayers = () => {
       freeBuildPerAge: {}, // Only used if Player is playing Olympia A. // TODO: Might make sense to move this to the wonder struct. Or make this optional as well as other special effects.
     };
 
+    // Apply initial production from the wonder
+    aiPlayer.resources = {
+      ...aiPlayer.resources,
+      ...aiPlayer.wonder.production,
+    };
+
     // Log each AI player's wonder and initial resources
     console.log(`AI Player ${i} Wonder: ${aiPlayer.wonder.name}`);
     console.log(`AI Player ${i} Initial Resources:`, aiPlayer.resources);
-
-    // Apply initial production from the wonder
-    if (aiPlayer.wonder.production) {
-      Object.entries(aiPlayer.wonder.production).forEach(
-        ([resource, amount]) => {
-          if (amount !== undefined && resource in aiPlayer.resources) {
-            aiPlayer.resources[resource as keyof Resource] =
-              (aiPlayer.resources[resource as keyof Resource] || 0) + amount;
-          }
-        }
-      );
-    }
 
     players.push(aiPlayer);
   }

@@ -1,6 +1,6 @@
 import { Player } from "../types/player";
 import { Card } from "../types/card";
-import { Production, ResourceType, ScienceType } from "../types/resource";
+import { Resource, ScienceType } from "../types/resource";
 import { checkResources } from "./resourceCheck";
 import { GameState } from "../gameState";
 import { applyGoldVictoryBonus } from "../types/cardSpecialEffects";
@@ -9,10 +9,16 @@ import { applyGoldVictoryBonus } from "../types/cardSpecialEffects";
 
 export function playCard(player: Player, card: Card) {
   const updatedPlayer = { ...player };
-  
+
   // Check if the player already has a card with the same name on their board
-  if (Array.from(updatedPlayer.playerBoard).some(boardCard => boardCard.name === card.name)) {
-    alert("You cannot play a card with the same name as a card already on your board"); // TODO: Replace with UI
+  if (
+    Array.from(updatedPlayer.playerBoard).some(
+      (boardCard) => boardCard.name === card.name
+    )
+  ) {
+    alert(
+      "You cannot play a card with the same name as a card already on your board"
+    ); // TODO: Replace with UI
     return updatedPlayer; // Return the player without modifying their hand or board
   }
 
@@ -34,7 +40,6 @@ export function playCard(player: Player, card: Card) {
 
     // Log the card played and updated resources
     console.log(`Played card: ${card.name}`);
-    console.log(`Updated resources:`, updatedPlayer.resources);
   } else {
     alert("Not enough resources to play this card"); // TODO: Replace with UI
     return updatedPlayer; // Return the player without modifying their hand
@@ -46,7 +51,7 @@ export function playCard(player: Player, card: Card) {
 export function discardCard(player: Player, card: Card, gameState: GameState) {
   const updatedPlayer = { ...player };
   const updatedGameState = { ...gameState };
-  
+
   const index = updatedPlayer.playerHand.indexOf(card);
   if (index > -1) {
     updatedPlayer.playerHand = [
@@ -56,14 +61,22 @@ export function discardCard(player: Player, card: Card, gameState: GameState) {
     updatedPlayer.gold += 3;
     updatedGameState.discardPile = [...updatedGameState.discardPile, card];
   }
-  
+
   return { player: updatedPlayer, gameState: updatedGameState };
 }
 
 function applyCardEffects(player: Player, card: Card) {
   // Apply resource production
   if (card.production) {
-    applyProduction(player, card.production);
+    if (card.production.choice) {
+      // promptChoiceProduction(player, card.production.choice); // TODO: Implement this
+    } else {
+      Object.entries(card.production).forEach(([resource, amount]) => {
+        player.resources[resource as keyof Resource] =
+          (player.resources[resource as keyof Resource] || 0) +
+          (amount as number);
+      });
+    }
   }
 
   // Apply victory points
@@ -79,10 +92,8 @@ function applyCardEffects(player: Player, card: Card) {
   // Apply science
   if (card.science) {
     Object.entries(card.science).forEach(([resource, amount]) => {
-      if (amount !== undefined) {
-        player.science[resource as ScienceType] =
-          (player.science[resource as ScienceType] || 0) + amount;
-      }
+      player.science[resource as ScienceType] =
+        (player.science[resource as ScienceType] || 0) + (amount as number);
     });
   }
 
@@ -94,14 +105,4 @@ function applyCardEffects(player: Player, card: Card) {
   if (card.specialEffect && card.specialEffect.type === "goldVictoryBonus") {
     applyGoldVictoryBonus(player, card.specialEffect);
   }
-}
-
-function applyProduction(player: Player, production: Production) {
-  // Handle resource production based on card effects
-  Object.entries(production).forEach(([resource, amount]) => {
-    if (amount !== undefined) {
-      player.resources[resource as ResourceType] =
-        (player.resources[resource as ResourceType] || 0) + amount;
-    }
-  });
 }

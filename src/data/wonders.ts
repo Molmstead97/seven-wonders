@@ -1,10 +1,12 @@
-import { Wonder } from "../gameLogic/types/wonder";
+import { Wonder } from "../game-logic/types/wonder";
 
 // TODO: Add special effects to wonders
+// TODO: MAKE SURE ALL ARE PNG NOT JPG
 
 export const wonders: Wonder[] = [
   {
     name: "Alexandria A",
+    imagePath: "../public/images/wonder-images/alexandriaA.png",
     production: { Glass: 1 },
     wonderStages: [
       {
@@ -17,7 +19,9 @@ export const wonders: Wonder[] = [
         stage: 2,
         cost: { Ore: 2 },
         production: {
-          resources: ["Clay", "Ore", "Wood", "Stone"],
+          choice: [
+            { options: ["Clay", "Ore", "Wood", "Stone"], amount: 1 },
+          ],
         },
         isBuilt: false,
       },
@@ -31,13 +35,16 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Alexandria B",
+    imagePath: "../public/images/wonder-images/alexandriaB.jpg",
     production: { Glass: 1 },
     wonderStages: [
       {
         stage: 1,
         cost: { Clay: 2 },
         production: {
-          resources: ["Wood", "Stone", "Ore", "Clay"],
+          choice: [
+            { options: ["Wood", "Stone", "Ore", "Clay"], amount: 1 },
+          ],
         },
         isBuilt: false,
       },
@@ -45,7 +52,9 @@ export const wonders: Wonder[] = [
         stage: 2,
         cost: { Wood: 2 },
         production: {
-          resources: ["Glass", "Textile", "Papyrus"],
+          choice: [
+            { options: ["Glass", "Textile", "Papyrus"], amount: 1 },
+          ],
         },
         isBuilt: false,
       },
@@ -59,6 +68,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Babylon A",
+    imagePath: "../public/images/wonder-images/babylonA.png",
     production: { Clay: 1 },
     wonderStages: [
       {
@@ -86,6 +96,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Babylon B",
+    imagePath: "../public/images/wonder-images/babylonB.png",
     production: { Clay: 1 },
     wonderStages: [
       {
@@ -118,6 +129,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Éphesos A",
+    imagePath: "../public/images/wonder-images/ephesosA.png",
     production: { Papyrus: 1 },
     wonderStages: [
       {
@@ -142,6 +154,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Éphesos B",
+    imagePath: "../public/images/wonder-images/ephesosB.jpg",
     production: { Papyrus: 1 },
     wonderStages: [
       {
@@ -173,6 +186,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Gizah A",
+    imagePath: "../public/images/wonder-images/gizahA.png",
     production: { Stone: 1 },
     wonderStages: [
       {
@@ -197,6 +211,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Gizah B",
+    imagePath: "../public/images/wonder-images/gizahB.png",
     production: { Stone: 1 },
     wonderStages: [
       {
@@ -227,6 +242,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Halikarnassós A",
+    imagePath: "../public/images/wonder-images/halikarnassosA.png",
     production: { Textile: 1 },
     wonderStages: [
       {
@@ -251,6 +267,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Halikarnassós B",
+    imagePath: "../public/images/wonder-images/halikarnassosB.png",
     production: { Textile: 1 },
     wonderStages: [
       {
@@ -277,6 +294,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Olympía A",
+    imagePath: "../public/images/wonder-images/olympiaA.png",
     production: { Wood: 1 },
     wonderStages: [
       {
@@ -301,6 +319,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Olympía B",
+    imagePath: "../public/images/wonder-images/olympiaB.png",
     production: { Wood: 1 },
     wonderStages: [
       {
@@ -329,6 +348,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Rhódos A",
+    imagePath: "../public/images/wonder-images/rhodosA.png",
     production: { Ore: 1 },
     wonderStages: [
       {
@@ -353,6 +373,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Rhódos B",
+    imagePath: "../public/images/wonder-images/rhodosB.png",
     production: { Ore: 1 },
     wonderStages: [
       {

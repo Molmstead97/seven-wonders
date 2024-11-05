@@ -14,7 +14,8 @@ export interface WonderStage {
 }
 
 export interface Wonder {
-    name: string;
-    production: Production;
-    wonderStages: WonderStage[];
+  name: string;
+  imagePath: string;
+  production: Production;
+  wonderStages: WonderStage[];
 }

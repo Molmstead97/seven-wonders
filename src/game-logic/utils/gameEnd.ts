@@ -29,6 +29,8 @@ export function gameEnd(players: Player[]): Player[] {
       }
     });
 
+    console.log(`You ended the game with ${player.victoryPoints} victory points!`); // TODO: Replace with UI
+
     return player;
   });
 }
