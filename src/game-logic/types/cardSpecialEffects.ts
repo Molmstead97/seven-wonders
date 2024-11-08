@@ -39,9 +39,9 @@ export function applyGoldVictoryBonus(
   if (goldVictoryBonus.name === "Builders Guild") {
     matchingCards =
       player.wonder.wonderStages.filter((stage) => stage.isBuilt).length +
-      player.leftPlayer.wonder.wonderStages.filter((stage) => stage.isBuilt)
+      (player.leftPlayer || player).wonder.wonderStages.filter((stage) => stage.isBuilt)
         .length +
-      player.rightPlayer.wonder.wonderStages.filter((stage) => stage.isBuilt)
+      (player.rightPlayer || player).wonder.wonderStages.filter((stage) => stage.isBuilt)
         .length;
   } else if (goldVictoryBonus.name === "Arena") {
     matchingCards = player.wonder.wonderStages.filter(
@@ -49,8 +49,8 @@ export function applyGoldVictoryBonus(
     ).length;
   } else if (goldVictoryBonus.name === "Strategy Guild") {
     matchingCards =
-      player.leftPlayer.conflictLossTokens +
-      player.rightPlayer.conflictLossTokens;
+      (player.leftPlayer || player).conflictLossTokens +
+      (player.rightPlayer || player).conflictLossTokens;
   } else {
     switch (goldVictoryBonus.scope) {
       case "self":
@@ -58,14 +58,14 @@ export function applyGoldVictoryBonus(
         break;
       case "neighbors":
         matchingCards =
-          countMatchingCards(player.leftPlayer) +
-          countMatchingCards(player.rightPlayer);
+          countMatchingCards(player.leftPlayer || player) +
+          countMatchingCards(player.rightPlayer || player);
         break;
       case "all":
         matchingCards =
           countMatchingCards(player) +
-          countMatchingCards(player.leftPlayer) +
-          countMatchingCards(player.rightPlayer);
+          countMatchingCards(player.leftPlayer || player) +
+          countMatchingCards(player.rightPlayer || player);
         break;
     }
   }

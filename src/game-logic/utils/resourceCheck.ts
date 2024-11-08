@@ -15,10 +15,13 @@ export function checkResources(
 
   const cost = gameItem.cost;
 
-  if (typeof cost === "object" && !Array.isArray(cost)) {
+  const getTotalResources = (player: Player, resourceType: keyof Resource): number => {
+    return (player.resources[resourceType] || 0) + (player.tempResources[resourceType] || 0);
+  };
+
+  if (typeof cost === "object") {
     for (const [resource, amount] of Object.entries(cost)) {
-      const totalAvailable = (player.resources[resource as keyof Resource] || 0) + (player.tempResources[resource as keyof Resource] || 0);
-      if (totalAvailable < amount) {
+      if (getTotalResources(player, resource as keyof Resource) < amount) {
         return false;
       }
     }

@@ -21,10 +21,10 @@ export function ageEnd(players: Player[], gameState: GameState): GameState {
   const updatedPlayers = players.map((player) => {
     const updatedPlayer = { ...player };
 
-    updatedPlayer.victoryPoints += getMilitaryPoints(player, player.leftPlayer);
+    updatedPlayer.victoryPoints += getMilitaryPoints(player, player.leftPlayer || player);
     updatedPlayer.victoryPoints += getMilitaryPoints(
       player,
-      player.rightPlayer
+      player.rightPlayer || player
     );
 
     if (

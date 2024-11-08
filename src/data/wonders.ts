@@ -6,7 +6,7 @@ import { Wonder } from "../game-logic/types/wonder";
 export const wonders: Wonder[] = [
   {
     name: "Alexandria A",
-    imagePath: "../public/images/wonder-images/alexandriaA.png",
+    imagePath: "/images/wonder-images/alexandriaA.png",
     production: { Glass: 1 },
     wonderStages: [
       {
@@ -35,7 +35,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Alexandria B",
-    imagePath: "../public/images/wonder-images/alexandriaB.jpg",
+    imagePath: "/images/wonder-images/alexandriaB.jpg",
     production: { Glass: 1 },
     wonderStages: [
       {
@@ -68,7 +68,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Babylon A",
-    imagePath: "../public/images/wonder-images/babylonA.png",
+    imagePath: "/images/wonder-images/babylonA.png",
     production: { Clay: 1 },
     wonderStages: [
       {
@@ -96,7 +96,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Babylon B",
-    imagePath: "../public/images/wonder-images/babylonB.png",
+    imagePath: "/images/wonder-images/babylonB.png",
     production: { Clay: 1 },
     wonderStages: [
       {
@@ -129,7 +129,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Éphesos A",
-    imagePath: "../public/images/wonder-images/ephesosA.png",
+    imagePath: "/images/wonder-images/ephesosA.jpg",
     production: { Papyrus: 1 },
     wonderStages: [
       {
@@ -154,7 +154,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Éphesos B",
-    imagePath: "../public/images/wonder-images/ephesosB.jpg",
+    imagePath: "/images/wonder-images/ephesosB.jpg",
     production: { Papyrus: 1 },
     wonderStages: [
       {
@@ -186,7 +186,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Gizah A",
-    imagePath: "../public/images/wonder-images/gizahA.png",
+    imagePath: "/images/wonder-images/gizahA.png",
     production: { Stone: 1 },
     wonderStages: [
       {
@@ -211,7 +211,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Gizah B",
-    imagePath: "../public/images/wonder-images/gizahB.png",
+    imagePath: "/images/wonder-images/gizahB.png",
     production: { Stone: 1 },
     wonderStages: [
       {
@@ -242,7 +242,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Halikarnassós A",
-    imagePath: "../public/images/wonder-images/halikarnassosA.png",
+    imagePath: "/images/wonder-images/halikarnassosA.png",
     production: { Textile: 1 },
     wonderStages: [
       {
@@ -267,7 +267,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Halikarnassós B",
-    imagePath: "../public/images/wonder-images/halikarnassosB.png",
+    imagePath: "/images/wonder-images/halikarnassosB.png",
     production: { Textile: 1 },
     wonderStages: [
       {
@@ -294,7 +294,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Olympía A",
-    imagePath: "../public/images/wonder-images/olympiaA.png",
+    imagePath: "/images/wonder-images/olympiaA.png",
     production: { Wood: 1 },
     wonderStages: [
       {
@@ -319,7 +319,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Olympía B",
-    imagePath: "../public/images/wonder-images/olympiaB.png",
+    imagePath: "/images/wonder-images/olympiaB.png",
     production: { Wood: 1 },
     wonderStages: [
       {
@@ -348,7 +348,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Rhódos A",
-    imagePath: "../public/images/wonder-images/rhodosA.png",
+    imagePath: "/images/wonder-images/rhodosA.png",
     production: { Ore: 1 },
     wonderStages: [
       {
@@ -373,7 +373,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Rhódos B",
-    imagePath: "../public/images/wonder-images/rhodosB.png",
+    imagePath: "/images/wonder-images/rhodosB.png",
     production: { Ore: 1 },
     wonderStages: [
       {

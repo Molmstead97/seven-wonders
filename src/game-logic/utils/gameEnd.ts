@@ -13,7 +13,7 @@ export function gameEnd(players: Player[]): Player[] {
 
     // Apply 'CopyGuildEffect'
     if (player.wonder.wonderStages.some(stage => stage.specialEffect?.type === 'copyGuild')) {
-      copyGuildFunction(player, player.leftPlayer, player.rightPlayer);
+      copyGuildFunction(player, player.leftPlayer || player, player.rightPlayer || player);
     }
 
     // Apply 'FreeScienceEffect'

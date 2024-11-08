@@ -1,52 +1,28 @@
 import { Player } from "../types/player";
 import { Card } from "../types/card";
 import { Resource, ScienceType } from "../types/resource";
-import { checkResources } from "./resourceCheck";
-import { GameState } from "../gameState";
 import { applyGoldVictoryBonus } from "../types/cardSpecialEffects";
+
+import { checkResources } from "./resourceCheck";
+
+import { GameState } from "../gameState";
 
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
 
-export function playCard(player: Player, card: Card) {
-  const updatedPlayer = { ...player };
-
-  // Check if the player already has a card with the same name on their board
-  if (
-    Array.from(updatedPlayer.playerBoard).some(
-      (boardCard) => boardCard.name === card.name
-    )
-  ) {
-    alert(
-      "You cannot play a card with the same name as a card already on your board"
-    ); // TODO: Replace with UI
-    return updatedPlayer; // Return the player without modifying their hand or board
+export const playCard = (player: Player, card: Card): Player => {
+  if (!checkResources(player, card)) {
+    console.warn("Not enough resources to play this card");
+    return player;
   }
 
-  // Check if the player has enough resources to play the card
-  if (checkResources(player, card)) {
-    updatedPlayer.playerBoard = new Set([...updatedPlayer.playerBoard, card]);
-    applyCardEffects(updatedPlayer, card);
-    if (typeof card.cost === "number") {
-      updatedPlayer.gold -= card.cost;
-    }
-
-    const index = updatedPlayer.playerHand.indexOf(card);
-    if (index > -1) {
-      updatedPlayer.playerHand = [
-        ...updatedPlayer.playerHand.slice(0, index),
-        ...updatedPlayer.playerHand.slice(index + 1),
-      ];
-    }
-
-    // Log the card played and updated resources
-    console.log(`Played card: ${card.name}`);
-  } else {
-    alert("Not enough resources to play this card"); // TODO: Replace with UI
-    return updatedPlayer; // Return the player without modifying their hand
-  }
-
-  return updatedPlayer;
-}
+  return {
+    ...player,
+    playerBoard: new Set([...player.playerBoard, card]),
+    playerHand: player.playerHand.filter(c => c !== card),
+    gold: typeof card.cost === "number" ? player.gold - card.cost : player.gold,
+    ...applyCardEffects(player, card)
+  };
+};
 
 export function discardCard(player: Player, card: Card, gameState: GameState) {
   const updatedPlayer = { ...player };
@@ -65,7 +41,7 @@ export function discardCard(player: Player, card: Card, gameState: GameState) {
   return { player: updatedPlayer, gameState: updatedGameState };
 }
 
-function applyCardEffects(player: Player, card: Card) {
+function applyCardEffects(player: Player, card: Card): Partial<Player> {
   // Apply resource production
   if (card.production) {
     if (card.production.choice) {
@@ -105,4 +81,6 @@ function applyCardEffects(player: Player, card: Card) {
   if (card.specialEffect && card.specialEffect.type === "goldVictoryBonus") {
     applyGoldVictoryBonus(player, card.specialEffect);
   }
+
+  return player;
 }

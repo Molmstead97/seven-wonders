@@ -1,14 +1,12 @@
 /*import { useState } from 'react'*/
-import HomePage from './components/HomePage'
-
-import './App.css'
+import MainPage from './components/MainPage'
 
 function App() {
   
 
   return (
     <>
-      <HomePage />
+      <MainPage />
     </>
   )
 }

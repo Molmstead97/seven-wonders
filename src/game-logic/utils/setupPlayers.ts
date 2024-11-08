@@ -1,31 +1,20 @@
 import { Player } from "../types/player";
 import { Card } from "../types/card";
-import { pickWonders } from "./pickWonders";
+import { randomizeWonders } from "./randomizeWonders";
+import { Wonder } from "../types/wonder";
 
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET, MAKE SURE TO DOUBLE CHECK LEFT AND RIGHT PLAYER ASSIGNMENTS
 
-export const setupPlayers = () => {
-  let howManyAIPlayers;
-  let players: Player[] = []; // Initialize players array
+export function setupPlayers(aiPlayerCount: number, selectedWonder?: Wonder): Player[] {
+  const players: Player[] = [];
 
-  while (true) {
-    howManyAIPlayers = prompt("How many AI players are playing?");
-
-    if (
-      howManyAIPlayers !== null &&
-      howManyAIPlayers !== "" &&
-      Number(howManyAIPlayers) >= 2 &&
-      Number(howManyAIPlayers) <= 6
-    ) {
-      break;
-    }
-
-    alert(
-      "Invalid number of AI players. You must enter a number between 2 and 6."
-    );
+  if (aiPlayerCount < 2 || aiPlayerCount > 6) {
+    throw new Error("Invalid number of AI players");
   }
 
-  const setWonders = pickWonders(Number(howManyAIPlayers) + 1); // Add 1 for the user player
+  const setWonders = selectedWonder 
+    ? [selectedWonder, ...randomizeWonders(aiPlayerCount)] // Only pick AI wonders
+    : randomizeWonders(aiPlayerCount + 1); // Pick all wonders including user's
 
   // Create the user player
   const userPlayer: Player = {
@@ -60,10 +49,9 @@ export const setupPlayers = () => {
       Tablet: 0,
     },
     shields: 0,
-    conflictLossTokens: 0, // Only used for Strategy Guild card
-    leftPlayer: null as unknown as Player, // Temporarily assign null
-    rightPlayer: null as unknown as Player, // Temporarily assign null
-    canPlaySeventhCard: false, // Only used if Player is playing Babylon B
+    conflictLossTokens: 0,
+    leftPlayer: null,
+    rightPlayer: null,
     freeBuildPerAge: {},
   };
 
@@ -81,7 +69,7 @@ export const setupPlayers = () => {
   players.push(userPlayer);
 
   // Create AI players
-  for (let i = 1; i <= Number(howManyAIPlayers); i++) {
+  for (let i = 1; i <= aiPlayerCount; i++) {
     const aiPlayer: Player = {
       id: i,
       name: `AI Player ${i}`,
@@ -115,9 +103,8 @@ export const setupPlayers = () => {
       },
       shields: 0,
       conflictLossTokens: 0, // Only used for Strategy Guild card
-      leftPlayer: null as unknown as Player, // Temporarily assign null
-      rightPlayer: null as unknown as Player, // Temporarily assign null
-      canPlaySeventhCard: false, // Only used if Player is playing Babylon B
+      leftPlayer: null, // Temporarily assign null
+      rightPlayer: null, // Temporarily assign null
       freeBuildPerAge: {}, // Only used if Player is playing Olympia A. // TODO: Might make sense to move this to the wonder struct. Or make this optional as well as other special effects.
     };
 
@@ -145,4 +132,4 @@ export const setupPlayers = () => {
   }
 
   return players;
-};
+}

@@ -1,7 +1,6 @@
 import { GameState } from './gameState';
 
 import { ResourceType } from './types/resource';
-import { Card } from './types/card';
 import { Wonder } from './types/wonder';
 
 import { playCard } from './utils/cardActions';
@@ -25,18 +24,22 @@ export function handleCardPlay(gameState: GameState, playerId: number, cardIndex
 
 export function handleDiscardCard(gameState: GameState, playerId: number, cardIndex: number): GameState {
   const newState = { ...gameState };
-  const player = newState.players[playerId];
+  const player = { ...newState.players[playerId] };
   const card = player.playerHand[cardIndex];
 
-    const updatedPlayer = discardCard(player, card, newState);
-    newState.players[playerId] = updatedPlayer.player;
-    newState.discardPile = updatedPlayer.gameState.discardPile; 
-    return newState;
+  const updatedPlayer = discardCard(player, card, newState);
+  newState.players = newState.players.map((p, idx) => 
+    idx === playerId ? updatedPlayer.player : p
+  );
+  newState.discardPile = updatedPlayer.gameState.discardPile;
+  
+  return newState;
 }
 
-export function handleBuildWonder(gameState: GameState, playerId: number, wonder: Wonder, card: Card): GameState {
+export function handleBuildWonder(gameState: GameState, playerId: number, wonder: Wonder, cardIndex: number): GameState {
   const newState = { ...gameState };
   const player = newState.players[playerId];
+  const card = player.playerHand[cardIndex];
 
   const updatedPlayer = buildWonder(player, wonder, card, newState);
   newState.players[playerId] = updatedPlayer;
@@ -55,8 +58,11 @@ export function handleTrade(gameState: GameState, playerId: number, resourceType
   const newState = { ...gameState };
   const player = newState.players[playerId];
 
-  const updatedPlayer = tradeResource(player, player.leftPlayer || player.rightPlayer, resourceType, amount);
-  newState.players[playerId] = updatedPlayer;
+  const tradingPlayer = player.leftPlayer || player.rightPlayer;
+  if (tradingPlayer) {
+    const updatedPlayer = tradeResource(player, tradingPlayer, resourceType, amount);
+    newState.players[playerId] = updatedPlayer;
+  }
 
   return newState;
 }
@@ -80,8 +86,6 @@ export function handleAgeEnd(gameState: GameState): GameState {
 }
 
 export function handleEndGame(gameState: GameState): GameState {
-  // Only call gameEnd if the age is 4 (i.e., after age 3 has been completed)
-  if (gameState.age === 4) {
     const updatedPlayers = gameEnd(gameState.players);
 
     return {
@@ -90,9 +94,7 @@ export function handleEndGame(gameState: GameState): GameState {
     };
   }
 
-  // If the age is not 4, return the game state as is
-  return gameState;
-}
+  
 
 
 
