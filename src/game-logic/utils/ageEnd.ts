@@ -46,7 +46,7 @@ export function ageEnd(players: Player[], gameState: GameState): GameState {
 
   return {
     ...updatedGameState,
-    age: updatedGameState.age + 1,
+    age: updatedGameState.age,
     players: updatedPlayers,
   };
 }

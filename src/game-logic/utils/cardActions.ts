@@ -24,20 +24,28 @@ export const playCard = (player: Player, card: Card): Player => {
   };
 };
 
-export function discardCard(player: Player, card: Card, gameState: GameState) {
+export function discardCard(player: Player, cardIndex: number, gameState: GameState) {
+  console.log('=== DISCARD CARD ===');
+  console.log(`Player ${player.name} discarding card at index ${cardIndex}`);
+  console.log('Initial hand:', player.playerHand.map(card => card.name));
+  
   const updatedPlayer = { ...player };
   const updatedGameState = { ...gameState };
-
-  const index = updatedPlayer.playerHand.indexOf(card);
-  if (index > -1) {
-    updatedPlayer.playerHand = [
-      ...updatedPlayer.playerHand.slice(0, index),
-      ...updatedPlayer.playerHand.slice(index + 1),
-    ];
-    updatedPlayer.gold += 3;
-    updatedGameState.discardPile = [...updatedGameState.discardPile, card];
-  }
-
+  
+  const cardToDiscard = updatedPlayer.playerHand[cardIndex];
+  console.log('Card being discarded:', cardToDiscard.name);
+  
+  updatedPlayer.playerHand = [
+    ...updatedPlayer.playerHand.slice(0, cardIndex),
+    ...updatedPlayer.playerHand.slice(cardIndex + 1)
+  ];
+  
+  updatedGameState.discardPile = [...updatedGameState.discardPile, cardToDiscard];
+  updatedPlayer.gold += 3;
+  
+  console.log('Hand after discard:', updatedPlayer.playerHand.map(card => card.name));
+  console.log('New hand size:', updatedPlayer.playerHand.length);
+  
   return { player: updatedPlayer, gameState: updatedGameState };
 }
 

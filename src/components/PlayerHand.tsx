@@ -1,13 +1,13 @@
-import React, { useMemo, useState } from 'react';
-
+import React, { useMemo, useState, useRef } from 'react';
 import { Card as CardType } from '../game-logic/types/card';
 import { Wonder } from '../game-logic/types/wonder';
 import { GameState } from '../game-logic/gameState';
 import EnhancedCard from './EnhancedCard';
+import { CardPosition } from '../game-logic/types/card';
 
 interface PlayerHandProps {
   cards: CardType[];
-  currentWonder: Wonder; // Used for building wonders
+  currentWonder: Wonder;
   gameState: GameState;
   onCardPlay: (cardIndex: number) => void;
   onWonderBuild: (cardIndex: number) => void;
@@ -16,11 +16,16 @@ interface PlayerHandProps {
 
 const PlayerHand: React.FC<PlayerHandProps> = ({ 
   cards,  
+  currentWonder,
+  gameState,
   onCardPlay,
   onWonderBuild,
   onCardDiscard,
 }) => {
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
+  const [selectedCardPosition, setSelectedCardPosition] = useState<CardPosition | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const cardRefs = useRef<HTMLDivElement[]>([]);
 
   // Calculate card positions in a fan layout
   const cardPositions = useMemo(() => {
@@ -39,21 +44,45 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
     });
   }, [cards.length]);
 
+  const handleCardClick = (card: CardType, index: number) => {
+    const cardElement = cardRefs.current[index];
+    if (!cardElement) return;
+
+    const rect = cardElement.getBoundingClientRect();
+    const { rotation } = cardPositions[index];
+    
+    // Reset any transforms to get true dimensions
+    const position: CardPosition = {
+      x: rect.left,
+      y: rect.top,
+      rotation: rotation,
+      width: cardElement.offsetWidth,
+      height: cardElement.offsetHeight,
+    };
+
+    setSelectedCardPosition(position);
+    setSelectedCard(card);
+  };
+
   return (
     <div className="fixed bottom-0 left-1/2 -translate-x-1/2 h-48 perspective-1000">
       <div className="relative w-full h-full">
         {cards.map((card, index) => {
           const { x, y, rotation } = cardPositions[index];
+          const isSelected = selectedCard === card;
+          
           return (
             <div 
               key={`${card.name}-${index}`}
+              ref={(el) => (cardRefs.current[index] = el!)}
               className="absolute group"
               style={{
                 transform: `translateX(${x}px) translateY(${y}px) rotate(${rotation}deg)`,
                 transformOrigin: 'bottom center',
                 transition: 'transform 0.3s ease-out',
+                opacity: (isSelected && isAnimating) ? 0 : 1,
               }}
-              onClick={() => setSelectedCard(card)}
+              onClick={() => handleCardClick(card, index)}
             >
               <div className="relative w-32 h-48 rounded-lg overflow-hidden hover:z-10">
                 <img 
@@ -61,48 +90,40 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
                   alt={card.name}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all">
-                  <div className="absolute bottom-0 left-0 right-0 flex justify-center space-x-2 bg-black bg-opacity-50 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => onCardPlay(index)}
-                      className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
-                    >
-                      Play
-                    </button>
-                    <button
-                      onClick={() => onWonderBuild(index)}
-                      className="px-2 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 text-xs"
-                    >
-                      Build Wonder
-                    </button>
-                    <button
-                      onClick={() => onCardDiscard(index)}
-                      className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs"
-                    >
-                      Discard
-                    </button>
-                  </div>
-                </div>
               </div>
             </div>
           );
         })}
       </div>
-      {selectedCard && (
+      {selectedCard && selectedCardPosition && (
         <EnhancedCard
           card={selectedCard}
-          onClose={() => setSelectedCard(null)}
+          initialPosition={selectedCardPosition}
+          onAnimationStart={() => setIsAnimating(true)}
+          currentWonder={currentWonder}
+          gameState={gameState}
+          onClose={() => {
+            setSelectedCard(null);
+            setSelectedCardPosition(null);
+            setIsAnimating(false);
+          }}
           onCardPlay={() => {
             onCardPlay(cards.indexOf(selectedCard));
             setSelectedCard(null);
+            setSelectedCardPosition(null);
+            setIsAnimating(false);
           }}
           onWonderBuild={() => {
             onWonderBuild(cards.indexOf(selectedCard));
             setSelectedCard(null);
+            setSelectedCardPosition(null);
+            setIsAnimating(false);
           }}
           onCardDiscard={() => {
             onCardDiscard(cards.indexOf(selectedCard));
             setSelectedCard(null);
+            setSelectedCardPosition(null);
+            setIsAnimating(false);
           }}
         />
       )}

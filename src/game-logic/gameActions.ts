@@ -13,45 +13,61 @@ import { passHands } from "./utils/passHand";
 
 export function handleCardPlay(gameState: GameState, playerId: number, cardIndex: number): GameState {
   const newState = { ...gameState };
-  const player = newState.players[playerId];
+  const player = { ...newState.players[playerId] };
   const card = player.playerHand[cardIndex];
 
   const updatedPlayer = playCard(player, card);
-  newState.players[playerId] = updatedPlayer;
+  newState.players = newState.players.map((p, idx) => 
+    idx === playerId ? updatedPlayer : p
+  );
 
   return newState;
 }
 
 export function handleDiscardCard(gameState: GameState, playerId: number, cardIndex: number): GameState {
+  console.log('=== HANDLE DISCARD CARD ===');
+  console.log(`Processing discard for player ${playerId}, card index ${cardIndex}`);
+  console.log('Initial state player hands:', gameState.players.map(p => ({
+    player: p.name,
+    handSize: p.playerHand.length,
+    cards: p.playerHand.map(c => c.name)
+  })));
+
   const newState = { ...gameState };
   const player = { ...newState.players[playerId] };
-  const card = player.playerHand[cardIndex];
-
-  const updatedPlayer = discardCard(player, card, newState);
-  newState.players = newState.players.map((p, idx) => 
-    idx === playerId ? updatedPlayer.player : p
-  );
-  newState.discardPile = updatedPlayer.gameState.discardPile;
+  const result = discardCard(player, cardIndex, newState);
   
-  return newState;
+  const updatedState = {
+    ...newState,
+    players: newState.players.map((p, idx) => 
+      idx === playerId ? result.player : p
+    )
+  };
+
+  console.log('Final state player hands:', updatedState.players.map(p => ({
+    player: p.name,
+    handSize: p.playerHand.length,
+    cards: p.playerHand.map(c => c.name)
+  })));
+  
+  return updatedState;
 }
 
 export function handleBuildWonder(gameState: GameState, playerId: number, wonder: Wonder, cardIndex: number): GameState {
   const newState = { ...gameState };
-  const player = newState.players[playerId];
+  const player = { ...newState.players[playerId] };
   const card = player.playerHand[cardIndex];
 
   const updatedPlayer = buildWonder(player, wonder, card, newState);
-  newState.players[playerId] = updatedPlayer;
+  newState.players = newState.players.map((p, idx) => 
+    idx === playerId ? updatedPlayer : p
+  );
 
   return newState;
 }
 
 export function handlePassHand(gameState: GameState): GameState {
-  let updatedGameState = gameState;
-  updatedGameState = passHands(updatedGameState);
-
-  return updatedGameState;
+  return passHands(gameState);
 }
 
 export function handleTrade(gameState: GameState, playerId: number, resourceType: ResourceType, amount: number): GameState {

@@ -1,49 +1,165 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Card } from '../game-logic/types/card';
+import { Wonder } from '../game-logic/types/wonder';
+
+import { gsap } from 'gsap';
+import { expandZoom, shrinkZoom } from './animations/expandZoom';
+import { blurBackground, unblurBackground } from './animations/backgroundBlur';
+import { checkResources } from '../game-logic/utils/resourceCheck';
+import { GameState } from '../game-logic/gameState';
+
+interface CardPosition {
+  x: number;
+  y: number;
+  rotation: number;
+  width: number;
+  height: number;
+}
 
 interface EnhancedCardProps {
   card: Card;
+  initialPosition: CardPosition;
+  onAnimationStart: () => void;
   onClose: () => void;
   onCardPlay: () => void;
   onWonderBuild: () => void;
   onCardDiscard: () => void;
+  currentWonder: Wonder;
+  gameState: GameState;
 }
 
-const EnhancedCard: React.FC<EnhancedCardProps> = ({ 
-  card, 
+const EnhancedCard: React.FC<EnhancedCardProps> = ({
+  card,
+  initialPosition,
+  onAnimationStart,
   onClose,
   onCardPlay,
   onWonderBuild,
   onCardDiscard,
+  currentWonder,
+  gameState,
 }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
+  const backgroundRef = useRef<HTMLDivElement>(null);
+
+  const canPlayCard = checkResources(gameState.players[0], card);
+  
+  const nextStageIndex = currentWonder.wonderStages.findIndex(
+    (stage) => !stage.isBuilt
+  );
+  const canBuildWonder = nextStageIndex !== -1 && 
+    checkResources(gameState.players[0], currentWonder.wonderStages[nextStageIndex]);
+
+  useEffect(() => {
+    if (!cardRef.current) return;
+
+    onAnimationStart();
+    
+    const targetPosition = {
+      x: (window.innerWidth - initialPosition.width * 4) / 2,
+      y: (window.innerHeight - initialPosition.height * 4) / 2,
+      rotation: 0,
+      width: initialPosition.width * 4,
+      height: initialPosition.height * 4,
+    };
+
+    if (backgroundRef.current) {
+      blurBackground(backgroundRef.current);
+    }
+
+    const timeline = expandZoom(cardRef.current, initialPosition, targetPosition);
+    
+    timeline.add(() => {
+      if (controlsRef.current) {
+        gsap.to(controlsRef.current, {
+          opacity: 1,
+          duration: 0.3,
+        });
+      }
+    }, '>-0.3'); // Start slightly before the main animation ends
+  }, [initialPosition, onAnimationStart]);
+
+  const handleClose = () => {
+    if (!cardRef.current) return;
+
+    if (controlsRef.current) {
+      gsap.to(controlsRef.current, {
+        opacity: 0,
+        duration: 0.3,
+      });
+    }
+
+    if (backgroundRef.current) {
+      unblurBackground(backgroundRef.current);
+    }
+
+    shrinkZoom(cardRef.current, initialPosition, onClose);
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
-      <div className="relative bg-white p-8 rounded-lg shadow-lg">
-        <img src={card.imagePath} alt={card.name} className="w-64 h-96 object-cover mb-4" />
-        <h2 className="text-2xl font-bold mb-4">{card.name}</h2>
-        <div className="flex space-x-4">
-          <button 
-            onClick={onCardPlay}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Play
-          </button>
-          <button 
-            onClick={onWonderBuild}
-            className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
-          >
-            Build Wonder
-          </button>
-          <button 
-            onClick={onCardDiscard}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Discard
-          </button>
-        </div>
+    <>
+      <div ref={backgroundRef} className="fixed inset-0" />
+      <div 
+        ref={cardRef}
+        className="fixed"
+        style={{
+          left: initialPosition.x,
+          top: initialPosition.y,
+          width: initialPosition.width,
+          height: initialPosition.height,
+          transform: `rotate(${initialPosition.rotation}deg)`,
+        }}
+      >
+        <img 
+          src={card.imagePath}
+          alt={card.name}
+          className="w-full h-full object-cover rounded-lg"
+        />
+        <button
+          onClick={handleClose}
+          className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300"
+        >
+          ✕
+        </button>
       </div>
-    </div>
+      <div
+        ref={controlsRef}
+        className="fixed left-1/2 -translate-x-1/2 flex space-x-4 opacity-0"
+        style={{
+          top: '60%',
+        }}
+      >
+        <button 
+          onClick={onCardPlay}
+          disabled={!canPlayCard}
+          className={`px-4 py-2 rounded ${
+            canPlayCard 
+              ? 'bg-blue-500 text-white hover:bg-blue-600' 
+              : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+          }`}
+        >
+          Play
+        </button>
+        <button 
+          onClick={onWonderBuild}
+          disabled={!canBuildWonder}
+          className={`px-4 py-2 rounded ${
+            canBuildWonder 
+              ? 'bg-purple-500 text-white hover:bg-purple-600' 
+              : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+          }`}
+        >
+          Build Wonder
+        </button>
+        <button 
+          onClick={onCardDiscard}
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          Discard
+        </button>
+      </div>
+    </>
   );
 };
 

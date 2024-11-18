@@ -15,12 +15,16 @@ import {
 
 export interface GameState {
   age: number;
+  turns: number;
   players: Player[];
   discardPile: Card[];
   // ... other game state properties
 }
 
-export function initializeGame(aiPlayerCount: number, selectedWonder?: Wonder): GameState {
+export function initializeGame(
+  aiPlayerCount: number,
+  selectedWonder?: Wonder
+): GameState {
   const players = setupPlayers(aiPlayerCount, selectedWonder);
 
   const dealtCards = dealCards(players.length, 1);
@@ -39,97 +43,88 @@ export function initializeGame(aiPlayerCount: number, selectedWonder?: Wonder): 
 
   return {
     age: 1,
+    turns: 0,
     players,
     discardPile: [],
     // ... initialize other game state properties
   };
 }
 
-export function gameLoop(gameState: GameState, playerActionTaken: boolean): GameState {
-  let updatedGameState = {
-    ...gameState,
-    players: gameState.players.map(player => ({
-      ...player,
-      tempResources: {
-        Wood: 0,
-        Stone: 0,
-        Ore: 0,
-        Clay: 0,
-        Glass: 0,
-        Papyrus: 0,
-        Textile: 0,
-      },
-      playerHand: [...player.playerHand]
-    }))
-  };
-
-  // If no player action, return current state
+export function gameLoop(
+  gameState: GameState,
+  playerActionTaken: boolean
+): GameState {
+  console.log('\n=== GAME LOOP START ===');
+  console.log(`Age: ${gameState.age}, Turn: ${gameState.turns}, Player Action Taken: ${playerActionTaken}`);
+  
   if (!playerActionTaken) {
-    return updatedGameState;
+    console.log('No player action taken, returning current state');
+    return gameState;
   }
 
-  // Have AI players take their actions (randomly discard a card)
-  // TODO: REMOVE THIS BEFORE FINALIZING, FOR TESTING PURPOSES ONLY
+  let updatedGameState = { ...gameState };
+  
+  console.log('Initial hand sizes:');
+  updatedGameState.players.forEach((player, index) => {
+    console.log(`${player.name}:`, {
+      handSize: player.playerHand.length,
+      cards: player.playerHand.map(c => c.name)
+    });
+  });
+
+  // AI Actions
   updatedGameState.players.slice(1).forEach((player, index) => {
-    const aiPlayerIndex = index + 1; // Add 1 because we skip the human player
-    if (player.playerHand.length > 0) {
-      updatedGameState = {
-        ...updatedGameState,
-        players: updatedGameState.players.map((player, index) => {
-          if (index === aiPlayerIndex) {
-            const randomCardIndex = Math.floor(Math.random() * player.playerHand.length);
-            const updatedPlayers = handleDiscardCard(updatedGameState, aiPlayerIndex, randomCardIndex).players;
-            return { ...player, ...updatedPlayers[aiPlayerIndex] };
-          }
-          return player;
-        })
-      };
-    }
+    const aiPlayerIndex = index + 1;
+    console.log(`\nAI Player ${aiPlayerIndex} taking action`);
+    const randomCardIndex = Math.floor(Math.random() * player.playerHand.length);
+    updatedGameState = handleDiscardCard(updatedGameState, aiPlayerIndex, randomCardIndex);
   });
 
-  // Regular turn actions
-  updatedGameState.players.forEach((player) => {
-    addRandomResourceFromCards(player);
-  });
+  // Update turn counter
+  updatedGameState = {
+    ...updatedGameState,
+    turns: updatedGameState.turns + 1,
+  };
+  console.log(`\nTurn counter updated to: ${updatedGameState.turns}`);
 
-  displayPlayerState(updatedGameState.players[0]); // Only display the user
-
-  // Reset temporary resources
-  updatedGameState.players.forEach((player) => {
-    player.tempResources = {
-      Wood: 0,
-      Stone: 0,
-      Ore: 0,
-      Clay: 0,
-      Glass: 0,
-      Papyrus: 0,
-      Textile: 0,
-    };
-  });
-
-  // Pass hands if not the last turn of the age
-  if (updatedGameState.players[0].playerHand.length > 1) {
-    updatedGameState = {
-      ...updatedGameState,
-      players: handlePassHand(updatedGameState).players
-    };
+  // Handle turn end
+  if (updatedGameState.turns < 6) {
+    console.log('\nPassing hands...');
+    updatedGameState = handlePassHand(updatedGameState);
   } else {
-    // Handle end of age
-    updatedGameState.discardPile.push(
-      ...updatedGameState.players.flatMap((player) => player.playerHand)
-    );
-
-    const newCards = dealCards(updatedGameState.players.length, updatedGameState.age);
-
+    console.log('\nEnd of age reached');
     updatedGameState = {
       ...updatedGameState,
-      ...ageEnd(updatedGameState.players, updatedGameState),
-      players: updatedGameState.players.map((player, index) => ({
-        ...player,
-        playerHand: newCards.slice(index * 7, (index + 1) * 7)
-      }))
+        turns: 0,  // Reset turns for next age
+        age: updatedGameState.age + 1,  // Increment age
+        discardPile: [
+          ...updatedGameState.discardPile,
+          ...updatedGameState.players.flatMap((player) => player.playerHand)
+      ],
     };
+  
+    // Deal new cards if not the end of the game
+      if (updatedGameState.age <= 3) {
+        const newCards = dealCards(updatedGameState.players.length, updatedGameState.age);
+        updatedGameState = {
+          ...updatedGameState,
+          ...ageEnd(updatedGameState.players, updatedGameState),
+          players: updatedGameState.players.map((player, index) => ({
+            ...player,
+            playerHand: newCards.slice(index * 7, (index + 1) * 7),
+          })),
+        };
+    }
   }
+
+  console.log('\n=== GAME LOOP END ===');
+  console.log('Final hand sizes:');
+  updatedGameState.players.forEach((player, index) => {
+    console.log(`${player.name}:`, {
+      handSize: player.playerHand.length,
+      cards: player.playerHand.map(c => c.name)
+    });
+  });
 
   return updatedGameState;
 }

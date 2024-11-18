@@ -13,12 +13,8 @@ interface CardProps {
   currentWonder: Wonder;
 }
 
-
-
 export default ({ card }: CardProps) => {
   return <div>{card.name}</div>;
 };
-
-
 
 export type { CardProps };

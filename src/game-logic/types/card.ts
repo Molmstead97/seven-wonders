@@ -25,3 +25,12 @@ export interface Card {
   age: 1 | 2 | 3;
   cardColor: CardColor | CardColor[];
 }
+
+// Used for animations
+export interface CardPosition { 
+  x: number;
+  y: number;
+  rotation: number;
+  width: number;
+  height: number;
+}
