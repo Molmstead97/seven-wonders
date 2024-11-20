@@ -7,10 +7,14 @@ import { setupPlayers } from "./utils/setupPlayers";
 import { dealCards } from "./utils/dealCards";
 import { ageEnd } from "./utils/ageEnd";
 
+import { scoreActions } from "./ai/scoring";
+
 import {
   handleEndGame,
   handlePassHand,
   handleDiscardCard,
+  handleCardPlay,
+  handleBuildWonder,
 } from "./gameActions";
 
 export interface GameState {
@@ -18,7 +22,44 @@ export interface GameState {
   turns: number;
   players: Player[];
   discardPile: Card[];
+  isAutomated?: boolean;
   // ... other game state properties
+}
+
+export function handleAITurn(player: Player, gameState: GameState): {
+  action: "play" | "wonder" | "discard";
+  cardIndex: number;
+} {
+  let bestScore = -Infinity;
+  let bestAction = {
+    action: "discard" as "play" | "wonder" | "discard",
+    cardIndex: 0,
+  };
+
+  // Score each card in hand
+  player.playerHand.forEach((card, index) => {
+    // Skip scoring if card already exists in player's board
+    if (Array.from(player.playerBoard).some(boardCard => boardCard.name === card.name)) {
+      return;
+    }
+
+    const scores = scoreActions(player, card, gameState);
+    
+    // Find the highest scoring action for this card
+    const bestActionForCard = scores.reduce((best, current) =>
+      current.score > best.score ? current : best
+    );
+
+    if (bestActionForCard.score > bestScore) {
+      bestScore = bestActionForCard.score;
+      bestAction = {
+        action: bestActionForCard.action,
+        cardIndex: index,
+      };
+    }
+  });
+
+  return bestAction;
 }
 
 export function initializeGame(
@@ -26,19 +67,18 @@ export function initializeGame(
   selectedWonder?: Wonder
 ): GameState {
   const players = setupPlayers(aiPlayerCount, selectedWonder);
-
   const dealtCards = dealCards(players.length, 1);
 
-  // Shuffle the dealt cards
+  console.log(`Total cards dealt: ${dealtCards.length}`);
+
   const shuffledCards = dealtCards.sort(() => Math.random() - 0.5);
 
-  // Distribute 7 cards to each player
   players.forEach((player, index) => {
     player.playerHand = shuffledCards.slice(index * 7, (index + 1) * 7);
-    console.log(
-      `Player ${player.name} has been dealt:`,
-      player.playerHand.map((card) => card.name)
-    );
+    console.log(`${player.name} initial hand:`, {
+      handSize: player.playerHand.length,
+      cards: player.playerHand.map((card) => card.name),
+    });
   });
 
   return {
@@ -46,7 +86,6 @@ export function initializeGame(
     turns: 0,
     players,
     discardPile: [],
-    // ... initialize other game state properties
   };
 }
 
@@ -54,30 +93,47 @@ export function gameLoop(
   gameState: GameState,
   playerActionTaken: boolean
 ): GameState {
-  console.log('\n=== GAME LOOP START ===');
-  console.log(`Age: ${gameState.age}, Turn: ${gameState.turns}, Player Action Taken: ${playerActionTaken}`);
   
+  console.log(`=== TURN ${gameState.turns} ===`);  
+  // Add random resources until UI is added
+  gameState.players.forEach((player) => {
+    addRandomResourceFromCards(player);
+  });
+
   if (!playerActionTaken) {
-    console.log('No player action taken, returning current state');
     return gameState;
   }
 
   let updatedGameState = { ...gameState };
-  
-  console.log('Initial hand sizes:');
-  updatedGameState.players.forEach((player, index) => {
-    console.log(`${player.name}:`, {
-      handSize: player.playerHand.length,
-      cards: player.playerHand.map(c => c.name)
-    });
-  });
 
-  // AI Actions
-  updatedGameState.players.slice(1).forEach((player, index) => {
-    const aiPlayerIndex = index + 1;
-    console.log(`\nAI Player ${aiPlayerIndex} taking action`);
-    const randomCardIndex = Math.floor(Math.random() * player.playerHand.length);
-    updatedGameState = handleDiscardCard(updatedGameState, aiPlayerIndex, randomCardIndex);
+  // Skip AI processing if this is an automated game
+  if (!gameState.isAutomated) {
+    // Process AI turns after player action
+    for (let i = 1; i < updatedGameState.players.length; i++) {
+      const aiPlayer = updatedGameState.players[i];
+      const aiAction = handleAITurn(aiPlayer, updatedGameState);
+      const cardName = aiPlayer.playerHand[aiAction.cardIndex].name; // Get name before action
+
+      // Execute AI action
+      switch (aiAction.action) {
+        case "play":
+          updatedGameState = handleCardPlay(updatedGameState, i, aiAction.cardIndex);
+          console.log(`AI Player ${i} played: ${cardName}`);
+          break;
+        case "wonder":
+          updatedGameState = handleBuildWonder(updatedGameState, i, aiAction.cardIndex);
+          console.log(`AI Player ${i} built wonder stage using: ${cardName}`);
+          break;
+        case "discard":
+          updatedGameState = handleDiscardCard(updatedGameState, i, aiAction.cardIndex);
+          console.log(`AI Player ${i} discarded: ${cardName}`);
+          break;
+      }
+    }
+  }
+
+  updatedGameState.players.forEach((player) => {
+    displayPlayerState(player);
   });
 
   // Update turn counter
@@ -85,44 +141,44 @@ export function gameLoop(
     ...updatedGameState,
     turns: updatedGameState.turns + 1,
   };
-  console.log(`\nTurn counter updated to: ${updatedGameState.turns}`);
 
   // Handle turn end
   if (updatedGameState.turns < 6) {
-    console.log('\nPassing hands...');
+    console.log("=== PASSING HANDS ===");
     updatedGameState = handlePassHand(updatedGameState);
   } else {
-    console.log('\nEnd of age reached');
+    console.log('=== AGE END ===');
     updatedGameState = {
       ...updatedGameState,
-        turns: 0,  // Reset turns for next age
-        age: updatedGameState.age + 1,  // Increment age
-        discardPile: [
-          ...updatedGameState.discardPile,
-          ...updatedGameState.players.flatMap((player) => player.playerHand)
+      turns: 0, // Reset turns for next age
+      age: updatedGameState.age + 1, // Increment age
+      discardPile: [
+        ...updatedGameState.discardPile,
+        ...updatedGameState.players.flatMap((player) => player.playerHand),
       ],
     };
-  
+
     // Deal new cards if not the end of the game
-      if (updatedGameState.age <= 3) {
-        const newCards = dealCards(updatedGameState.players.length, updatedGameState.age);
-        updatedGameState = {
-          ...updatedGameState,
-          ...ageEnd(updatedGameState.players, updatedGameState),
-          players: updatedGameState.players.map((player, index) => ({
-            ...player,
-            playerHand: newCards.slice(index * 7, (index + 1) * 7),
-          })),
-        };
+    if (updatedGameState.age <= 3) {
+      // First process age end effects
+      updatedGameState = {
+        ...updatedGameState,
+        ...ageEnd(updatedGameState.players, updatedGameState),
+      };
+      
+      // Then deal new cards
+      const newCards = dealCards(updatedGameState.players.length, updatedGameState.age);
+      updatedGameState.players = updatedGameState.players.map((player, index) => ({
+        ...player,
+        playerHand: newCards.slice(index * 7, (index + 1) * 7),
+      }));
     }
   }
 
-  console.log('\n=== GAME LOOP END ===');
-  console.log('Final hand sizes:');
   updatedGameState.players.forEach((player, index) => {
     console.log(`${player.name}:`, {
       handSize: player.playerHand.length,
-      cards: player.playerHand.map(c => c.name)
+      cards: player.playerHand.map((c) => c.name),
     });
   });
 

@@ -22,9 +22,9 @@ export function buildWonder(
   gameState: GameState
 ): Player {
   let updatedPlayer = { ...player };
-  const updatedWonder = { 
+  const updatedWonder = {
     ...wonder,
-    wonderStages: wonder.wonderStages.map(stage => ({ ...stage }))
+    wonderStages: wonder.wonderStages.map((stage) => ({ ...stage })),
   };
   updatedPlayer.wonder = updatedWonder;
 
@@ -40,7 +40,7 @@ export function buildWonder(
 
   const nextStage = updatedWonder.wonderStages[nextStageIndex];
 
-  if (checkResources(player, nextStage)) {
+  if (checkResources(player, null, nextStage)) {
     updatedWonder.wonderStages[nextStageIndex].isBuilt = true;
 
     // Apply the effects of the built stage
@@ -50,7 +50,8 @@ export function buildWonder(
       } else {
         Object.entries(nextStage.production).forEach(([resource, amount]) => {
           updatedPlayer.resources[resource as keyof Resource] =
-            (updatedPlayer.resources[resource as keyof Resource] || 0) + (amount as number);
+            (updatedPlayer.resources[resource as keyof Resource] || 0) +
+            (amount as number);
         });
       }
     }

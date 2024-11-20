@@ -2,8 +2,10 @@ import { Player } from "../types/player";
 import { Card } from "../types/card";
 import { randomizeWonders } from "./randomizeWonders";
 import { Wonder } from "../types/wonder";
+//import { generateAIPersonality } from "../types/aiPlayer";
+import { PRESET_PERSONALITIES } from "../types/aiPlayer";
 
-// NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET, MAKE SURE TO DOUBLE CHECK LEFT AND RIGHT PLAYER ASSIGNMENTS
+
 
 export function setupPlayers(aiPlayerCount: number, selectedWonder?: Wonder): Player[] {
   const players: Player[] = [];
@@ -69,11 +71,19 @@ export function setupPlayers(aiPlayerCount: number, selectedWonder?: Wonder): Pl
   players.push(userPlayer);
 
   // Create AI players
+  // TODO: Remove the presets when testing is complete
+  const presetTypes = Object.keys(PRESET_PERSONALITIES) as (keyof typeof PRESET_PERSONALITIES)[];
+  
   for (let i = 1; i <= aiPlayerCount; i++) {
+    // Cycle through presets, wrapping around if we have more AI players than presets
+    const presetIndex = (i - 1) % presetTypes.length;
+    const personalityType = presetTypes[presetIndex];
+    
     const aiPlayer: Player = {
       id: i,
-      name: `AI Player ${i}`,
+      name: `AI Player ${i} (${personalityType})`,
       wonder: setWonders[i],
+      aiPersonality: PRESET_PERSONALITIES[personalityType],
       playerBoard: new Set<Card>(),
       playerHand: [],
       resources: {
@@ -115,8 +125,8 @@ export function setupPlayers(aiPlayerCount: number, selectedWonder?: Wonder): Pl
     };
 
     // Log each AI player's wonder and initial resources
+    console.log(`AI Player ${i} personality: ${personalityType}`);
     console.log(`AI Player ${i} Wonder: ${aiPlayer.wonder.name}`);
-    console.log(`AI Player ${i} Initial Resources:`, aiPlayer.resources);
 
     players.push(aiPlayer);
   }

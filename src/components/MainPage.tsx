@@ -161,7 +161,7 @@ const MainPage = () => {
         );
       }
       return (
-        <div className="relative">
+        <div className="h-screen w-screen overflow-hidden relative bg-gray-900">
           <GameBoard
             playerCount={gameState?.players.length || 0}
             assignedWonders={
@@ -170,8 +170,6 @@ const MainPage = () => {
           />
           {gameState && (
             <div className="relative z-10">
-              {" "}
-              {/* Add this wrapper */}
               <PlayerHand
                 cards={gameState.players[0].playerHand}
                 currentWonder={gameState.players[0].wonder}
@@ -185,7 +183,6 @@ const MainPage = () => {
                   const updatedState = handleBuildWonder(
                     gameState,
                     0,
-                    gameState.players[0].wonder,
                     cardIndex
                   );
                   setGameState(updatedState);

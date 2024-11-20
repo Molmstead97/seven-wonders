@@ -1,10 +1,12 @@
 import { Wonder } from "./wonder";
 import { Card } from "./card";
 import { Resource, ResourceType, Science } from "./resource";
+import { AIPersonality } from "./aiPlayer";
 
 export interface Player {
   id: number;
   name: string;
+  aiPersonality?: AIPersonality; // Optional because the user won't have it
   wonder: Wonder;
   playerBoard: Set<Card>;
   playerHand: Card[];

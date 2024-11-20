@@ -7,29 +7,45 @@ import { Resource } from "../types/resource";
 
 export function checkResources(
   player: Player,
-  gameItem: Card | WonderStage
+  card: Card | null,
+  wonderStage: WonderStage | null
 ): boolean {
-  if (gameItem.cost === null) {
+  const cost = card?.cost || wonderStage?.cost;
+
+  if (cost === null || cost === undefined) {
     return true;
   }
 
-  const cost = gameItem.cost;
+  const isDuplicate = card
+    ? Array.from(player.playerBoard).some(
+        (boardCard) => boardCard.name === card.name
+      )
+    : false;
 
-  const getTotalResources = (player: Player, resourceType: keyof Resource): number => {
-    return (player.resources[resourceType] || 0) + (player.tempResources[resourceType] || 0);
-  };
+  if (!isDuplicate) {
+    const getTotalResources = (
+      player: Player,
+      resourceType: keyof Resource
+    ): number => {
+      return (
+        (player.resources[resourceType] || 0) +
+        (player.tempResources[resourceType] || 0)
+      );
+    };
 
-  if (typeof cost === "object") {
-    for (const [resource, amount] of Object.entries(cost)) {
-      if (getTotalResources(player, resource as keyof Resource) < amount) {
+    if (typeof cost === "object") {
+      for (const [resource, amount] of Object.entries(cost)) {
+        if (getTotalResources(player, resource as keyof Resource) < amount) {
+          return false;
+        }
+      }
+    } else if (typeof cost === "number") {
+      if (player.gold < cost) {
         return false;
       }
     }
-  } else if (typeof cost === "number") {
-    if (player.gold < cost) {
-      return false;
-    }
-  }
 
-  return true;
+    return true;
+  }
+  return false;
 }

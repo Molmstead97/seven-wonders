@@ -6,47 +6,95 @@ import { cardFromDiscardFunction } from "../types/wonderSpecialEffects";
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
 
 export function ageEnd(players: Player[], gameState: GameState): GameState {
-  const updatedGameState = { ...gameState };
-
-  const getMilitaryPoints = (player: Player, neighbor: Player): number => {
-    const basePoints = gameState.age === 1 ? 1 : gameState.age === 2 ? 3 : 5;
-    if (player.shields > neighbor.shields) return basePoints;
-    if (player.shields < neighbor.shields) {
-      player.conflictLossTokens += 1;
-      return -1;
-    }
-    return 0;
+  // Create deep copy of state
+  const newState = {
+    ...gameState,
+    players: players.map((p) => ({
+      ...p,
+      playerHand: [...p.playerHand],
+      playerBoard: new Set([...p.playerBoard]),
+      wonder: {
+        ...p.wonder,
+        wonderStages: p.wonder.wonderStages.map((stage) => ({ ...stage })),
+      },
+      resources: { ...p.resources },
+      science: { ...p.science },
+    })),
+    discardPile: [...gameState.discardPile],
   };
 
-  const updatedPlayers = players.map((player) => {
-    const updatedPlayer = { ...player };
+  // Calculate military points based on age
+  const militaryPoints = {
+    1: { win: 1, loss: -1 },
+    2: { win: 3, loss: -1 },
+    3: { win: 5, loss: -1 },
+  }[gameState.age] ?? { win: 0, loss: 0 };
 
-    updatedPlayer.victoryPoints += getMilitaryPoints(player, player.leftPlayer || player);
-    updatedPlayer.victoryPoints += getMilitaryPoints(
-      player,
-      player.rightPlayer || player
-    );
+  // Process each player
+  newState.players.forEach((player) => {
+    console.log(`\nProcessing player: ${player.name}`);
 
-    if (
-      updatedPlayer.wonder.name === "Halikarnassós A" &&
-      updatedPlayer.wonder.wonderStages[2].isBuilt
-    ) {
-      const chosenCard = updatedGameState.discardPile[0]; // TODO: Replace with UI prompt
-      updatedPlayer.playerBoard = new Set([
-        ...updatedPlayer.playerBoard,
-        chosenCard,
-      ]);
-      updatedGameState.discardPile = updatedGameState.discardPile.slice(1);
-    } else if (updatedPlayer.wonder.name === "Halikarnassós B") {
-      cardFromDiscardFunction(updatedPlayer, updatedGameState); // Used a separate function for this since the logic is different and more complex
+    // Military conflicts
+    const leftNeighbor = player.leftPlayer;
+    const rightNeighbor = player.rightPlayer;
+
+    if (leftNeighbor) {
+      const leftConflict = resolveMilitaryConflict(
+        player,
+        leftNeighbor,
+        militaryPoints
+      );
+      player.victoryPoints += leftConflict.points;
+      player.conflictLossTokens += leftConflict.lossTokens;
     }
 
-    return updatedPlayer;
+    if (rightNeighbor) {
+      const rightConflict = resolveMilitaryConflict(
+        player,
+        rightNeighbor,
+        militaryPoints
+      );
+      player.victoryPoints += rightConflict.points;
+      player.conflictLossTokens += rightConflict.lossTokens;
+    }
+
+    // Handle special wonder effects
+    if (
+      player.wonder.name === "Halikarnassós A" &&
+      player.wonder.wonderStages[2].isBuilt &&
+      newState.discardPile.length > 0
+    ) {
+      handleHalikarnassosEffect(player, newState);
+    }
   });
 
-  return {
-    ...updatedGameState,
-    age: updatedGameState.age,
-    players: updatedPlayers,
-  };
+  return newState;
+}
+
+function resolveMilitaryConflict(
+  player: Player,
+  neighbor: Player,
+  points: { win: number; loss: number }
+): { points: number; lossTokens: number } {
+  if (player.shields > neighbor.shields) {
+    return { points: points.win, lossTokens: 0 };
+  }
+  if (player.shields < neighbor.shields) {
+    return { points: points.loss, lossTokens: 1 };
+  }
+  return { points: 0, lossTokens: 0 };
+}
+
+function handleHalikarnassosEffect(player: Player, gameState: GameState) {
+  // Note: This is a placeholder. The actual card selection will be handled by the UI
+  const chosenCard = gameState.discardPile[0];
+  if (chosenCard) {
+    player.playerBoard.add(chosenCard);
+    gameState.discardPile = gameState.discardPile.slice(1);
+
+    console.log("Halikarnassos effect:", {
+      cardTaken: chosenCard.name,
+      remainingDiscardSize: gameState.discardPile.length,
+    });
+  }
 }

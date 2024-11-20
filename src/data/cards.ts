@@ -229,6 +229,22 @@ export const cards: Card[] = [
     cardColor: "Grey",
   },
 
+  // Copy for Age 2 since data is slightly different
+  {
+    name: "Loom",
+    description: "Produces 1 Textile per turn.",
+    imagePath: "/images/card-images/grey/loom.jpg",
+    production: { Textile: 1 },
+    playerCount: [
+      { minPlayers: 3, copies: 1 },
+      { minPlayers: 5, copies: 2 },
+    ],
+    upgradeCard: null,
+    cost: null,
+    age: 2,
+    cardColor: "Grey",
+  },
+
   {
     name: "Glassworks",
     description: "Produces 1 Glass per turn.",
@@ -244,6 +260,22 @@ export const cards: Card[] = [
     cardColor: "Grey",
   },
 
+  // Copy for Age 2 since data is slightly different
+  {
+    name: "Glassworks",
+    description: "Produces 1 Glass per turn.",
+    imagePath: "/images/card-images/grey/glassworks.jpg",
+    production: { Glass: 1 },
+    playerCount: [
+      { minPlayers: 3, copies: 1 },
+      { minPlayers: 5, copies: 2 },
+    ],
+    upgradeCard: null,
+    cost: null,
+    age: 2,
+    cardColor: "Grey",
+  },
+
   {
     name: "Press",
     description: "Produces 1 Papyrus per turn.",
@@ -256,6 +288,22 @@ export const cards: Card[] = [
     upgradeCard: null,
     cost: null,
     age: 1,
+    cardColor: "Grey",
+  },
+
+  // Copy for Age 2 since data is slightly different
+  {
+    name: "Press",
+    description: "Produces 1 Papyrus per turn.",
+    imagePath: "/images/card-images/grey/press.jpg",
+    production: { Papyrus: 1 },
+    playerCount: [
+      { minPlayers: 3, copies: 1 },
+      { minPlayers: 5, copies: 2 },
+    ],
+    upgradeCard: null,
+    cost: null,
+    age: 2,
     cardColor: "Grey",
   },
 

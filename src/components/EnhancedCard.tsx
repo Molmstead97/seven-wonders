@@ -43,13 +43,13 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
   const controlsRef = useRef<HTMLDivElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
 
-  const canPlayCard = checkResources(gameState.players[0], card);
+  const canPlayCard = checkResources(gameState.players[0], card, null);
   
   const nextStageIndex = currentWonder.wonderStages.findIndex(
     (stage) => !stage.isBuilt
   );
   const canBuildWonder = nextStageIndex !== -1 && 
-    checkResources(gameState.players[0], currentWonder.wonderStages[nextStageIndex]);
+    checkResources(gameState.players[0], null, currentWonder.wonderStages[nextStageIndex]);
 
   useEffect(() => {
     if (!cardRef.current) return;
@@ -57,11 +57,11 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
     onAnimationStart();
     
     const targetPosition = {
-      x: (window.innerWidth - initialPosition.width * 4) / 2,
-      y: (window.innerHeight - initialPosition.height * 4) / 2,
+      x: window.innerWidth / 2 - (initialPosition.width * 2.5) / 2,
+      y: window.innerHeight / 2 - (initialPosition.height * 2.5) / 2,
       rotation: 0,
-      width: initialPosition.width * 4,
-      height: initialPosition.height * 4,
+      width: initialPosition.width * 2.5,
+      height: initialPosition.height * 2.5,
     };
 
     if (backgroundRef.current) {
@@ -99,10 +99,10 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
 
   return (
     <>
-      <div ref={backgroundRef} className="fixed inset-0" />
+      <div ref={backgroundRef} className="fixed inset-0 z-40" />
       <div 
         ref={cardRef}
-        className="fixed"
+        className="fixed z-50"
         style={{
           left: initialPosition.x,
           top: initialPosition.y,
@@ -125,7 +125,7 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
       </div>
       <div
         ref={controlsRef}
-        className="fixed left-1/2 -translate-x-1/2 flex space-x-4 opacity-0"
+        className="fixed left-1/2 -translate-x-1/2 z-50 flex space-x-4 opacity-0"
         style={{
           top: '60%',
         }}
