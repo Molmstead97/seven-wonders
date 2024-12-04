@@ -1,7 +1,8 @@
 import { Player } from "./types/player";
 import { Card } from "./types/card";
 import { Wonder } from "./types/wonder";
-import { ResourceType } from "./types/resource";
+import { Resource, ResourceType } from "./types/resource";
+import { ProductionChoiceState } from "./types/productionChoice";
 
 import { setupPlayers } from "./utils/setupPlayers";
 import { dealCards } from "./utils/dealCards";
@@ -23,6 +24,7 @@ export interface GameState {
   players: Player[];
   discardPile: Card[];
   isAutomated?: boolean;
+  productionChoiceState: ProductionChoiceState
   // ... other game state properties
 }
 
@@ -86,6 +88,10 @@ export function initializeGame(
     turns: 0,
     players,
     discardPile: [],
+    productionChoiceState: {
+      choices: [],
+      currentChoiceIndex: 0,
+    },
   };
 }
 
@@ -93,11 +99,13 @@ export function gameLoop(
   gameState: GameState,
   playerActionTaken: boolean
 ): GameState {
-  
+
   console.log(`=== TURN ${gameState.turns} ===`);  
   // Add random resources until UI is added
-  gameState.players.forEach((player) => {
-    addRandomResourceFromCards(player);
+  gameState.players.forEach((player, index) => {
+    if (index > 0) { // Skip human player
+      addRandomResourceFromCards(player);
+    }
   });
 
   if (!playerActionTaken) {
@@ -207,19 +215,26 @@ function displayPlayerState(player: Player) {
 
 // TODO: This is a function for TESTING PURPOSES ONLY, remove before finalizing
 function addRandomResourceFromCards(player: Player) {
+  player.tempResources = {
+    Wood: 0, Stone: 0, Ore: 0, Clay: 0,
+    Glass: 0, Papyrus: 0, Textile: 0
+  };
+
   player.playerBoard.forEach((card) => {
     if (card.production) {
       Object.entries(card.production).forEach(([resource, amount]) => {
-        if (typeof resource === "string" && resource.includes(",")) {
-          const choices = resource
-            .split(",")
-            .map((r) => r.trim()) as ResourceType[];
-          const randomChoice =
-            choices[Math.floor(Math.random() * choices.length)];
-
-          player.tempResources[randomChoice] =
-            (player.tempResources[randomChoice] || 0) + (amount as number);
+        // Handle single resource production
+        if (!resource.includes(',')) {
+          player.tempResources[resource as keyof Resource] = 
+            (player.tempResources[resource as keyof Resource] || 0) + (amount as number);
+          return;
         }
+
+        // Handle choice production
+        const choices = resource.split(',').map(r => r.trim()) as ResourceType[];
+        const randomChoice = choices[Math.floor(Math.random() * choices.length)];
+        player.tempResources[randomChoice] = 
+          (player.tempResources[randomChoice] || 0) + (amount as number);
       });
     }
   });

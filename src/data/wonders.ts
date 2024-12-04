@@ -129,7 +129,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Éphesos A",
-    imagePath: "/images/wonder-images/ephesosA.jpg",
+    imagePath: "/images/wonder-images/ephesosA.png",
     production: { Papyrus: 1 },
     wonderStages: [
       {
@@ -154,7 +154,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Éphesos B",
-    imagePath: "/images/wonder-images/ephesosB.jpg",
+    imagePath: "/images/wonder-images/ephesosB.png",
     production: { Papyrus: 1 },
     wonderStages: [
       {

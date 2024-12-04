@@ -1,9 +1,10 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { Card as CardType } from '../game-logic/types/card';
 import { Wonder } from '../game-logic/types/wonder';
 import { GameState } from '../game-logic/gameState';
 import EnhancedCard from './EnhancedCard';
 import { CardPosition } from '../game-logic/types/card';
+import gsap from 'gsap';
 
 interface PlayerHandProps {
   cards: CardType[];
@@ -22,10 +23,58 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
   onWonderBuild,
   onCardDiscard,
 }) => {
+  const [prevCards, setPrevCards] = useState(cards);
+  const [isDealing, setIsDealing] = useState(false);
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
-  const [selectedCardPosition, setSelectedCardPosition] = useState<CardPosition | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [selectedCardPosition, setSelectedCardPosition] = useState<CardPosition | null>(null);
   const cardRefs = useRef<HTMLDivElement[]>([]);
+  const animationInProgressRef = useRef(false);
+
+  // Simple debug effect
+  useEffect(() => {
+    console.log("Cards state:", {
+      currentCards: cards.map(c => c.name),
+      prevCards: prevCards.map(c => c.name),
+      isDealing,
+      age: gameState.age
+    });
+  }, [cards, prevCards, isDealing, gameState.age]);
+
+  // Detect card changes
+  useEffect(() => {
+    const cardsChanged = prevCards.some((card, i) => card.name !== cards[i].name);
+    
+    if (cardsChanged && !animationInProgressRef.current) {
+      console.log("Cards changed, starting animation");
+      animationInProgressRef.current = true;
+      setIsDealing(true);
+
+      // Kill any existing animations
+      gsap.killTweensOf(cardRefs.current);
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          animationInProgressRef.current = false;
+          setIsDealing(false);
+          console.log("Animation complete");
+        }
+      });
+
+      tl.to(cardRefs.current, {
+        opacity: 0,
+        duration: 0.2,
+        stagger: 0.05,
+        onComplete: () => setPrevCards(cards)
+      })
+      .to(cardRefs.current, {
+        opacity: 1,
+        duration: 0.3,
+        stagger: 0.08,
+        delay: 0.1
+      });
+    }
+  }, [cards, prevCards]);
 
   // Calculate card positions in a fan layout
   const cardPositions = useMemo(() => {
@@ -45,22 +94,19 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
   }, [cards.length]);
 
   const handleCardClick = (card: CardType, index: number) => {
+    if (isDealing || !cardRefs.current[index]) return;
+    
     const cardElement = cardRefs.current[index];
-    if (!cardElement) return;
-
     const rect = cardElement.getBoundingClientRect();
     const { rotation } = cardPositions[index];
     
-    // Reset any transforms to get true dimensions
-    const position: CardPosition = {
+    setSelectedCardPosition({
       x: rect.left,
       y: rect.top,
       rotation: rotation,
       width: cardElement.offsetWidth,
       height: cardElement.offsetHeight,
-    };
-
-    setSelectedCardPosition(position);
+    });
     setSelectedCard(card);
   };
 
@@ -69,18 +115,16 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
       <div className="relative w-full h-full">
         {cards.map((card, index) => {
           const { x, y, rotation } = cardPositions[index];
-          const isSelected = selectedCard === card;
           
           return (
             <div 
               key={`${card.name}-${index}`}
-              ref={(el) => (cardRefs.current[index] = el!)}
+              ref={el => cardRefs.current[index] = el!}
               className="absolute group"
               style={{
                 transform: `translateX(${x}px) translateY(${y}px) rotate(${rotation}deg)`,
                 transformOrigin: 'bottom center',
-                transition: 'transform 0.3s ease-out',
-                opacity: (isSelected && isAnimating) ? 0 : 1,
+                opacity: isDealing ? 0 : 1,
               }}
               onClick={() => handleCardClick(card, index)}
             >
@@ -105,25 +149,21 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
           onClose={() => {
             setSelectedCard(null);
             setSelectedCardPosition(null);
-            setIsAnimating(false);
           }}
           onCardPlay={() => {
             onCardPlay(cards.indexOf(selectedCard));
             setSelectedCard(null);
             setSelectedCardPosition(null);
-            setIsAnimating(false);
           }}
           onWonderBuild={() => {
             onWonderBuild(cards.indexOf(selectedCard));
             setSelectedCard(null);
             setSelectedCardPosition(null);
-            setIsAnimating(false);
           }}
           onCardDiscard={() => {
             onCardDiscard(cards.indexOf(selectedCard));
             setSelectedCard(null);
             setSelectedCardPosition(null);
-            setIsAnimating(false);
           }}
         />
       )}

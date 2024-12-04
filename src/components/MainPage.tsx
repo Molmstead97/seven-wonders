@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import * as THREE from "three";
 
-import GameBoard from "./GameBoard";
 import { gameLoop, initializeGame, GameState } from "../game-logic/gameState";
 import PlayerHand from "./PlayerHand";
 
@@ -13,10 +12,15 @@ import {
   handleDiscardCard,
 } from "../game-logic/gameActions";
 //import { SceneManager } from '../components/animations/sceneManager';
-import { AiPlayersModal, WonderChoiceModal } from "./gameSetupModals";
+import { AiPlayersModal, WonderChoiceModal } from "./GameSetupModals";
 
 import { fadeOut } from "./animations/fadeAnimation"; // fadeIn is used in the modals when they mount
 import { blurBackground, unblurBackground } from "./animations/backgroundBlur";
+import ProductionChoiceModal from "./ProductionChoiceModal";
+import { ProductionChoiceState } from "../game-logic/types/productionChoice";
+import { ResourceType } from "../game-logic/types/resource";
+import { Card } from "../game-logic/types/card";
+import GameBoard from "./GameBoard";
 
 type GamePhase = "home" | "playing";
 
@@ -28,9 +32,6 @@ const MainPage = () => {
   const [aiPlayerCount, setAiPlayerCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const gameLoopRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [playerActionTaken, setPlayerActionTaken] = useState(false);
-
   const [showAiPlayersModal, setShowAiPlayersModal] = useState(false);
   const [showWonderChoiceModal, setShowWonderChoiceModal] = useState(false);
   const [isChoosingWonder, setIsChoosingWonder] = useState(false);
@@ -40,28 +41,8 @@ const MainPage = () => {
   const wonderChoiceModalRef = useRef<HTMLDivElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
 
-  // Initialize game loop when game state changes and game phase is "playing"
-  useEffect(() => {
-    if (gameState && gamePhase === "playing") {
-      gameLoopRef.current = setInterval(() => {
-        setGameState((prevState) => {
-          if (prevState && playerActionTaken) {
-            const newState = gameLoop(prevState, playerActionTaken);
-            // Reset playerActionTaken after the game loop processes it
-            setPlayerActionTaken(false);
-            return newState;
-          }
-          return prevState;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (gameLoopRef.current) {
-        clearInterval(gameLoopRef.current);
-      }
-    };
-  }, [gameState, gamePhase]);
+  const [productionChoiceState, setProductionChoiceState] =
+    useState<ProductionChoiceState | null>(null);
 
   // Function to start the game setup
   const startSetup = () => {
@@ -135,6 +116,54 @@ const MainPage = () => {
     setGamePhase("home"); // Reset the game phase
   };
 
+  const handleProductionChoice = (resource: ResourceType) => {
+    if (!gameState || !productionChoiceState) return;
+
+    // Update the game state with the chosen resource
+    const updatedGameState = {
+      ...gameState,
+      players: gameState.players.map((player, index) => {
+        if (index === 0) {
+          // Current player
+          return {
+            ...player,
+            tempResources: {
+              ...player.tempResources,
+              [resource]: (player.tempResources[resource] || 0) + 1,
+            },
+          };
+        }
+        return player;
+      }),
+    };
+
+    // Move to next choice or finish
+    if (
+      productionChoiceState.currentChoiceIndex <
+      productionChoiceState.choices.length - 1
+    ) {
+      setProductionChoiceState({
+        ...productionChoiceState,
+        currentChoiceIndex: productionChoiceState.currentChoiceIndex + 1,
+      });
+    } else {
+      setProductionChoiceState(null);
+    }
+
+    setGameState(updatedGameState);
+  };
+
+  // Add a state change monitor
+  useEffect(() => {
+    console.log("GameState changed:", {
+      age: gameState?.age,
+      turns: gameState?.turns,
+      playerCount: gameState?.players.length,
+      handSize: gameState?.players[0]?.playerHand.length,
+      timestamp: new Date().toISOString(),
+    });
+  }, [gameState]);
+
   // Loading screen
   if (isLoading) {
     return (
@@ -161,12 +190,21 @@ const MainPage = () => {
         );
       }
       return (
-        <div className="h-screen w-screen overflow-hidden relative bg-gray-900">
+        <div
+          style={{
+            height: "100vh",
+            width: "100vw",
+            overflow: "hidden",
+            position: "relative",
+            backgroundColor: "#121212",
+          }}
+        >
           <GameBoard
-            playerCount={gameState?.players.length || 0}
+            playerCount={gameState?.players.length ?? 0}
             assignedWonders={
               gameState?.players.map((player) => player.wonder) || []
             }
+            discardPile={gameState?.discardPile || []}
           />
           {gameState && (
             <div className="relative z-10">
@@ -176,29 +214,50 @@ const MainPage = () => {
                 gameState={gameState}
                 onCardPlay={(cardIndex) => {
                   const updatedState = handleCardPlay(gameState, 0, cardIndex);
-                  setGameState(updatedState);
-                  setPlayerActionTaken(true);
+
+                  const nextState = gameLoop(updatedState, true);
+
+                  setGameState(nextState);
                 }}
                 onWonderBuild={(cardIndex) => {
+                  if (!gameState) return;
                   const updatedState = handleBuildWonder(
                     gameState,
                     0,
                     cardIndex
                   );
-                  setGameState(updatedState);
-                  setPlayerActionTaken(true);
+                  const nextState = gameLoop(updatedState, true);
+                  setGameState(nextState);
                 }}
                 onCardDiscard={(cardIndex) => {
+                  if (!gameState) return;
                   const updatedState = handleDiscardCard(
                     gameState,
                     0,
                     cardIndex
                   );
-                  setGameState(updatedState);
-                  setPlayerActionTaken(true);
+                  const nextState = gameLoop(updatedState, true);
+                  setGameState(nextState);
                 }}
               />
             </div>
+          )}
+          {productionChoiceState && (
+            <ProductionChoiceModal
+              card={
+                {
+                  name: productionChoiceState.choices[
+                    productionChoiceState.currentChoiceIndex
+                  ].cardName,
+                  imagePath:
+                    productionChoiceState.choices[
+                      productionChoiceState.currentChoiceIndex
+                    ].cardImage,
+                } as Card
+              }
+              onChoiceSelected={handleProductionChoice}
+              onClose={() => setProductionChoiceState(null)}
+            />
           )}
         </div>
       );

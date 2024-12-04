@@ -41,7 +41,9 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
-  const backgroundRef = useRef<HTMLDivElement>(null);
+
+  const CARD_WIDTH = 300;
+  const CARD_HEIGHT = 450;
 
   const canPlayCard = checkResources(gameState.players[0], card, null);
   
@@ -55,18 +57,14 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
     if (!cardRef.current) return;
 
     onAnimationStart();
-    
-    const targetPosition = {
-      x: window.innerWidth / 2 - (initialPosition.width * 2.5) / 2,
-      y: window.innerHeight / 2 - (initialPosition.height * 2.5) / 2,
-      rotation: 0,
-      width: initialPosition.width * 2.5,
-      height: initialPosition.height * 2.5,
-    };
 
-    if (backgroundRef.current) {
-      blurBackground(backgroundRef.current);
-    }
+    const targetPosition = {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      rotation: 0,
+      width: CARD_WIDTH,
+      height: CARD_HEIGHT,
+    };
 
     const timeline = expandZoom(cardRef.current, initialPosition, targetPosition);
     
@@ -77,44 +75,41 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
           duration: 0.3,
         });
       }
-    }, '>-0.3'); // Start slightly before the main animation ends
+    });
+
+    return () => {
+      timeline.kill();
+    };
   }, [initialPosition, onAnimationStart]);
 
   const handleClose = () => {
-    if (!cardRef.current) return;
-
-    if (controlsRef.current) {
-      gsap.to(controlsRef.current, {
-        opacity: 0,
-        duration: 0.3,
+    if (cardRef.current) {
+      shrinkZoom(cardRef.current, initialPosition, () => {
+        onClose();
       });
     }
-
-    if (backgroundRef.current) {
-      unblurBackground(backgroundRef.current);
-    }
-
-    shrinkZoom(cardRef.current, initialPosition, onClose);
   };
 
   return (
-    <>
-      <div ref={backgroundRef} className="fixed inset-0 z-40" />
+    <div
+      className="fixed inset-0 z-40 flex items-center justify-center"
+      style={{
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backdropFilter: 'blur(8px)',
+      }}
+    >
       <div 
         ref={cardRef}
-        className="fixed z-50"
+        className="relative z-50"
         style={{
-          left: initialPosition.x,
-          top: initialPosition.y,
           width: initialPosition.width,
           height: initialPosition.height,
-          transform: `rotate(${initialPosition.rotation}deg)`,
         }}
       >
         <img 
           src={card.imagePath}
           alt={card.name}
-          className="w-full h-full object-cover rounded-lg"
+          className="w-full h-full object-cover rounded-lg shadow-2xl"
         />
         <button
           onClick={handleClose}
@@ -125,9 +120,9 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
       </div>
       <div
         ref={controlsRef}
-        className="fixed left-1/2 -translate-x-1/2 z-50 flex space-x-4 opacity-0"
+        className="flex space-x-4 mt-8"
         style={{
-          top: '60%',
+          opacity: 0,
         }}
       >
         <button 
@@ -159,7 +154,7 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
           Discard
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

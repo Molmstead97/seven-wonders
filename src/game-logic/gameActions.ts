@@ -2,6 +2,7 @@ import { GameState } from "./gameState";
 
 import { ResourceType } from "./types/resource";
 import { Wonder } from "./types/wonder";
+import { ProductionChoiceState } from './types/productionChoice';
 
 import { applyCardEffects } from "./utils/applyCardEffects";
 import { buildWonder } from "./utils/buildWonder";
@@ -25,9 +26,24 @@ export function handleCardPlay(
     })),
   };
 
-  // Get current player
+  // Get current player and card
   const currentPlayer = newState.players[playerId];
   const cardToPlay = currentPlayer.playerHand[cardIndex];
+
+  // Check for production choices
+  if (cardToPlay.production?.choice) {
+    const choices = cardToPlay.production.choice.map(choice => ({
+      cardName: cardToPlay.name,
+      cardImage: cardToPlay.imagePath,
+      options: choice.options,
+      amount: choice.amount
+    }));
+
+    newState.productionChoiceState = {
+      choices,
+      currentChoiceIndex: 0
+    };
+  }
 
   // Update player state
   currentPlayer.playerBoard.add(cardToPlay);
@@ -36,12 +52,12 @@ export function handleCardPlay(
     ...currentPlayer.playerHand.slice(cardIndex + 1),
   ];
 
-  // Apply other effects
+  // Apply cost
   if (typeof cardToPlay.cost === "number") {
     currentPlayer.gold -= cardToPlay.cost;
   }
 
-  // Apply card effects
+  // Apply card effects (except for production choices which will be handled by the UI)
   const effectsUpdate = applyCardEffects(currentPlayer, cardToPlay);
   Object.assign(currentPlayer, effectsUpdate);
 

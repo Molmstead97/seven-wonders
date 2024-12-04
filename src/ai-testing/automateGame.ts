@@ -4,6 +4,7 @@ import { handleAITurn } from "../game-logic/gameState";
 import { setupPlayers } from "../game-logic/utils/setupPlayers";
 import { dealCards } from "../game-logic/utils/dealCards";
 import { PRESET_PERSONALITIES } from "../game-logic/types/aiPlayer";
+import { gameEnd } from "../game-logic/utils/gameEnd";
 
 function initializeAutomatedGame(aiPlayerCount: number): GameState {
   // Force all players (including first player) to be AI
@@ -26,6 +27,10 @@ function initializeAutomatedGame(aiPlayerCount: number): GameState {
     players,
     discardPile: [],
     isAutomated: true,
+    productionChoiceState: {
+      choices: [],
+      currentChoiceIndex: 0
+    }
   };
 }
 
@@ -65,6 +70,7 @@ export function automateGame(aiPlayerCount: number = 3): void {
   }
 
   console.log("\n=== GAME FINISHED ===\n");
+  gameState.players = gameEnd(gameState.players);
   console.log("Final Scores:");
   gameState.players.forEach(player => {
     console.log(`${player.name}: ${player.victoryPoints} points`);

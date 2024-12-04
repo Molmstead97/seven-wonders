@@ -1,6 +1,7 @@
 import { Resource, Production } from "./resource";
 import { Science } from "./resource"
 import { SpecialEffect } from "./wonderSpecialEffects";
+
 export interface WonderStage {
     stage: number;
     cost: Resource | number | null; // The number provides gold to player

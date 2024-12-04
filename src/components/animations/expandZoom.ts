@@ -18,25 +18,23 @@ export const expandZoom = (
     onComplete
   });
 
-  // Set initial position absolutely
+  // Set initial state
   gsap.set(element, {
     position: 'fixed',
-    left: startPosition.x,
-    top: startPosition.y,
-    width: startPosition.width,
-    height: startPosition.height,
-    rotation: startPosition.rotation,
-    zIndex: 50,
-  });
-
-  // Animate to target position
-  timeline.to(element, {
-    left: targetPosition.x,
-    top: targetPosition.y,
+    left: '50%',
+    top: '-75%',
+    xPercent: -50,
+    yPercent: -50,
     width: targetPosition.width,
     height: targetPosition.height,
-    rotation: 0,
-    duration: 0.8,
+    opacity: 0,
+    zIndex: 999,
+  });
+
+  // Simple fade in
+  timeline.to(element, {
+    opacity: 1,
+    duration: 0.5,
     ease: 'power2.inOut',
   });
 
@@ -52,14 +50,10 @@ export const shrinkZoom = (
     onComplete
   });
 
+  // Simple fade out
   timeline.to(element, {
-    x: targetPosition.x,
-    y: targetPosition.y,
-    rotation: targetPosition.rotation,
-    width: targetPosition.width,
-    height: targetPosition.height,
-    scale: 1,
-    duration: 0.8,
+    opacity: 0,
+    duration: 0.5,
     ease: 'power2.inOut',
   });
 
