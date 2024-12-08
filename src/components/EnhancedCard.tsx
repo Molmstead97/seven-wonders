@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Card, CardPosition } from '../data/types/card';
 import { Wonder } from '../data/types/wonder';
 
-import { expandZoom, shrinkZoom } from './animations/expandZoom';
+import { expandZoom } from './animations/expandZoom';
 import { checkResources } from '../game-logic/utils/resourceCheck';
 import { GameState } from '../game-logic/gameState';
 import { canPlayCard } from '../game-logic/gameActions';
@@ -13,15 +13,16 @@ interface EnhancedCardProps {
   initialPosition: CardPosition;
   onAnimationStart: () => void;
   onClose: () => void;
-  onCardPlay: () => void;
-  onWonderBuild: () => void;
-  onCardDiscard: () => void;
-  currentWonder: Wonder;
-  gameState: GameState;
   showActions?: boolean;
+  // These props are only required if showActions is true
+  onCardPlay?: () => void;
+  onWonderBuild?: () => void;
+  onCardDiscard?: () => void;
+  currentWonder?: Wonder;
+  gameState?: GameState;
 }
 
-const EnhancedCard: React.FC<EnhancedCardProps> = ({
+export const EnhancedCard: React.FC<EnhancedCardProps> = ({
   card,
   initialPosition,
   onAnimationStart,
@@ -39,13 +40,13 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
   const CARD_WIDTH = 300;
   const CARD_HEIGHT = 450;
 
-  const hasResources = canPlayCard(gameState, 0, card);
-  
-  const nextStageIndex = currentWonder.wonderStages.findIndex(
-    (stage) => !stage.isBuilt
-  );
-  const canBuildWonder = nextStageIndex !== -1 && 
-    checkResources(gameState.players[0], null, currentWonder.wonderStages[nextStageIndex]);
+  // Only calculate these if we're showing actions
+  const hasResources = showActions && gameState ? canPlayCard(gameState, 0, card) : false;
+  const canBuildWonder = showActions && currentWonder && gameState ? 
+    (() => {
+      const nextStageIndex = currentWonder.wonderStages.findIndex(stage => !stage.isBuilt);
+      return nextStageIndex !== -1 && checkResources(gameState.players[0], null, currentWonder.wonderStages[nextStageIndex]);
+    })() : false;
 
   useEffect(() => {
     if (!cardRef.current || !controlsRef.current) return;

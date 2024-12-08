@@ -155,7 +155,7 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
         <EnhancedCard
           card={selectedCard}
           initialPosition={selectedCardPosition}
-          onAnimationStart={() => setIsAnimating(true)}
+          onAnimationStart={() => {}}
           currentWonder={currentWonder}
           gameState={gameState}
           onClose={() => {

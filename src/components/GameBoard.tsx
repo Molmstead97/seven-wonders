@@ -7,15 +7,14 @@ import React, {
 } from "react";
 import * as THREE from "three";
 import { Wonder } from "../data/types/wonder";
-import EnhancedCard from "./EnhancedCard";
-import { Card, CardPosition } from "../data/types/card";
+import { Card } from "../data/types/card";
 import { GameState } from "../game-logic/gameState";
 import TradeModal from "./TradeModal";
-import { PlayerBoard, PlayerPosition } from "./PlayerBoard";
 import { ResourceType } from "../data/types/resource";
 import { handleTrade } from "../game-logic/gameActions";
 import ProductionChoiceModal from "./ProductionChoiceModal";
 import { ProductionChoiceState } from "../data/types/productionChoice";
+import { PlayerBoard } from "./PlayerBoard";
 
 interface GameBoardProps {
   playerCount: number;
@@ -38,16 +37,17 @@ const GameBoard = React.memo(
     const [isLoading, setIsLoading] = useState(true);
     const [selectedWonder, setSelectedWonder] = useState<Wonder | null>(null);
     const [isGameLogOpen, setIsGameLogOpen] = useState(false);
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-    const mountedRef = useRef(true);
-    const initCompletedRef = useRef(false);
     const [displayedGameLog, setDisplayedGameLog] = useState<string[]>([]);
     const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
     const [productionChoiceState, setProductionChoiceState] =
       useState<ProductionChoiceState | null>(null);
-    const [selectedBoardCard, setSelectedBoardCard] = useState<Card | null>(null);
-    const [selectedBoardCardPosition, setSelectedBoardCardPosition] = useState<CardPosition | null>(null);
+    const [selectedPlayerBoardIndex, setSelectedPlayerBoardIndex] = useState<number | null>(null);
+
+    // Three.js refs
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+    const mountedRef = useRef(true);
+    const initCompletedRef = useRef(false);
 
     const stableRefs = useMemo(
       () => ({
@@ -62,6 +62,7 @@ const GameBoard = React.memo(
       []
     );
 
+    // Three.js setup functions
     const createTable = useCallback(() => {
       const tableGroup = new THREE.Group();
 
@@ -86,7 +87,7 @@ const GameBoard = React.memo(
         { x: 35, z: 35 },
       ];
 
-      legPositions.forEach((pos, index) => {
+      legPositions.forEach((pos) => {
         const leg = new THREE.Mesh(legGeometry, legMaterial);
         leg.position.set(pos.x, -15, pos.z);
         leg.castShadow = true;
@@ -122,11 +123,7 @@ const GameBoard = React.memo(
 
       scene.add(mainLight);
 
-      const hemisphereLight = new THREE.HemisphereLight(
-        0xffffff,
-        0x444444,
-        0.3
-      );
+      const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.3);
       scene.add(hemisphereLight);
 
       const table = createTable();
@@ -134,58 +131,6 @@ const GameBoard = React.memo(
 
       return scene;
     }, [createTable]);
-
-    // Helper to determine player positions based on player count
-function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosition {
-  // Player 0 is always the user at bottom
-  if (playerIndex === 0) return "bottom";
-
-  switch (playerCount) {
-    case 3:
-      // 3 players: user bottom, AI top-left and top-right
-      return playerIndex === 1 ? "left-top" : "right-top";
-    case 4:
-      // 4 players: user bottom, then clockwise from left-bottom
-      switch (playerIndex) {
-        case 1: return "left-bottom";
-        case 2: return "top-left";
-        case 3: return "right-top";
-        default: return "bottom";
-      }
-    case 5:
-      // 5 players: user bottom, then clockwise from left-bottom
-      switch (playerIndex) {
-        case 1: return "left-bottom";
-        case 2: return "left-top";
-        case 3: return "top-center";
-        case 4: return "right-top";
-        default: return "bottom";
-      }
-    case 6:
-      // 6 players: user bottom, then clockwise from left-bottom
-      switch (playerIndex) {
-        case 1: return "left-bottom";
-        case 2: return "left-top";
-        case 3: return "top-left";
-        case 4: return "top-right";
-        case 5: return "right-top";
-        default: return "bottom";
-      }
-    case 7:
-      // 7 players: user bottom, then clockwise from left-bottom
-      switch (playerIndex) {
-        case 1: return "left-bottom";
-        case 2: return "left-top";
-        case 3: return "top-left";
-        case 4: return "top-right";
-        case 5: return "right-top";
-        case 6: return "right-bottom";
-        default: return "bottom";
-      }
-    default:
-      return "bottom";
-      }
-    }
 
     // Basic initialization effect
     useEffect(() => {
@@ -213,6 +158,7 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
       };
     }, [setupScene]);
 
+    // Game log animation effect
     useEffect(() => {
       if (gameLog.length > displayedGameLog.length) {
         const timer = setTimeout(() => {
@@ -220,7 +166,7 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
             const nextIndex = prevLog.length;
             return [...prevLog, gameLog[nextIndex]];
           });
-        }, 1000);
+        }, 750);
 
         return () => {
           clearTimeout(timer);
@@ -292,13 +238,11 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
       if (!gameState) return;
 
       const currentPlayer = gameState.players[0];
-
       const choiceCards = Array.from(currentPlayer.playerBoard).filter(
         (card) => card.production && "choice" in card.production
       );
 
       const choices = choiceCards.map((card) => {
-        // Since we filtered for cards with production and choice, we can safely assert this
         const production = card.production!;
         const choiceOptions = "choice" in production ? production.choice[0].options ?? [] : [];
         const choiceAmount = "choice" in production ? production.choice[0].amount ?? 0 : 0;
@@ -317,39 +261,17 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
       });
     };
 
-    const handleBoardCardClick = (card: Card, position: CardPosition) => {
-      setSelectedBoardCardPosition(position);
-      setSelectedBoardCard(card);
-    };
-
     return (
       <div className="relative w-full h-full">
         <canvas ref={canvasRef} className="w-full h-full" />
 
-        {/* Add PlayerBoards overlay */}
-        {gameState && (
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="relative w-full h-full pointer-events-auto">
-              {gameState.players.map((player, index) => (
-                <PlayerBoard
-                  key={player.id}
-                  player={player}
-                  position={getPlayerPosition(gameState.players.length, index)}
-                  onCardClick={handleBoardCardClick}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Floating UI for players/wonders */}
         {gameState && (
-          <>
-            <div className="absolute top-4 left-4 space-y-2 bg-gray-700/50">
-              {assignedWonders.map((wonder, index) => (
+          <div className="absolute top-4 left-4 space-y-2 bg-gray-700/50">
+            {assignedWonders.map((wonder, index) => (
+              <div key={wonder.name} className="text-white rounded-lg shadow-lg border border-gray-700/50">
                 <div
-                  key={wonder.name}
-                  className="text-white p-4 rounded-lg cursor-pointer hover:bg-black/90 transition-colors shadow-lg border border-gray-700/50"
+                  className="p-4 cursor-pointer hover:bg-black/90 transition-colors"
                   onClick={() => setSelectedWonder(wonder)}
                 >
                   <div className="font-bold">
@@ -357,12 +279,20 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
                   </div>
                   <div className="text-sm opacity-80">{wonder.name}</div>
                 </div>
-              ))}
-            </div>
-          </>
+                {gameState.players[index].playerBoard.size > 0 && (
+                  <button
+                    className="w-full p-2 text-sm bg-white/10 hover:bg-white/20 transition-colors border-t border-gray-700/50"
+                    onClick={() => setSelectedPlayerBoardIndex(index)}
+                  >
+                    View Board
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         )}
 
-        {/* Wonder detail view with backdrop */}
+        {/* Wonder detail view */}
         {selectedWonder && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
@@ -379,7 +309,6 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
             >
               {/* Header */}
               <div className="flex items-center justify-between mb-4">
-                {/* Left Section - Player Info */}
                 <div>
                   <h2 className="text-xl text-white font-bold">
                     Player{" "}
@@ -387,12 +316,9 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
                       (w) => w.name === selectedWonder.name
                     ) + 1}
                   </h2>
-                  <h3 className="text-lg text-white/80">
-                    {selectedWonder.name}
-                  </h3>
+                  <h3 className="text-lg text-white/80">{selectedWonder.name}</h3>
                 </div>
 
-                {/* Center Section - Trade Button */}
                 {assignedWonders.findIndex(
                   (w) => w.name === selectedWonder.name
                 ) !== 0 && (
@@ -404,7 +330,6 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
                   </button>
                 )}
 
-                {/* Right Section - Close Button */}
                 <button
                   onClick={() => setSelectedWonder(null)}
                   className="rounded-full p-2 bg-white/10 hover:bg-white/20 transition-colors"
@@ -451,7 +376,9 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
 
                   {/* Temporary Resources Panel */}
                   <div className="bg-gray-700/50 p-4 rounded-lg shadow-lg backdrop-blur-sm">
-                    <h3 className="font-bold mb-2 text-md">Temporary Resources</h3>
+                    <h3 className="font-bold mb-2 text-md">
+                      Temporary Resources
+                    </h3>
                     <div className="grid grid-cols-2 gap-2">
                       {Object.entries(
                         gameState.players[
@@ -521,19 +448,6 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
                   </div>
                 </div>
               )}
-
-              {isTradeModalOpen && (
-                <TradeModal
-                  onClose={() => setIsTradeModalOpen(false)}
-                  onTrade={handleTradeAction}
-                  selectedWonder={selectedWonder}
-                  userWonder={assignedWonders[0]}
-                  gameState={gameState!}
-                  tradingPlayerId={assignedWonders.findIndex(
-                    (w) => w.name === selectedWonder?.name
-                  )}
-                />
-              )}
             </div>
           </div>
         )}
@@ -543,7 +457,7 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
             <p className="text-white">Loading game board...</p>
           </div>
         )}
-        
+
         {/* Game Log */}
         <div className="fixed bottom-4 right-4 w-48 bg-black/80 text-white font-bold text-sm rounded-lg shadow-2xl">
           <div
@@ -576,14 +490,16 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
             </div>
           )}
         </div>
+
         {hasProductionChoiceCard && (
           <button
-            className="bg-gray-700/50 fixed bottom-4 left-24 text-white px-4 py-2 rounded hover:bg-black/90 transition-colors"
+            className="bg-gray-700/50 border border-gray-500/50 fixed bottom-4 left-16 text-white px-4 py-2 rounded hover:bg-black/90 transition-colors"
             onClick={openProductionChoiceModal}
           >
             Choose Production
           </button>
         )}
+
         {productionChoiceState && (
           <ProductionChoiceModal
             card={
@@ -601,21 +517,25 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
             onClose={() => setProductionChoiceState(null)}
           />
         )}
-        {selectedBoardCard && selectedBoardCardPosition && (
-          <EnhancedCard
-            card={selectedBoardCard}
-            initialPosition={selectedBoardCardPosition}
-            onAnimationStart={() => {}}
-            onClose={() => {
-              setSelectedBoardCard(null);
-              setSelectedBoardCardPosition(null);
-            }}
-            onCardPlay={() => {}}
-            onWonderBuild={() => {}}
-            onCardDiscard={() => {}}
-            currentWonder={gameState!.players[0].wonder}
+
+        {selectedPlayerBoardIndex !== null && (
+          <PlayerBoard
+            player={gameState!.players[selectedPlayerBoardIndex]}
+            onClose={() => setSelectedPlayerBoardIndex(null)}
+            onCardClick={() => {}} // We can remove this if we don't need card interactions
+          />
+        )}
+
+        {isTradeModalOpen && selectedWonder && (
+          <TradeModal
+            onClose={() => setIsTradeModalOpen(false)}
+            onTrade={handleTradeAction}
+            selectedWonder={selectedWonder}
+            userWonder={assignedWonders[0]}
             gameState={gameState!}
-            showActions={false}
+            tradingPlayerId={assignedWonders.findIndex(
+              (w) => w.name === selectedWonder?.name
+            )}
           />
         )}
       </div>
