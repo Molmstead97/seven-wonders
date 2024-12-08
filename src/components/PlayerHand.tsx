@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react';
-import { Card as CardType } from '../game-logic/types/card';
-import { Wonder } from '../game-logic/types/wonder';
+import { Card as CardType } from '../data/types/card';
+import { Wonder } from '../data/types/wonder';
 import { GameState } from '../game-logic/gameState';
 import EnhancedCard from './EnhancedCard';
-import { CardPosition } from '../game-logic/types/card';
+import { CardPosition } from '../data/types/card';
 import gsap from 'gsap';
 
 interface PlayerHandProps {
@@ -23,6 +23,10 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
   onWonderBuild,
   onCardDiscard,
 }) => {
+  if (!cards || !currentWonder || !gameState) {
+    return null;
+  }
+
   const [prevCards, setPrevCards] = useState(cards);
   const [isDealing, setIsDealing] = useState(false);
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
@@ -31,22 +35,30 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
   const cardRefs = useRef<HTMLDivElement[]>([]);
   const animationInProgressRef = useRef(false);
 
-  // Simple debug effect
-  useEffect(() => {
-    console.log("Cards state:", {
-      currentCards: cards.map(c => c.name),
-      prevCards: prevCards.map(c => c.name),
-      isDealing,
-      age: gameState.age
-    });
-  }, [cards, prevCards, isDealing, gameState.age]);
-
   // Detect card changes
   useEffect(() => {
-    const cardsChanged = prevCards.some((card, i) => card.name !== cards[i].name);
+    // First check if the arrays are different lengths
+    if (prevCards.length !== cards.length) {
+      console.log("Cards changed (length difference)");
+      handleCardAnimation();
+      return;
+    }
+
+    // Then check for content differences
+    const cardsChanged = prevCards.some((prevCard, i) => {
+      const currentCard = cards[i];
+      return prevCard && currentCard && prevCard.name !== currentCard.name;
+    });
     
-    if (cardsChanged && !animationInProgressRef.current) {
-      console.log("Cards changed, starting animation");
+    if (cardsChanged) {
+      console.log("Cards changed (content difference)");
+      handleCardAnimation();
+    }
+
+    function handleCardAnimation() {
+      if (animationInProgressRef.current) return;
+      
+      console.log("Starting animation");
       animationInProgressRef.current = true;
       setIsDealing(true);
 

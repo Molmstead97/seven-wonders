@@ -3,7 +3,7 @@ import { handleCardPlay, handleBuildWonder, handleDiscardCard } from "../game-lo
 import { handleAITurn } from "../game-logic/gameState";
 import { setupPlayers } from "../game-logic/utils/setupPlayers";
 import { dealCards } from "../game-logic/utils/dealCards";
-import { PRESET_PERSONALITIES } from "../game-logic/types/aiPlayer";
+import { PRESET_PERSONALITIES } from "../data/types/aiPlayer";
 import { gameEnd } from "../game-logic/utils/gameEnd";
 
 function initializeAutomatedGame(aiPlayerCount: number): GameState {
@@ -26,6 +26,7 @@ function initializeAutomatedGame(aiPlayerCount: number): GameState {
     turns: 0,
     players,
     discardPile: [],
+    gameLog: [],
     isAutomated: true,
     productionChoiceState: {
       choices: [],

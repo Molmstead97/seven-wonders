@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { Wonder } from '../../game-logic/types/wonder';
+import { Wonder } from '../../data/types/wonder';
 import { wonders } from '../../data/wonders';
 
 interface WonderSelectorProps {

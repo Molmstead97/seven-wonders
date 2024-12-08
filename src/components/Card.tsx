@@ -1,10 +1,10 @@
 import React from "react";
 import * as THREE from "three";
 
-import { Card } from "../game-logic/types/card";
+import { Card } from "../data/types/card";
 
 import { GameState } from "../game-logic/gameState";
-import { Wonder } from "../game-logic/types/wonder";
+import { Wonder } from "../data/types/wonder";
 
 interface CardProps {
   card: Card;

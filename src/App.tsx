@@ -1,12 +1,12 @@
 /*import { useState } from 'react'*/
-import MainPage from './components/MainPage'
+import Main from './components/Main'
 
 function App() {
   
 
   return (
     <>
-      <MainPage />
+      <Main />
     </>
   )
 }

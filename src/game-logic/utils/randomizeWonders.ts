@@ -1,4 +1,4 @@
-import { Wonder } from "../types/wonder";
+import { Wonder } from "../../data/types/wonder";
 
 import { wonders } from "../../data/wonders";
 

@@ -16,9 +16,7 @@ export type ProductionChoice = {
   amount: number;
 };
 
-export type Production = Resource & {
-  choice?: ProductionChoice[];
-};
+export type Production = Resource | { choice: ProductionChoice[] };
 
 export type ScienceType = "Cog" | "Compass" | "Tablet";
 

@@ -1,14 +1,14 @@
-import { Player } from "./types/player";
-import { Card } from "./types/card";
-import { Wonder } from "./types/wonder";
-import { Resource, ResourceType } from "./types/resource";
-import { ProductionChoiceState } from "./types/productionChoice";
+import { Player } from "../data/types/player";
+import { Card } from "../data/types/card";
+import { Wonder } from "../data/types/wonder";
+import { Resource, ResourceType } from "../data/types/resource";
+import { ProductionChoiceState } from "../data/types/productionChoice";
 
 import { setupPlayers } from "./utils/setupPlayers";
 import { dealCards } from "./utils/dealCards";
 import { ageEnd } from "./utils/ageEnd";
 
-import { scoreActions } from "./ai/scoring";
+import { scoreActions, applyProductionChoices } from "./ai/scoring";
 
 import {
   handleEndGame,
@@ -16,6 +16,7 @@ import {
   handleDiscardCard,
   handleCardPlay,
   handleBuildWonder,
+  addToGameLog,
 } from "./gameActions";
 
 export interface GameState {
@@ -23,6 +24,7 @@ export interface GameState {
   turns: number;
   players: Player[];
   discardPile: Card[];
+  gameLog: string[];
   isAutomated?: boolean;
   productionChoiceState: ProductionChoiceState
   // ... other game state properties
@@ -88,6 +90,7 @@ export function initializeGame(
     turns: 0,
     players,
     discardPile: [],
+    gameLog: [],
     productionChoiceState: {
       choices: [],
       currentChoiceIndex: 0,
@@ -100,11 +103,11 @@ export function gameLoop(
   playerActionTaken: boolean
 ): GameState {
 
-  console.log(`=== TURN ${gameState.turns} ===`);  
+  addToGameLog(gameState.gameLog, `=== TURN ${gameState.turns} ===`);  
   // Add random resources until UI is added
   gameState.players.forEach((player, index) => {
     if (index > 0) { // Skip human player
-      addRandomResourceFromCards(player);
+      applyProductionChoices(player, gameState);
     }
   });
 
@@ -155,7 +158,7 @@ export function gameLoop(
     console.log("=== PASSING HANDS ===");
     updatedGameState = handlePassHand(updatedGameState);
   } else {
-    console.log('=== AGE END ===');
+    addToGameLog(updatedGameState.gameLog, `=== AGE ${updatedGameState.age} END ===`);
     updatedGameState = {
       ...updatedGameState,
       turns: 0, // Reset turns for next age
@@ -210,32 +213,5 @@ function displayPlayerState(player: Player) {
     console.log(
       `  Stage ${index + 1}: ${stage.isBuilt ? "Built" : "Not Built"}`
     );
-  });
-}
-
-// TODO: This is a function for TESTING PURPOSES ONLY, remove before finalizing
-function addRandomResourceFromCards(player: Player) {
-  player.tempResources = {
-    Wood: 0, Stone: 0, Ore: 0, Clay: 0,
-    Glass: 0, Papyrus: 0, Textile: 0
-  };
-
-  player.playerBoard.forEach((card) => {
-    if (card.production) {
-      Object.entries(card.production).forEach(([resource, amount]) => {
-        // Handle single resource production
-        if (!resource.includes(',')) {
-          player.tempResources[resource as keyof Resource] = 
-            (player.tempResources[resource as keyof Resource] || 0) + (amount as number);
-          return;
-        }
-
-        // Handle choice production
-        const choices = resource.split(',').map(r => r.trim()) as ResourceType[];
-        const randomChoice = choices[Math.floor(Math.random() * choices.length)];
-        player.tempResources[randomChoice] = 
-          (player.tempResources[randomChoice] || 0) + (amount as number);
-      });
-    }
   });
 }

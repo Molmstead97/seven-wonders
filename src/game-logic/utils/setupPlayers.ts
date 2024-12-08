@@ -1,9 +1,9 @@
-import { Player } from "../types/player";
-import { Card } from "../types/card";
+import { Player } from "../../data/types/player";
+import { Card } from "../../data/types/card";
 import { randomizeWonders } from "./randomizeWonders";
-import { Wonder } from "../types/wonder";
-//import { generateAIPersonality } from "../types/aiPlayer";
-import { PRESET_PERSONALITIES } from "../types/aiPlayer";
+import { Wonder } from "../../data/types/wonder";
+//import { generateAIPersonality } from "../../data/types/aiPlayer";
+import { PRESET_PERSONALITIES } from "../../data/types/aiPlayer";
 
 
 

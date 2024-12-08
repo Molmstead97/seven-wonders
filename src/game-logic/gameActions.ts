@@ -1,8 +1,8 @@
 import { GameState } from "./gameState";
 
-import { ResourceType } from "./types/resource";
-import { Wonder } from "./types/wonder";
-import { ProductionChoiceState } from './types/productionChoice';
+import { ResourceType } from "../data/types/resource";
+import { Wonder } from "../data/types/wonder";
+import { ProductionChoiceState } from "../data/types/productionChoice";
 
 import { applyCardEffects } from "./utils/applyCardEffects";
 import { buildWonder } from "./utils/buildWonder";
@@ -10,28 +10,46 @@ import { tradeResource } from "./utils/tradeResource";
 import { ageEnd } from "./utils/ageEnd";
 import { gameEnd } from "./utils/gameEnd";
 import { passHands } from "./utils/passHand";
+import { checkResources } from './utils/resourceCheck';
+import { Card } from "../data/types/card";
+
+export const addToGameLog = (gameLog: string[], message: string) => {
+  console.log("Adding to game log:", message);
+  return [...gameLog, message];
+};
 
 export function handleCardPlay(
   gameState: GameState,
   playerId: number,
   cardIndex: number
 ): GameState {
+  if (!gameState || !gameState.players[playerId]) {
+    console.error('Invalid game state or player ID');
+    return gameState;
+  }
+
   // Create deep copy of state
   const newState = {
     ...gameState,
-    players: gameState.players.map((p) => ({
+    players: gameState.players.map((p, index) => ({
       ...p,
-      playerHand: [...p.playerHand],
-      playerBoard: new Set([...p.playerBoard]),
+      playerHand: index === playerId ? [...p.playerHand] : p.playerHand,
+      playerBoard: index === playerId ? new Set([...p.playerBoard]) : p.playerBoard,
     })),
+    gameLog: [...(gameState.gameLog || [])] // Ensure gameLog exists
   };
 
   // Get current player and card
   const currentPlayer = newState.players[playerId];
   const cardToPlay = currentPlayer.playerHand[cardIndex];
 
+  if (!cardToPlay) {
+    console.error('Invalid card index');
+    return gameState;
+  }
+
   // Check for production choices
-  if (cardToPlay.production?.choice) {
+  if (cardToPlay.production && "choice" in cardToPlay.production) {
     const choices = cardToPlay.production.choice.map(choice => ({
       cardName: cardToPlay.name,
       cardImage: cardToPlay.imagePath,
@@ -47,10 +65,15 @@ export function handleCardPlay(
 
   // Update player state
   currentPlayer.playerBoard.add(cardToPlay);
-  currentPlayer.playerHand = [
-    ...currentPlayer.playerHand.slice(0, cardIndex),
-    ...currentPlayer.playerHand.slice(cardIndex + 1),
-  ];
+  currentPlayer.playerHand.splice(cardIndex, 1);
+
+  // Update the game log
+  newState.gameLog = addToGameLog(
+    newState.gameLog, 
+    playerId === 0 
+      ? `You constructed ${cardToPlay.name}`
+      : `Player ${playerId + 1} constructed ${cardToPlay.name}`
+  );
 
   // Apply cost
   if (typeof cardToPlay.cost === "number") {
@@ -69,32 +92,46 @@ export function handleDiscardCard(
   playerId: number,
   cardIndex: number
 ): GameState {
+  if (!gameState || !gameState.players[playerId]) {
+    console.error('Invalid game state or player ID');
+    return gameState;
+  }
+  
   // Create deep copy of state
   const newState = {
     ...gameState,
-    players: gameState.players.map((p) => ({
+    players: gameState.players.map((p, index) => ({
       ...p,
-      playerHand: [...p.playerHand],
-      playerBoard: new Set([...p.playerBoard]),
+      playerHand: index === playerId ? [...p.playerHand] : p.playerHand,
+      playerBoard: index === playerId ? new Set([...p.playerBoard]) : p.playerBoard,
     })),
     discardPile: [...gameState.discardPile],
+    gameLog: [...(gameState.gameLog || [])] // Ensure gameLog exists
   };
 
-  // Get current player
+  // Get current player and card
   const currentPlayer = newState.players[playerId];
   const cardToDiscard = currentPlayer.playerHand[cardIndex];
+
+  if (!cardToDiscard) {
+    console.error('Invalid card index');
+    return gameState;
+  }
 
   // Add 3 gold for discarding
   currentPlayer.gold += 3;
 
   // Remove card from hand
-  currentPlayer.playerHand = [
-    ...currentPlayer.playerHand.slice(0, cardIndex),
-    ...currentPlayer.playerHand.slice(cardIndex + 1),
-  ];
+  currentPlayer.playerHand.splice(cardIndex, 1);
 
   // Add card to discard pile
   newState.discardPile.push(cardToDiscard);
+
+  // Update the game log
+  newState.gameLog = addToGameLog(newState.gameLog, playerId === 0 
+    ? `You discarded ${cardToDiscard.name}`
+    : `Player ${playerId + 1} discarded ${cardToDiscard.name}`
+  );
 
   return newState;
 }
@@ -104,23 +141,34 @@ export function handleBuildWonder(
   playerId: number,
   cardIndex: number
 ): GameState {
+  if (!gameState || !gameState.players[playerId]) {
+    console.error('Invalid game state or player ID');
+    return gameState;
+  }
+
   // Create deep copy of state
   const newState = {
     ...gameState,
-    players: gameState.players.map((p) => ({
+    players: gameState.players.map((p, index) => ({
       ...p,
-      playerHand: [...p.playerHand],
-      playerBoard: new Set([...p.playerBoard]),
-      wonder: {
+      playerHand: index === playerId ? [...p.playerHand] : p.playerHand,
+      playerBoard: index === playerId ? new Set([...p.playerBoard]) : p.playerBoard,
+      wonder: index === playerId ? {
         ...p.wonder,
-        wonderStages: p.wonder.wonderStages.map((stage) => ({ ...stage })),
-      },
+        wonderStages: p.wonder.wonderStages.map(stage => ({ ...stage })),
+      } : p.wonder,
     })),
+    gameLog: [...(gameState.gameLog || [])] // Ensure gameLog exists
   };
 
-  // Get current player
+  // Get current player and card
   const currentPlayer = newState.players[playerId];
   const cardToUse = currentPlayer.playerHand[cardIndex];
+
+  if (!cardToUse) {
+    console.error('Invalid card index');
+    return gameState;
+  }
 
   // Use buildWonder utility function to handle the wonder building logic
   const updatedPlayer = buildWonder(
@@ -133,6 +181,17 @@ export function handleBuildWonder(
   // Update the player in the game state
   newState.players[playerId] = updatedPlayer;
 
+  // Remove card from hand
+  currentPlayer.playerHand.splice(cardIndex, 1);
+
+  // Update the game log
+  newState.gameLog = addToGameLog(
+    newState.gameLog,
+    playerId === 0 
+      ? `You built a Wonder stage`
+      : `Player ${playerId + 1} built a Wonder stage`
+  );
+
   return newState;
 }
 
@@ -140,63 +199,28 @@ export function handlePassHand(gameState: GameState): GameState {
   return passHands(gameState);
 }
 
-export function handleTrade(
-  gameState: GameState,
-  playerId: number,
-  resourceType: ResourceType,
-  amount: number
-): GameState {
-  console.log("=== HANDLE TRADE ===");
-  console.log(
-    `Processing trade for player ${playerId}, resource ${resourceType}, amount ${amount}`
-  );
-
-  // Create deep copy of state
-  const newState = {
+export function handleTrade(gameState: GameState, tradingPlayerId: number, resourceType: ResourceType, amount: number): GameState {
+  if (!gameState) return gameState;
+  
+  const tradingPlayer = gameState.players[tradingPlayerId];
+  const userPlayer = gameState.players[0];
+  
+  const { player: updatedUserPlayer, neighbor: updatedTradingPlayer } = tradeResource(userPlayer, tradingPlayer, resourceType, amount);
+  
+  // Update game state
+  const newState: GameState = {
     ...gameState,
-    players: gameState.players.map((p) => ({
-      ...p,
-      playerHand: [...p.playerHand],
-      playerBoard: new Set([...p.playerBoard]),
-      resources: { ...p.resources },
-    })),
+    players: gameState.players.map((player, index) => 
+      index === 0 ? updatedUserPlayer : 
+      index === tradingPlayerId ? updatedTradingPlayer :
+      player
+    ),
+    gameLog: addToGameLog(
+      gameState.gameLog,
+      `${tradingPlayerId === 0 ? 'You' : `Player ${tradingPlayerId + 1}`} traded ${amount} ${resourceType} for ${amount * 2} gold`
+    ),
   };
-
-  // Get current player
-  const currentPlayer = newState.players[playerId];
-  const tradingPlayer = currentPlayer.leftPlayer || currentPlayer.rightPlayer;
-
-  if (!tradingPlayer) {
-    console.warn("No trading partner available");
-    return gameState;
-  }
-
-  console.log("Before trade:", {
-    playerGold: currentPlayer.gold,
-    playerResources: currentPlayer.resources[resourceType],
-    tradingPlayerResources: tradingPlayer.resources[resourceType],
-  });
-
-  // Calculate trade cost (2 gold per resource)
-  const tradeCost = amount * 2;
-
-  // Check if player has enough gold
-  if (currentPlayer.gold < tradeCost) {
-    console.warn("Not enough gold for trade");
-    return gameState;
-  }
-
-  // Execute trade
-  currentPlayer.gold -= tradeCost;
-  currentPlayer.resources[resourceType] =
-    (currentPlayer.resources[resourceType] || 0) + amount;
-
-  console.log("After trade:", {
-    playerGold: currentPlayer.gold,
-    playerResources: currentPlayer.resources[resourceType],
-    tradingPlayerResources: tradingPlayer.resources[resourceType],
-  });
-
+  
   return newState;
 }
 
@@ -225,4 +249,22 @@ export function handleEndGame(gameState: GameState): GameState {
     ...gameState,
     players: updatedPlayers,
   };
+}
+
+export function canPlayCard(gameState: GameState, playerId: number, card: Card): boolean {
+  if (!gameState || !gameState.players || !gameState.players[playerId] || !gameState.players[playerId].playerBoard) {
+    return false;
+  }
+
+  const player = gameState.players[playerId];
+
+  // Check if the player has sufficient resources to play the card
+  const hasResources = checkResources(player, card, null);
+
+  // Check if the card has already been played by the player
+  const isCardPlayed = Array.from(player.playerBoard).some(
+    (playedCard) => playedCard && playedCard.name === card.name
+  );
+
+  return hasResources && !isCardPlayed;
 }

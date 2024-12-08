@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Card } from '../game-logic/types/card';
-import { ResourceType } from '../game-logic/types/resource';
+import React, { useState, useEffect } from 'react';
+import { Card } from '../data/types/card';
+import { ResourceType } from '../data/types/resource';
 import { motion } from 'framer-motion';
 
 interface ProductionChoiceModalProps {
@@ -8,6 +8,17 @@ interface ProductionChoiceModalProps {
   onChoiceSelected: (resource: ResourceType) => void;
   onClose: () => void;
 }
+
+// Define clickable areas for each resource type
+const resourceAreas: Record<ResourceType, { top: number; left: number; width: number; height: number }> = {
+  Wood: { top: 240, left: 20, width: 40, height: 40 },
+  Stone: { top: 240, left: 70, width: 40, height: 40 },
+  Clay: { top: 240, left: 120, width: 40, height: 40 },
+  Ore: { top: 240, left: 170, width: 40, height: 40 },
+  Glass: { top: 290, left: 20, width: 40, height: 40 },
+  Papyrus: { top: 290, left: 70, width: 40, height: 40 },
+  Textile: { top: 290, left: 120, width: 40, height: 40 },
+};
 
 const ProductionChoiceModal: React.FC<ProductionChoiceModalProps> = ({
   card,
@@ -24,18 +35,48 @@ const ProductionChoiceModal: React.FC<ProductionChoiceModalProps> = ({
     return choices ? choices.split(',').map(r => r.trim() as ResourceType) : [];
   };
 
-  // Get the color for each resource type
-  const getResourceColor = (resource: ResourceType) => {
-    const colors: Record<ResourceType, string> = {
-      Wood: '#8B4513',
-      Stone: '#808080',
-      Clay: '#CD5C5C',
-      Ore: '#4A4A4A',
-      Glass: '#ADD8E6',
-      Papyrus: '#F5DEB3',
-      Textile: '#E6E6FA',
-    };
-    return colors[resource];
+  const handleCardClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    const choices = getProductionChoices();
+    for (const resource of choices) {
+      const area = resourceAreas[resource];
+      if (
+        x >= area.left && 
+        x <= area.left + area.width && 
+        y >= area.top && 
+        y <= area.top + area.height
+      ) {
+        onChoiceSelected(resource);
+        break;
+      }
+    }
+  };
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    const choices = getProductionChoices();
+    let foundResource: ResourceType | null = null;
+    
+    for (const resource of choices) {
+      const area = resourceAreas[resource];
+      if (
+        x >= area.left && 
+        x <= area.left + area.width && 
+        y >= area.top && 
+        y <= area.top + area.height
+      ) {
+        foundResource = resource;
+        break;
+      }
+    }
+    
+    setHoveredResource(foundResource);
   };
 
   return (
@@ -50,8 +91,13 @@ const ProductionChoiceModal: React.FC<ProductionChoiceModalProps> = ({
         </h2>
         
         <div className="flex flex-col items-center space-y-4">
-          {/* Card Image */}
-          <div className="relative w-[240px] h-[336px] rounded-lg overflow-hidden shadow-lg">
+          {/* Card Image with clickable areas */}
+          <div 
+            className="relative w-[240px] h-[336px] rounded-lg overflow-hidden shadow-lg cursor-pointer"
+            onClick={handleCardClick}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => setHoveredResource(null)}
+          >
             <img 
               src={card.imagePath} 
               alt={card.name}
@@ -59,36 +105,18 @@ const ProductionChoiceModal: React.FC<ProductionChoiceModalProps> = ({
             />
             {hoveredResource && (
               <div 
-                className="absolute inset-0 bg-opacity-30"
-                style={{ backgroundColor: getResourceColor(hoveredResource) }}
+                className="absolute inset-0 bg-white bg-opacity-20"
+                style={{
+                  top: resourceAreas[hoveredResource].top,
+                  left: resourceAreas[hoveredResource].left,
+                  width: resourceAreas[hoveredResource].width,
+                  height: resourceAreas[hoveredResource].height,
+                }}
               />
             )}
           </div>
-          
-          {/* Resource Choices */}
-          <div className="flex space-x-4 mt-6">
-            {getProductionChoices().map((resource) => (
-              <motion.button
-                key={resource}
-                onClick={() => onChoiceSelected(resource)}
-                onHoverStart={() => setHoveredResource(resource)}
-                onHoverEnd={() => setHoveredResource(null)}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 rounded-lg text-white font-semibold shadow-md transition-colors"
-                style={{ 
-                  backgroundColor: getResourceColor(resource),
-                  border: '2px solid transparent',
-                  borderColor: hoveredResource === resource ? '#ffffff' : 'transparent'
-                }}
-              >
-                {resource}
-              </motion.button>
-            ))}
-          </div>
         </div>
 
-        {/* Close button */}
         <motion.button
           onClick={onClose}
           className="absolute top-2 right-2 p-2 text-gray-500 hover:text-gray-700"

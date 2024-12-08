@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Resource, Production } from "../game-logic/types/resource";
-import { Wonder as WonderType } from "../game-logic/types/wonder";
+import { Resource, Production } from "../data/types/resource";
+import { Wonder as WonderType } from "../data/types/wonder";
 
 
 interface WonderProps {

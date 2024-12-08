@@ -1,7 +1,7 @@
-import { Player } from "../types/player";
-import { applyGoldVictoryBonus } from "../types/cardSpecialEffects";
-import { freeScienceFunction, copyGuildFunction, FreeScienceEffect } from "../types/wonderSpecialEffects";
-import { Science } from "../types/resource";
+import { Player } from "../../data/types/player";
+import { applyGoldVictoryBonus } from "../../data/types/cardSpecialEffects";
+import { freeScienceFunction, copyGuildFunction, FreeScienceEffect } from "../../data/types/wonderSpecialEffects";
+import { Science } from "../../data/types/resource";
 
 export function gameEnd(players: Player[]): Player[] {
   return players.map(player => {

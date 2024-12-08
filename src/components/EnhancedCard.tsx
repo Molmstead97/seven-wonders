@@ -1,12 +1,13 @@
 import React, { useRef, useEffect } from 'react';
-import { Card } from '../game-logic/types/card';
-import { Wonder } from '../game-logic/types/wonder';
+import { Card } from '../data/types/card';
+import { Wonder } from '../data/types/wonder';
 
 import { gsap } from 'gsap';
 import { expandZoom, shrinkZoom } from './animations/expandZoom';
 import { blurBackground, unblurBackground } from './animations/backgroundBlur';
 import { checkResources } from '../game-logic/utils/resourceCheck';
 import { GameState } from '../game-logic/gameState';
+import { canPlayCard } from '../game-logic/gameActions';
 
 interface CardPosition {
   x: number;
@@ -45,7 +46,7 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
   const CARD_WIDTH = 300;
   const CARD_HEIGHT = 450;
 
-  const canPlayCard = checkResources(gameState.players[0], card, null);
+  const hasResources = canPlayCard(gameState, 0, card);
   
   const nextStageIndex = currentWonder.wonderStages.findIndex(
     (stage) => !stage.isBuilt
@@ -54,7 +55,7 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
     checkResources(gameState.players[0], null, currentWonder.wonderStages[nextStageIndex]);
 
   useEffect(() => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || !controlsRef.current) return;
 
     onAnimationStart();
 
@@ -66,16 +67,7 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
       height: CARD_HEIGHT,
     };
 
-    const timeline = expandZoom(cardRef.current, initialPosition, targetPosition);
-    
-    timeline.add(() => {
-      if (controlsRef.current) {
-        gsap.to(controlsRef.current, {
-          opacity: 1,
-          duration: 0.3,
-        });
-      }
-    });
+    const timeline = expandZoom(cardRef.current, controlsRef.current, initialPosition, targetPosition);
 
     return () => {
       timeline.kill();
@@ -83,10 +75,17 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
   }, [initialPosition, onAnimationStart]);
 
   const handleClose = () => {
-    if (cardRef.current) {
-      shrinkZoom(cardRef.current, initialPosition, () => {
+    if (cardRef.current && controlsRef.current) {
+      const timeline = shrinkZoom(cardRef.current, initialPosition, () => {
         onClose();
       });
+
+      timeline.add(() => {
+        gsap.to(controlsRef.current, {
+          opacity: 0,
+          duration: 0.3,
+        });
+      }, 0);
     }
   };
 
@@ -127,9 +126,9 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
       >
         <button 
           onClick={onCardPlay}
-          disabled={!canPlayCard}
+          disabled={!hasResources}
           className={`px-4 py-2 rounded ${
-            canPlayCard 
+            hasResources 
               ? 'bg-blue-500 text-white hover:bg-blue-600' 
               : 'bg-gray-400 text-gray-200 cursor-not-allowed'
           }`}

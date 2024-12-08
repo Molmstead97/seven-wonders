@@ -1,4 +1,4 @@
-import { Wonder } from "../game-logic/types/wonder";
+import { Wonder } from "../data/types/wonder";
 
 // TODO: Add special effects to wonders
 // TODO: MAKE SURE ALL ARE PNG NOT JPG
@@ -35,7 +35,7 @@ export const wonders: Wonder[] = [
   },
   {
     name: "Alexandria B",
-    imagePath: "/images/wonder-images/alexandriaB.jpg",
+    imagePath: "/images/wonder-images/alexandriaB.png",
     production: { Glass: 1 },
     wonderStages: [
       {

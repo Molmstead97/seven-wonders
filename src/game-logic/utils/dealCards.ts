@@ -1,4 +1,4 @@
-import { Card } from "../types/card";
+import { Card } from "../../data/types/card";
 import { cards } from "../../data/cards";
 
 export function dealCards(numPlayers: number, age: number): Card[] {

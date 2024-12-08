@@ -10,6 +10,7 @@ interface CardPosition {
 
 export const expandZoom = (
   element: HTMLElement,
+  controls: HTMLElement,
   startPosition: CardPosition,
   targetPosition: CardPosition,
   onComplete?: () => void
@@ -22,7 +23,7 @@ export const expandZoom = (
   gsap.set(element, {
     position: 'fixed',
     left: '50%',
-    top: '-75%',
+    top: '-90%',
     xPercent: -50,
     yPercent: -50,
     width: targetPosition.width,
@@ -31,8 +32,12 @@ export const expandZoom = (
     zIndex: 999,
   });
 
-  // Simple fade in
-  timeline.to(element, {
+  gsap.set(controls, {
+    opacity: 0,
+  });
+
+  // Fade in both card and controls simultaneously
+  timeline.to([element, controls], {
     opacity: 1,
     duration: 0.5,
     ease: 'power2.inOut',

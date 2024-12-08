@@ -1,7 +1,7 @@
-import { Player } from "../types/player";
-import { Card } from "../types/card";
-import { WonderStage } from "../types/wonder";
-import { Resource } from "../types/resource";
+import { Player } from "../../data/types/player";
+import { Card } from "../../data/types/card";
+import { WonderStage } from "../../data/types/wonder";
+import { Resource } from "../../data/types/resource";
 
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
 

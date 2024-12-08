@@ -1,4 +1,4 @@
-import { Card } from "../game-logic/types/card";
+import { Card } from "./types/card";
 
 // TODO: Add the chaining, all cards are currently set to null
 export const cards: Card[] = [

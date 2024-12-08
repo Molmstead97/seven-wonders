@@ -1,7 +1,7 @@
 import { GameState } from "../gameState";
 
-import { Player } from "../types/player";
-import { cardFromDiscardFunction } from "../types/wonderSpecialEffects";
+import { Player } from "../../data/types/player";
+import { cardFromDiscardFunction } from "../../data/types/wonderSpecialEffects";
 
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
 

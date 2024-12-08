@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import * as THREE from "three";
 
 import { gameLoop, initializeGame, GameState } from "../game-logic/gameState";
@@ -16,15 +16,11 @@ import { AiPlayersModal, WonderChoiceModal } from "./GameSetupModals";
 
 import { fadeOut } from "./animations/fadeAnimation"; // fadeIn is used in the modals when they mount
 import { blurBackground, unblurBackground } from "./animations/backgroundBlur";
-import ProductionChoiceModal from "./ProductionChoiceModal";
-import { ProductionChoiceState } from "../game-logic/types/productionChoice";
-import { ResourceType } from "../game-logic/types/resource";
-import { Card } from "../game-logic/types/card";
 import GameBoard from "./GameBoard";
 
 type GamePhase = "home" | "playing";
 
-const MainPage = () => {
+const Main = () => {
   // State variables
   const [gamePhase, setGamePhase] = useState<GamePhase>("home");
   const [gameState, setGameState] = useState<GameState | null>(null);
@@ -40,9 +36,6 @@ const MainPage = () => {
   const aiPlayersModalRef = useRef<HTMLDivElement>(null);
   const wonderChoiceModalRef = useRef<HTMLDivElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
-
-  const [productionChoiceState, setProductionChoiceState] =
-    useState<ProductionChoiceState | null>(null);
 
   // Function to start the game setup
   const startSetup = () => {
@@ -90,7 +83,6 @@ const MainPage = () => {
             setGameState(initializedGame);
           } else {
             // Randomize wonders
-
             const initializedGame = initializeGame(aiPlayerCount, undefined);
             setGameState(initializedGame);
             setGamePhase("playing");
@@ -116,41 +108,34 @@ const MainPage = () => {
     setGamePhase("home"); // Reset the game phase
   };
 
-  const handleProductionChoice = (resource: ResourceType) => {
-    if (!gameState || !productionChoiceState) return;
+  const handlePlayerAction = (
+    actionType: 'play' | 'wonder' | 'discard',
+    cardIndex: number
+  ) => {
+    if (!gameState) return;
 
-    // Update the game state with the chosen resource
-    const updatedGameState = {
-      ...gameState,
-      players: gameState.players.map((player, index) => {
-        if (index === 0) {
-          // Current player
-          return {
-            ...player,
-            tempResources: {
-              ...player.tempResources,
-              [resource]: (player.tempResources[resource] || 0) + 1,
-            },
-          };
-        }
-        return player;
-      }),
-    };
-
-    // Move to next choice or finish
-    if (
-      productionChoiceState.currentChoiceIndex <
-      productionChoiceState.choices.length - 1
-    ) {
-      setProductionChoiceState({
-        ...productionChoiceState,
-        currentChoiceIndex: productionChoiceState.currentChoiceIndex + 1,
-      });
-    } else {
-      setProductionChoiceState(null);
+    // First, apply the specific action
+    let actionState;
+    switch (actionType) {
+      case 'play':
+        actionState = handleCardPlay(gameState, 0, cardIndex);
+        break;
+      case 'wonder':
+        actionState = handleBuildWonder(gameState, 0, cardIndex);
+        break;
+      case 'discard':
+        actionState = handleDiscardCard(gameState, 0, cardIndex);
+        break;
     }
 
-    setGameState(updatedGameState);
+    console.log('Game log before gameLoop:', actionState?.gameLog);
+
+    // Then, run the game loop with the updated state
+    if (actionState) {
+      const updatedState = gameLoop(actionState, true);
+      console.log('Game log after gameLoop:', updatedState.gameLog);
+      setGameState(updatedState);
+    }
   };
 
   // Add a state change monitor
@@ -190,73 +175,25 @@ const MainPage = () => {
         );
       }
       return (
-        <div
-          style={{
-            height: "100vh",
-            width: "100vw",
-            overflow: "hidden",
-            position: "relative",
-            backgroundColor: "#121212",
-          }}
-        >
+        <div className="w-screen h-screen overflow-hidden">
           <GameBoard
             playerCount={gameState?.players.length ?? 0}
             assignedWonders={
               gameState?.players.map((player) => player.wonder) || []
             }
             discardPile={gameState?.discardPile || []}
+            gameState={gameState}
+            gameLog={gameState?.gameLog || []}
+            setGameState={setGameState}
           />
           {gameState && (
-            <div className="relative z-10">
-              <PlayerHand
-                cards={gameState.players[0].playerHand}
-                currentWonder={gameState.players[0].wonder}
-                gameState={gameState}
-                onCardPlay={(cardIndex) => {
-                  const updatedState = handleCardPlay(gameState, 0, cardIndex);
-
-                  const nextState = gameLoop(updatedState, true);
-
-                  setGameState(nextState);
-                }}
-                onWonderBuild={(cardIndex) => {
-                  if (!gameState) return;
-                  const updatedState = handleBuildWonder(
-                    gameState,
-                    0,
-                    cardIndex
-                  );
-                  const nextState = gameLoop(updatedState, true);
-                  setGameState(nextState);
-                }}
-                onCardDiscard={(cardIndex) => {
-                  if (!gameState) return;
-                  const updatedState = handleDiscardCard(
-                    gameState,
-                    0,
-                    cardIndex
-                  );
-                  const nextState = gameLoop(updatedState, true);
-                  setGameState(nextState);
-                }}
-              />
-            </div>
-          )}
-          {productionChoiceState && (
-            <ProductionChoiceModal
-              card={
-                {
-                  name: productionChoiceState.choices[
-                    productionChoiceState.currentChoiceIndex
-                  ].cardName,
-                  imagePath:
-                    productionChoiceState.choices[
-                      productionChoiceState.currentChoiceIndex
-                    ].cardImage,
-                } as Card
-              }
-              onChoiceSelected={handleProductionChoice}
-              onClose={() => setProductionChoiceState(null)}
+            <PlayerHand
+              cards={gameState.players[0].playerHand}
+              currentWonder={gameState.players[0].wonder}
+              gameState={gameState}
+              onCardPlay={(cardIndex) => handlePlayerAction('play', cardIndex)}
+              onWonderBuild={(cardIndex) => handlePlayerAction('wonder', cardIndex)}
+              onCardDiscard={(cardIndex) => handlePlayerAction('discard', cardIndex)}
             />
           )}
         </div>
@@ -307,4 +244,4 @@ const MainPage = () => {
   }
 };
 
-export default MainPage;
+export default Main;

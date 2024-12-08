@@ -1,17 +1,17 @@
-import { Player } from "../types/player";
-import { Wonder } from "../types/wonder";
-import { Card } from "../types/card";
-import { Resource } from "../types/resource";
+import { Player } from "../../data/types/player";
+import { Wonder } from "../../data/types/wonder";
+import { Card } from "../../data/types/card";
+import { Resource } from "../../data/types/resource";
 
 import { checkResources } from "./resourceCheck";
 
 import { GameState } from "../gameState";
 
-import { SpecialEffect } from "../types/wonderSpecialEffects";
+import { SpecialEffect } from "../../data/types/wonderSpecialEffects";
 import {
   cardFromDiscardFunction,
   freeBuildPerAgeFunction,
-} from "../types/wonderSpecialEffects";
+} from "../../data/types/wonderSpecialEffects";
 
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
 

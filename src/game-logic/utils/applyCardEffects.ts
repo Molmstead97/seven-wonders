@@ -1,7 +1,7 @@
-import { Player } from "../types/player";
-import { Card } from "../types/card";
-import { Resource, ScienceType } from "../types/resource";
-import { applyGoldVictoryBonus } from "../types/cardSpecialEffects";
+import { Player } from "../../data/types/player";
+import { Card } from "../../data/types/card";
+import { Resource, ScienceType } from "../../data/types/resource";
+import { applyGoldVictoryBonus } from "../../data/types/cardSpecialEffects";
 
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
 
