@@ -177,6 +177,7 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
             setSelectedCard(null);
             setSelectedCardPosition(null);
           }}
+          showActions={true}
         />
       )}
     </div>

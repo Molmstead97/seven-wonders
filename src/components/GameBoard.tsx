@@ -8,7 +8,7 @@ import React, {
 import * as THREE from "three";
 import { Wonder } from "../data/types/wonder";
 import EnhancedCard from "./EnhancedCard";
-import { Card } from "../data/types/card";
+import { Card, CardPosition } from "../data/types/card";
 import { GameState } from "../game-logic/gameState";
 import TradeModal from "./TradeModal";
 import { PlayerBoard, PlayerPosition } from "./PlayerBoard";
@@ -44,18 +44,19 @@ const GameBoard = React.memo(
     const initCompletedRef = useRef(false);
     const [displayedGameLog, setDisplayedGameLog] = useState<string[]>([]);
     const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
-    const [selectedCard, setSelectedCard] = useState<Card | null>(null);
     const [productionChoiceState, setProductionChoiceState] =
       useState<ProductionChoiceState | null>(null);
+    const [selectedBoardCard, setSelectedBoardCard] = useState<Card | null>(null);
+    const [selectedBoardCardPosition, setSelectedBoardCardPosition] = useState<CardPosition | null>(null);
 
     const stableRefs = useMemo(
       () => ({
         scene: null as THREE.Scene | null,
         camera: new THREE.PerspectiveCamera(
-          50,
+          45,
           window.innerWidth / window.innerHeight,
           0.5,
-          500
+          1000
         ),
       }),
       []
@@ -287,14 +288,6 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
       );
     }, [gameState]);
 
-    const handleCardClick = (card: Card) => {
-      setSelectedCard(card);
-    };
-  
-    const handleCloseEnhancedCard = () => {
-      setSelectedCard(null);
-    };
-
     const openProductionChoiceModal = () => {
       if (!gameState) return;
 
@@ -324,19 +317,30 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
       });
     };
 
+    const handleBoardCardClick = (card: Card, position: CardPosition) => {
+      setSelectedBoardCardPosition(position);
+      setSelectedBoardCard(card);
+    };
+
     return (
       <div className="relative w-full h-full">
         <canvas ref={canvasRef} className="w-full h-full" />
 
-        {/* Render PlayerBoards for all players */}
-      {gameState && gameState.players.map((player, index) => (
-        <PlayerBoard
-          key={player.id}
-          player={player}
-          position={getPlayerPosition(gameState.players.length, index)}
-          onCardClick={handleCardClick}
-          />
-        ))}
+        {/* Add PlayerBoards overlay */}
+        {gameState && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="relative w-full h-full pointer-events-auto">
+              {gameState.players.map((player, index) => (
+                <PlayerBoard
+                  key={player.id}
+                  player={player}
+                  position={getPlayerPosition(gameState.players.length, index)}
+                  onCardClick={handleBoardCardClick}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Floating UI for players/wonders */}
         {gameState && (
@@ -539,9 +543,7 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
             <p className="text-white">Loading game board...</p>
           </div>
         )}
-
-        {/* Player Hand - Now using conditional rendering instead of visibility/opacity */}
-
+        
         {/* Game Log */}
         <div className="fixed bottom-4 right-4 w-48 bg-black/80 text-white font-bold text-sm rounded-lg shadow-2xl">
           <div
@@ -597,6 +599,23 @@ function getPlayerPosition(playerCount: number, playerIndex: number): PlayerPosi
             }
             onChoiceSelected={handleProductionChoice}
             onClose={() => setProductionChoiceState(null)}
+          />
+        )}
+        {selectedBoardCard && selectedBoardCardPosition && (
+          <EnhancedCard
+            card={selectedBoardCard}
+            initialPosition={selectedBoardCardPosition}
+            onAnimationStart={() => {}}
+            onClose={() => {
+              setSelectedBoardCard(null);
+              setSelectedBoardCardPosition(null);
+            }}
+            onCardPlay={() => {}}
+            onWonderBuild={() => {}}
+            onCardDiscard={() => {}}
+            currentWonder={gameState!.players[0].wonder}
+            gameState={gameState!}
+            showActions={false}
           />
         )}
       </div>

@@ -1,4 +1,4 @@
-import { Card, CardColor } from "../data/types/card";
+import { Card, CardColor, CardPosition } from "../data/types/card";
 import { Player } from "../data/types/player";
 
 export type PlayerPosition =
@@ -16,7 +16,7 @@ export type PlayerPosition =
 interface PlayerBoardProps {
   player: Player;
   position: PlayerPosition;
-  onCardClick: (card: Card) => void;
+  onCardClick: (card: Card, position: CardPosition) => void;
 }
 
 const CARD_COLORS = ['Brown', 'Grey', 'Blue', 'Green', 'Yellow', 'Red', 'Purple'] as const;
@@ -25,6 +25,12 @@ const CARD_COLORS = ['Brown', 'Grey', 'Blue', 'Green', 'Yellow', 'Red', 'Purple'
 const CARD_OFFSET = {
   vertical: 30,    // Pixels to offset each card vertically
   horizontalGap: 4 // Gap between color columns
+};
+
+// Add this constant at the top
+const ENHANCED_CARD_SIZE = {
+  width: 300,
+  height: 450
 };
 
 export const PlayerBoard: React.FC<PlayerBoardProps> = ({ player, position, onCardClick }) => {
@@ -66,53 +72,27 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({ player, position, onCa
                     top: `${index * CARD_OFFSET.vertical}px`,
                     transform: getCardRotation(position),
                     zIndex: index,
-                    // Add a hover effect that slightly raises the card
                     cursor: 'pointer',
                   }}
-                  onClick={() => onCardClick(card)}
+                  onClick={(e) => onCardClick(card, {
+                    x: e.currentTarget.getBoundingClientRect().left,
+                    y: e.currentTarget.getBoundingClientRect().top,
+                    width: ENHANCED_CARD_SIZE.width,
+                    height: ENHANCED_CARD_SIZE.height,
+                    rotation: 0
+                  })}
                 >
-                  {/* Card content */}
                   <div 
                     className="w-24 h-36 rounded-lg shadow-md overflow-hidden relative"
                     style={{
                       clipPath: isLastCard ? 'none' : 'inset(0 0 20% 0)'
                     }}
                   >
-                    {/* Card background image */}
                     <img
                       src={card.imagePath}
                       alt={card.name}
                       className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
                     />
-                    
-                    {/* Card name - rotated on the side */}
-                    <div className="absolute left-0 top-0 h-full w-8 flex items-center">
-                      <span 
-                        className="text-white text-xs font-semibold transform -rotate-90 whitespace-nowrap"
-                        style={{ transformOrigin: 'center' }}
-                      >
-                        {card.name}
-                      </span>
-                    </div>
-
-                    {/* Cost and effects at the top */}
-                    <div className="absolute top-0 right-0 p-1 flex gap-1">
-                      {card.cost && typeof card.cost === 'object' && 
-                        Object.entries(card.cost).map(([resource, amount]) => (
-                          <div 
-                            key={resource}
-                            className="w-4 h-4 bg-white rounded-full flex items-center justify-center text-xs"
-                          >
-                            {amount}
-                          </div>
-                        ))
-                      }
-                      {card.victoryPoints && (
-                        <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center text-white text-xs">
-                          {card.victoryPoints}
-                        </div>
-                      )}
-                    </div>
                   </div>
                 </div>
               );

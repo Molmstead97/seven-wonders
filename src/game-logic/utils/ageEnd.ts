@@ -3,8 +3,6 @@ import { GameState } from "../gameState";
 import { Player } from "../../data/types/player";
 import { cardFromDiscardFunction } from "../../data/types/wonderSpecialEffects";
 
-// NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
-
 export function ageEnd(players: Player[], gameState: GameState): GameState {
   // Create deep copy of state
   const newState = {
