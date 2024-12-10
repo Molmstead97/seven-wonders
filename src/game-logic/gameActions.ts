@@ -8,7 +8,6 @@ import { applyCardEffects } from "./utils/applyCardEffects";
 import { buildWonder } from "./utils/buildWonder";
 import { tradeResource } from "./utils/tradeResource";
 import { ageEnd } from "./utils/ageEnd";
-import { gameEnd } from "./utils/gameEnd";
 import { passHands } from "./utils/passHand";
 import { checkResources } from './utils/resourceCheck';
 import { Card } from "../data/types/card";
@@ -51,10 +50,11 @@ export function handleCardPlay(
   // Check for production choices
   if (cardToPlay.production && "choice" in cardToPlay.production) {
     const choices = cardToPlay.production.choice.map(choice => ({
-      cardName: cardToPlay.name,
-      cardImage: cardToPlay.imagePath,
+      sourceName: cardToPlay.name,
+      sourceImage: cardToPlay.imagePath,
       options: choice.options,
-      amount: choice.amount
+      amount: choice.amount,
+      sourceType: 'card'
     }));
 
     newState.productionChoiceState = {
@@ -179,7 +179,7 @@ export function handleBuildWonder(
   );
 
   // Update the player in the game state
-  newState.players[playerId] = updatedPlayer;
+  newState.players[playerId] = updatedPlayer.updatedPlayer;
 
   // Remove card from hand
   currentPlayer.playerHand.splice(cardIndex, 1);
@@ -196,8 +196,8 @@ export function handleBuildWonder(
   const nextStage = currentPlayer.wonder.wonderStages.find(stage => !stage.isBuilt);
   if (nextStage?.production && "choice" in nextStage.production) {
     const choices = nextStage.production.choice.map(choice => ({
-      cardName: `${currentPlayer.wonder.name} Stage ${nextStage.stage}`,
-      cardImage: currentPlayer.wonder.imagePath,
+      sourceName: `${currentPlayer.wonder.name} Stage ${nextStage.stage}`,
+      sourceImage: currentPlayer.wonder.imagePath,
       options: choice.options,
       amount: choice.amount
     }));
@@ -259,12 +259,26 @@ export function handleAgeEnd(gameState: GameState): GameState {
 }
 
 export function handleEndGame(gameState: GameState): GameState {
-  const updatedPlayers = gameEnd(gameState.players);
-
-  return {
+  console.log("=== PREPARING FINAL GAME STATE ===");
+  
+  // Create final state with all trading and production disabled
+  const finalState = {
     ...gameState,
-    players: updatedPlayers,
+    finalState: true,  // This will disable interactions
+    players: gameState.players.map(player => ({
+      ...player,
+      canTrade: false,
+      canChooseProduction: false
+    }))
   };
+
+  console.log("Final player state:", finalState.players.map(p => ({
+    name: p.name,
+    points: p.victoryPoints,
+    gold: p.gold
+  })));
+
+  return finalState;
 }
 
 export function canPlayCard(gameState: GameState, playerId: number, card: Card): boolean {
@@ -281,15 +295,6 @@ export function canPlayCard(gameState: GameState, playerId: number, card: Card):
 
   if (isCardPlayed) {
     return false;
-  }
-
-  // Check for chain buildings
-  const canChainBuild = Array.from(player.playerBoard).some(
-    boardCard => boardCard.name === card.chainedFrom
-  );
-
-  if (canChainBuild) {
-    return true;
   }
 
   // Check resources including temporary resources

@@ -16,6 +16,7 @@ import ProductionChoiceModal from "./ProductionChoiceModal";
 import { ProductionChoiceState } from "../data/types/productionChoice";
 import { PlayerBoard } from "./PlayerBoard";
 import DiscardPile from "./DiscardPile";
+import EndgameRanking from "./EndgameRanking";
 
 interface GameBoardProps {
   playerCount: number;
@@ -42,9 +43,13 @@ const GameBoard = React.memo(
     const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
     const [productionChoiceState, setProductionChoiceState] =
       useState<ProductionChoiceState | null>(null);
-    const [selectedPlayerBoardIndex, setSelectedPlayerBoardIndex] = useState<number | null>(null);
+    const [selectedPlayerBoardIndex, setSelectedPlayerBoardIndex] = useState<
+      number | null
+    >(null);
     const [isDiscardPileOpen, setIsDiscardPileOpen] = useState(false);
-    const [usedProductionCards, setUsedProductionCards] = useState<Set<string>>(new Set());
+    const [usedProductionCards, setUsedProductionCards] = useState<Set<string>>(
+      new Set()
+    );
     const previousTurn = useRef<number>(0);
 
     // Three.js refs
@@ -127,7 +132,11 @@ const GameBoard = React.memo(
 
       scene.add(mainLight);
 
-      const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.3);
+      const hemisphereLight = new THREE.HemisphereLight(
+        0xffffff,
+        0x444444,
+        0.3
+      );
       scene.add(hemisphereLight);
 
       const table = createTable();
@@ -199,7 +208,22 @@ const GameBoard = React.memo(
     const handleProductionChoice = (resource: ResourceType) => {
       if (!gameState || !productionChoiceState) return;
 
-      setUsedProductionCards(prev => new Set([...prev, productionChoiceState.choices[productionChoiceState.currentChoiceIndex].cardName]));
+      // Only track used cards if the source name doesn't contain "Stage"
+      if (
+        !productionChoiceState.choices[
+          productionChoiceState.currentChoiceIndex
+        ].sourceName.includes("Stage")
+      ) {
+        setUsedProductionCards(
+          (prev) =>
+            new Set([
+              ...prev,
+              productionChoiceState.choices[
+                productionChoiceState.currentChoiceIndex
+              ].sourceName,
+            ])
+        );
+      }
 
       const updatedGameState = {
         ...gameState,
@@ -234,10 +258,13 @@ const GameBoard = React.memo(
 
     const hasProductionChoiceCard = useMemo(() => {
       if (!gameState) return false;
-      const productionCards = Array.from(gameState.players[0].playerBoard).filter(card => 
-        card.production && "choice" in card.production
+      const productionCards = Array.from(
+        gameState.players[0].playerBoard
+      ).filter((card) => card.production && "choice" in card.production);
+      return (
+        productionCards.length > 0 &&
+        productionCards.some((card) => !usedProductionCards.has(card.name))
       );
-      return productionCards.length > 0 && productionCards.some(card => !usedProductionCards.has(card.name));
     }, [gameState, usedProductionCards]);
 
     const openProductionChoiceModal = () => {
@@ -245,21 +272,25 @@ const GameBoard = React.memo(
 
       const currentPlayer = gameState.players[0];
       const choiceCards = Array.from(currentPlayer.playerBoard).filter(
-        (card) => card.production && 
-        "choice" in card.production && 
-        !usedProductionCards.has(card.name)
+        (card) =>
+          card.production &&
+          "choice" in card.production &&
+          !usedProductionCards.has(card.name)
       );
 
       const choices = choiceCards.map((card) => {
         const production = card.production!;
-        const choiceOptions = "choice" in production ? production.choice[0].options ?? [] : [];
-        const choiceAmount = "choice" in production ? production.choice[0].amount ?? 0 : 0;
+        const choiceOptions =
+          "choice" in production ? production.choice[0].options ?? [] : [];
+        const choiceAmount =
+          "choice" in production ? production.choice[0].amount ?? 0 : 0;
 
         return {
-          cardName: card.name,
-          cardImage: card.imagePath,
+          sourceName: card.name,
+          sourceImage: card.imagePath,
           options: choiceOptions,
           amount: choiceAmount,
+          sourceType: "card" as const,
         };
       });
 
@@ -277,8 +308,29 @@ const GameBoard = React.memo(
       }
     }, [gameState?.turns]);
 
+    const [showEndgameRanking, setShowEndgameRanking] = useState(false);
+
     return (
       <div className="relative w-full h-full">
+        {/* Age Display */}
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="bg-gray-800/90 px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm border border-gray-600">
+            <h2 className="text-2xl font-bold text-white text-center">
+              {gameState?.age === 4 ? "Game Over" : `Age ${gameState?.age}`}
+            </h2>
+            {gameState?.finalState && (
+              <div className="mt-4 flex justify-center">
+                <button
+                  onClick={() => setShowEndgameRanking(true)}
+                  className="px-6 py-3 bg-gray-700/50 border border-gray-400 text-white rounded-lg hover:bg-black/90 transition-colors animate-fadeIn"
+                >
+                  Continue to Rankings
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
         <canvas ref={canvasRef} className="w-full h-full" />
 
         {/* Floating UI for players/wonders */}
@@ -332,16 +384,22 @@ const GameBoard = React.memo(
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h2 className="text-xl text-white font-bold">
-                    {assignedWonders.findIndex((w) => w.name === selectedWonder.name) === 0 
+                    {assignedWonders.findIndex(
+                      (w) => w.name === selectedWonder.name
+                    ) === 0
                       ? selectedWonder.name
-                      : `Player ${assignedWonders.findIndex((w) => w.name === selectedWonder.name) + 1}`
-                    }
+                      : `Player ${
+                          assignedWonders.findIndex(
+                            (w) => w.name === selectedWonder.name
+                          ) + 1
+                        }`}
                   </h2>
                   <h3 className="text-lg text-white/80">
-                    {assignedWonders.findIndex((w) => w.name === selectedWonder.name) === 0 
+                    {assignedWonders.findIndex(
+                      (w) => w.name === selectedWonder.name
+                    ) === 0
                       ? ""
-                      : selectedWonder.name
-                    }
+                      : selectedWonder.name}
                   </h3>
                 </div>
 
@@ -349,8 +407,13 @@ const GameBoard = React.memo(
                   (w) => w.name === selectedWonder.name
                 ) !== 0 && (
                   <button
+                    className={`rounded-xl p-4 text-white text-md bg-white/10 hover:bg-white/20 transition-colors border border-gray-700/50 shadow-lg ${
+                      gameState?.finalState
+                        ? "bg-gray-600 cursor-not-allowed"
+                        : "bg-white/10 hover:bg-white/20"
+                    }`}
                     onClick={() => setIsTradeModalOpen(true)}
-                    className="rounded-xl p-4 text-white text-md bg-white/10 hover:bg-white/20 transition-colors border border-gray-700/50 shadow-lg"
+                    disabled={gameState?.finalState}
                   >
                     Trade
                   </button>
@@ -392,11 +455,13 @@ const GameBoard = React.memo(
                           )
                         ].resources
                       )
-                        .filter(([type]) => type !== 'choice')
+                        .filter(([type]) => type !== "choice")
                         .map(([type, count]) => (
                           <div key={type} className="flex items-center">
                             <span className="text-white/80 mr-2">{type}:</span>
-                            <span className="font-bold text-white">{count}</span>
+                            <span className="font-bold text-white">
+                              {count}
+                            </span>
                           </div>
                         ))}
                     </div>
@@ -461,7 +526,9 @@ const GameBoard = React.memo(
                         </span>
                       </div>
                       <div className="flex items-center">
-                        <span className="text-white/80 mr-2">Victory Points:</span>
+                        <span className="text-white/80 mr-2">
+                          Victory Points:
+                        </span>
                         <span className="font-bold text-blue-400 text-md">
                           {
                             gameState.players[
@@ -473,7 +540,9 @@ const GameBoard = React.memo(
                         </span>
                       </div>
                       <div className="flex items-center">
-                        <span className="text-white/80 mr-2">Military Shields:</span>
+                        <span className="text-white/80 mr-2">
+                          Military Shields:
+                        </span>
                         <span className="font-bold text-red-400 text-md">
                           {
                             gameState.players[
@@ -531,7 +600,7 @@ const GameBoard = React.memo(
           )}
         </div>
 
-        {hasProductionChoiceCard ? (
+        {hasProductionChoiceCard && !gameState?.finalState ? (
           <button
             className="bg-gray-700/50 border border-gray-400 fixed bottom-4 left-8 text-white px-4 py-2 rounded hover:bg-black/90 transition-colors"
             onClick={openProductionChoiceModal}
@@ -549,16 +618,31 @@ const GameBoard = React.memo(
 
         {productionChoiceState && (
           <ProductionChoiceModal
-            card={{
-              name: productionChoiceState.choices[productionChoiceState.currentChoiceIndex].cardName,
-              imagePath: productionChoiceState.choices[productionChoiceState.currentChoiceIndex].cardImage,
-              production: {
-                choice: [{
-                  options: productionChoiceState.choices[productionChoiceState.currentChoiceIndex].options,
-                  amount: productionChoiceState.choices[productionChoiceState.currentChoiceIndex].amount
-                }]
-              }
-            } as Card}
+            card={
+              {
+                name: productionChoiceState.choices[
+                  productionChoiceState.currentChoiceIndex
+                ].sourceName,
+                imagePath:
+                  productionChoiceState.choices[
+                    productionChoiceState.currentChoiceIndex
+                  ].sourceImage,
+                production: {
+                  choice: [
+                    {
+                      options:
+                        productionChoiceState.choices[
+                          productionChoiceState.currentChoiceIndex
+                        ].options,
+                      amount:
+                        productionChoiceState.choices[
+                          productionChoiceState.currentChoiceIndex
+                        ].amount,
+                    },
+                  ],
+                },
+              } as Card
+            }
             onChoiceSelected={handleProductionChoice}
             onClose={() => setProductionChoiceState(null)}
           />
@@ -599,6 +683,16 @@ const GameBoard = React.memo(
             gameState={gameState}
             onClose={() => setIsDiscardPileOpen(false)}
             onCardClick={() => {}} // You can implement card click handling if needed
+          />
+        )}
+
+        {showEndgameRanking && (
+          <EndgameRanking
+            players={gameState?.players ?? []}
+            onPlayAgain={() => {
+              // Reset game state logic here
+              setShowEndgameRanking(false);
+            }}
           />
         )}
       </div>

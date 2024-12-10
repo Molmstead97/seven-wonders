@@ -49,7 +49,8 @@ export function applyCardEffects(player: Player, card: Card): Partial<Player> {
 
   // Handle special effects
   if (card.specialEffect?.type === "goldVictoryBonus") {
-    applyGoldVictoryBonus(player, card.specialEffect, false); // This handles updating the player's gold and victory points internally
+    const bonusPoints = applyGoldVictoryBonus(player, card.specialEffect, false);
+    updates.victoryPoints! += bonusPoints;
   }
 
   return updates;

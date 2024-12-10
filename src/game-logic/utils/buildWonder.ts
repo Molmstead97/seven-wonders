@@ -21,7 +21,7 @@ export function buildWonder(
   wonder: Wonder,
   card: Card,
   gameState: GameState
-): Player {
+): { updatedPlayer: Player; hasProductionChoice: boolean } {
   let updatedPlayer = { ...player };
   const updatedWonder = {
     ...wonder,
@@ -29,17 +29,18 @@ export function buildWonder(
   };
   updatedPlayer.wonder = updatedWonder;
 
-  // Find the next stage to be built
   const nextStageIndex = updatedWonder.wonderStages.findIndex(
     (stage) => stage.isBuilt === false
   );
 
   if (nextStageIndex === -1) {
-    console.log("All Wonder stages have been built.");
-    return updatedPlayer;
+    return { updatedPlayer, hasProductionChoice: false };
   }
 
   const nextStage = updatedWonder.wonderStages[nextStageIndex];
+  
+  // Check for production choices before building
+  const hasProductionChoice = nextStage.production ? "choice" in nextStage.production : false;
 
   if (checkResources(player, null, nextStage)) {
     updatedWonder.wonderStages[nextStageIndex].isBuilt = true;
@@ -79,7 +80,7 @@ export function buildWonder(
   } else {
     console.log("Not enough resources to build this stage"); // TODO: Replace with UI
   }
-  return updatedPlayer;
+  return { updatedPlayer, hasProductionChoice };
 }
 
 function applySpecialEffect(

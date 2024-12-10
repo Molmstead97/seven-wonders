@@ -1,6 +1,6 @@
 export interface ProductionChoice {
-    cardName: string;
-    cardImage: string;
+    sourceName: string;
+    sourceImage: string;
     options: string[];
     amount: number;
   }

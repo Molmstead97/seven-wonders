@@ -27,6 +27,7 @@ export interface GameState {
   discardPile: Card[];
   gameLog: string[];
   isAutomated?: boolean;
+  finalState: boolean;
   productionChoiceState: ProductionChoiceState
   // ... other game state properties
 }
@@ -108,6 +109,7 @@ export function initializeGame(
     players,
     discardPile: [],
     gameLog: [],
+    finalState: false,
     productionChoiceState: {
       choices: [],
       currentChoiceIndex: 0,

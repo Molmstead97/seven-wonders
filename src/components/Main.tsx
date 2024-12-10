@@ -17,7 +17,6 @@ import { AiPlayersModal, WonderChoiceModal } from "./GameSetupModals";
 import { fadeOut } from "./animations/fadeAnimation"; // fadeIn is used in the modals when they mount
 import { blurBackground, unblurBackground } from "./animations/backgroundBlur";
 import GameBoard from "./GameBoard";
-import EndgameRanking from "./EndgameRanking";
 import { wonders } from "../data/wonders";
 
 type GamePhase = "home" | "playing";
@@ -170,9 +169,13 @@ const Main = () => {
     case "playing":
       if (gameState?.age === 4) {
         return (
-          <EndgameRanking
-            players={gameState.players}
-            onPlayAgain={handlePlayAgain}
+          <GameBoard
+            playerCount={gameState.players.length}
+            assignedWonders={gameState.players.map((player) => player.wonder)}
+            discardPile={gameState.discardPile}
+            gameState={gameState}
+            gameLog={gameState.gameLog}
+            setGameState={setGameState}
           />
         );
       }

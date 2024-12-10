@@ -79,6 +79,12 @@ export function ageEnd(players: Player[], gameState: GameState): GameState {
 
     // Store the results in our map using player name as key
     militaryResults.set(player.name, result);
+    console.log(`Military results for ${player.name}:`, {
+      points: result.points,
+      wins: result.wins,
+      losses: result.losses,
+      shields: player.shields
+    });
 
     // Handle special wonder effects
     if (
