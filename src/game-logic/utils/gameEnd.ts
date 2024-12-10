@@ -4,36 +4,41 @@ import { freeScienceFunction, copyGuildFunction, FreeScienceEffect } from "../..
 import { Science } from "../../data/types/resource";
 
 export function gameEnd(players: Player[]): Player[] {
+  console.log("=== CALCULATING FINAL POINTS ===");
+  
   return players.map(player => {
+    console.log(`Processing ${player.name}:`);
+    
+    const initialPoints = player.victoryPoints;
+    
     // Apply victory points for remaining gold
-    player.victoryPoints += Math.floor(player.gold / 3);
+    const goldPoints = Math.floor(player.gold / 3);
+    player.victoryPoints += goldPoints;
+    console.log(`Gold points: ${goldPoints} (from ${player.gold} gold)`);
 
-    // Apply science points
-    player.victoryPoints += calculateSciencePoints(player.science);
+    // Apply gold victory bonus from cards
+    player.playerBoard.forEach(card => {
+      if (card.specialEffect?.type === 'goldVictoryBonus') {
+        console.log(`Processing gold victory bonus for ${card.name}`);
+        const points = applyGoldVictoryBonus(player, card.specialEffect, true);
+        console.log(`Added ${points} points from ${card.name}`);
+      }
+    });
 
     // Apply 'CopyGuildEffect'
     if (player.wonder.wonderStages.some(stage => stage.specialEffect?.type === 'copyGuild')) {
+      console.log("Processing Copy Guild effect");
       copyGuildFunction(player, player.leftPlayer || player, player.rightPlayer || player);
     }
 
-    // Apply 'FreeScienceEffect'
-    const freeScienceStage = player.wonder.wonderStages.find(stage => stage.specialEffect?.type === 'freeScience');
-    if (freeScienceStage && freeScienceStage.specialEffect) {
-      freeScienceFunction(player, (freeScienceStage.specialEffect as FreeScienceEffect).scienceType);
-    }
-
-    // Apply Gold Victory Bonus from cards
-    player.playerBoard.forEach(card => {
-      if (card.specialEffect && card.specialEffect.type === 'goldVictoryBonus') {
-        applyGoldVictoryBonus(player, card.specialEffect, true);
-      }
-    });
+    console.log(`Total points change: ${player.victoryPoints - initialPoints}`);
+    console.log(`Final victory points: ${player.victoryPoints}\n`);
 
     return player;
   });
 }
 
-function calculateSciencePoints(science: Science): number {
+export function calculateSciencePoints(science: Science): number {
   
   // Calculate points for each symbol type
   const cogPoints = (science.Cog ?? 0) ** 2;

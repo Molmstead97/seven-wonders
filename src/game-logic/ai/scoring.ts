@@ -363,7 +363,7 @@ function analyzeWonderNeeds(wonder: Wonder): ResourceNeeds {
   return needs;
 }
 
-function analyzeTradingOptions(player: Player, gameState: GameState) {
+export function analyzeTradingOptions(player: Player, gameState: GameState) {
   const tradingOptions = new Map<
     string,
     {

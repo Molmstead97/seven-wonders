@@ -16,16 +16,14 @@ export function applyCardEffects(player: Player, card: Card): Partial<Player> {
 
   // Apply resource production
   if (card.production) {
-    if (!card.production.choice) {
-      // Handle fixed production
-      Object.entries(card.production).forEach(([resource, amount]) => {
-        const resourceKey = resource as keyof Resource;
-        updates.resources![resourceKey] =
-          (updates.resources![resourceKey] || 0) + (amount as number);
-      });
-    }
-    // Note: choice production will be handled by UI
+    // Handle fixed production
+    Object.entries(card.production).forEach(([resource, amount]) => {
+      const resourceKey = resource as keyof Resource;
+      updates.resources![resourceKey] =
+        (updates.resources![resourceKey] || 0) + (amount as number);
+    });
   }
+  // Note: choice production will be handled by UI
 
   // Apply science
   if (card.science) {

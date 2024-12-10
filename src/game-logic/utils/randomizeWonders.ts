@@ -15,7 +15,7 @@ function shuffleArray<T>(array: T[]): T[] {
 // Function to group wonders by base name (without A/B suffix)
 function groupWondersByName(wonders: Wonder[]): Record<string, Wonder[]> {
   return wonders.reduce((acc: Record<string, Wonder[]>, wonder) => {
-    const baseName = wonder.name.slice(0, -1);  // Remove the last character (A or B)
+    const baseName = wonder.name.replace(/ [AB]$/, '');  // Remove A or B suffix with space
     if (!acc[baseName]) {
       acc[baseName] = [];
     }

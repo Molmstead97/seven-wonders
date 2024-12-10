@@ -192,6 +192,22 @@ export function handleBuildWonder(
       : `Player ${playerId + 1} built a Wonder stage`
   );
 
+  // Check for production choices in the wonder stage
+  const nextStage = currentPlayer.wonder.wonderStages.find(stage => !stage.isBuilt);
+  if (nextStage?.production && "choice" in nextStage.production) {
+    const choices = nextStage.production.choice.map(choice => ({
+      cardName: `${currentPlayer.wonder.name} Stage ${nextStage.stage}`,
+      cardImage: currentPlayer.wonder.imagePath,
+      options: choice.options,
+      amount: choice.amount
+    }));
+
+    newState.productionChoiceState = {
+      choices,
+      currentChoiceIndex: 0
+    };
+  }
+
   return newState;
 }
 
@@ -252,19 +268,30 @@ export function handleEndGame(gameState: GameState): GameState {
 }
 
 export function canPlayCard(gameState: GameState, playerId: number, card: Card): boolean {
-  if (!gameState || !gameState.players || !gameState.players[playerId] || !gameState.players[playerId].playerBoard) {
+  if (!gameState?.players?.[playerId]?.playerBoard) {
     return false;
   }
 
   const player = gameState.players[playerId];
-
-  // Check if the player has sufficient resources to play the card
-  const hasResources = checkResources(player, card, null);
 
   // Check if the card has already been played by the player
   const isCardPlayed = Array.from(player.playerBoard).some(
     (playedCard) => playedCard && playedCard.name === card.name
   );
 
-  return hasResources && !isCardPlayed;
+  if (isCardPlayed) {
+    return false;
+  }
+
+  // Check for chain buildings
+  const canChainBuild = Array.from(player.playerBoard).some(
+    boardCard => boardCard.name === card.chainedFrom
+  );
+
+  if (canChainBuild) {
+    return true;
+  }
+
+  // Check resources including temporary resources
+  return checkResources(player, card, null, player.tempResources);
 }

@@ -302,7 +302,7 @@ const GameBoard = React.memo(
                 </div>
                 {gameState?.players[index].playerBoard.size > 0 && (
                   <button
-                    className="w-full mt-auto text-xs text-white bg-white/10 hover:bg-white/20 transition-colors border-t border-gray-700/50 p-1.5 text-center"
+                    className="w-full mt-auto text-sm text-white bg-white/10 hover:bg-white/20 transition-colors border-t border-gray-700/50 p-1.5 text-center"
                     onClick={() => setSelectedPlayerBoardIndex(index)}
                   >
                     View Board
@@ -391,12 +391,14 @@ const GameBoard = React.memo(
                             (w) => w.name === selectedWonder.name
                           )
                         ].resources
-                      ).map(([type, count]) => (
-                        <div key={type} className="flex items-center">
-                          <span className="text-white/80 mr-2">{type}:</span>
-                          <span className="font-bold text-white">{count}</span>
-                        </div>
-                      ))}
+                      )
+                        .filter(([type]) => type !== 'choice')
+                        .map(([type, count]) => (
+                          <div key={type} className="flex items-center">
+                            <span className="text-white/80 mr-2">{type}:</span>
+                            <span className="font-bold text-white">{count}</span>
+                          </div>
+                        ))}
                     </div>
                   </div>
 
@@ -444,7 +446,7 @@ const GameBoard = React.memo(
 
                   {/* Player Stats */}
                   <div className="bg-gray-700/50 p-4 rounded-lg shadow-lg backdrop-blur-sm">
-                    <h3 className="font-bold mb-2 text-md">Gold/Victory Points</h3>
+                    <h3 className="font-bold mb-2 text-md">Other Resources</h3>
                     <div className="space-y-2">
                       <div className="flex items-center">
                         <span className="text-white/80 mr-2">Gold:</span>
@@ -467,6 +469,18 @@ const GameBoard = React.memo(
                                 (w) => w.name === selectedWonder.name
                               )
                             ].victoryPoints
+                          }
+                        </span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="text-white/80 mr-2">Military Shields:</span>
+                        <span className="font-bold text-red-400 text-md">
+                          {
+                            gameState.players[
+                              assignedWonders.findIndex(
+                                (w) => w.name === selectedWonder.name
+                              )
+                            ].shields
                           }
                         </span>
                       </div>

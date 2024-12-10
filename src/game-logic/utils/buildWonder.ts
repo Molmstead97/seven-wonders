@@ -3,6 +3,7 @@ import { Wonder } from "../../data/types/wonder";
 import { Card } from "../../data/types/card";
 import { Resource } from "../../data/types/resource";
 
+
 import { checkResources } from "./resourceCheck";
 
 import { GameState } from "../gameState";
@@ -45,15 +46,11 @@ export function buildWonder(
 
     // Apply the effects of the built stage
     if (nextStage.production) {
-      if (nextStage.production.choice) {
-        // promptChoiceProduction(player, nextStage.production.choice);
-      } else {
-        Object.entries(nextStage.production).forEach(([resource, amount]) => {
-          updatedPlayer.resources[resource as keyof Resource] =
-            (updatedPlayer.resources[resource as keyof Resource] || 0) +
-            (amount as number);
-        });
-      }
+      Object.entries(nextStage.production).forEach(([resource, amount]) => {
+        updatedPlayer.resources[resource as keyof Resource] =
+          (updatedPlayer.resources[resource as keyof Resource] || 0) +
+          (amount as number);
+      });
     }
     if (nextStage.victoryPoints) {
       updatedPlayer.victoryPoints += nextStage.victoryPoints;

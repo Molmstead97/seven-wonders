@@ -1,23 +1,29 @@
 import React, { useState } from 'react';
 import { Card } from '../data/types/card';
 import { ResourceType } from '../data/types/resource';
+import { Wonder } from '../data/types/wonder';
 
 interface ProductionChoiceModalProps {
-  card: Card;
+  card?: Card;
+  wonder?: Wonder;
+  stageIndex?: number;
   onChoiceSelected: (resource: ResourceType) => void;
   onClose: () => void;
 }
 
 const ProductionChoiceModal: React.FC<ProductionChoiceModalProps> = ({
   card,
+  wonder,
+  stageIndex,
   onChoiceSelected,
   onClose,
 }) => {
   const [hoveredResource, setHoveredResource] = useState<ResourceType | null>(null);
 
   const getProductionChoices = (): Array<{ options: ResourceType[], amount: number }> => {
-    if (!card.production || !("choice" in card.production)) return [];
-    return card.production.choice;
+    const source = card || (wonder && typeof stageIndex === 'number' ? wonder.wonderStages[stageIndex] : null);
+    if (!source?.production || !("choice" in source.production)) return [];
+    return source.production.choice;
   };
 
   const choices = getProductionChoices();
@@ -34,7 +40,7 @@ const ProductionChoiceModal: React.FC<ProductionChoiceModalProps> = ({
         {/* Header */}
         <div className="flex justify-between items-center mb-12">
           <h2 className="text-2xl font-bold text-white text-center w-full">
-            {card.name} - Choose Production
+            {card ? card.name : wonder?.name} - Choose Production
           </h2>
           <button 
             onClick={onClose}

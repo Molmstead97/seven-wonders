@@ -3,6 +3,15 @@ import { GameState } from "../gameState";
 import { Player } from "../../data/types/player";
 import { cardFromDiscardFunction } from "../../data/types/wonderSpecialEffects";
 
+interface MilitaryResult {
+  points: number;
+  wins: number;
+  losses: number;
+}
+
+// Create a map to store military results
+export const militaryResults = new Map<string, MilitaryResult>();
+
 export function ageEnd(players: Player[], gameState: GameState): GameState {
   // Create deep copy of state
   const newState = {
@@ -36,6 +45,12 @@ export function ageEnd(players: Player[], gameState: GameState): GameState {
     const leftNeighbor = player.leftPlayer;
     const rightNeighbor = player.rightPlayer;
 
+    const result: MilitaryResult = {
+      points: 0,
+      wins: 0,
+      losses: 0
+    };
+
     if (leftNeighbor) {
       const leftConflict = resolveMilitaryConflict(
         player,
@@ -44,6 +59,9 @@ export function ageEnd(players: Player[], gameState: GameState): GameState {
       );
       player.victoryPoints += leftConflict.points;
       player.conflictLossTokens += leftConflict.lossTokens;
+      result.points += leftConflict.points;
+      result.wins += leftConflict.points > 0 ? 1 : 0;
+      result.losses += leftConflict.lossTokens;
     }
 
     if (rightNeighbor) {
@@ -54,7 +72,13 @@ export function ageEnd(players: Player[], gameState: GameState): GameState {
       );
       player.victoryPoints += rightConflict.points;
       player.conflictLossTokens += rightConflict.lossTokens;
+      result.points += rightConflict.points;
+      result.wins += rightConflict.points > 0 ? 1 : 0;
+      result.losses += rightConflict.lossTokens;
     }
+
+    // Store the results in our map using player name as key
+    militaryResults.set(player.name, result);
 
     // Handle special wonder effects
     if (

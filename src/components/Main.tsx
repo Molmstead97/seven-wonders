@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { gameLoop, initializeGame, GameState } from "../game-logic/gameState";
 import PlayerHand from "./PlayerHand";
 
-import WonderSelector from "./3D-Effects/WonderSelector";
+import WonderSelector from "./WonderSelector";
 
 import {
   handleCardPlay,
@@ -17,6 +17,8 @@ import { AiPlayersModal, WonderChoiceModal } from "./GameSetupModals";
 import { fadeOut } from "./animations/fadeAnimation"; // fadeIn is used in the modals when they mount
 import { blurBackground, unblurBackground } from "./animations/backgroundBlur";
 import GameBoard from "./GameBoard";
+import EndgameRanking from "./EndgameRanking";
+import { wonders } from "../data/wonders";
 
 type GamePhase = "home" | "playing";
 
@@ -79,8 +81,6 @@ const Main = () => {
           if (choice === "choose") {
             setIsChoosingWonder(true);
             setGamePhase("playing");
-            const initializedGame = initializeGame(aiPlayerCount, undefined); // temporary wonder
-            setGameState(initializedGame);
           } else {
             // Randomize wonders
             const initializedGame = initializeGame(aiPlayerCount, undefined);
@@ -109,7 +109,7 @@ const Main = () => {
   };
 
   const handlePlayerAction = (
-    actionType: 'play' | 'wonder' | 'discard',
+    actionType: "play" | "wonder" | "discard",
     cardIndex: number
   ) => {
     if (!gameState) return;
@@ -117,23 +117,23 @@ const Main = () => {
     // First, apply the specific action
     let actionState;
     switch (actionType) {
-      case 'play':
+      case "play":
         actionState = handleCardPlay(gameState, 0, cardIndex);
         break;
-      case 'wonder':
+      case "wonder":
         actionState = handleBuildWonder(gameState, 0, cardIndex);
         break;
-      case 'discard':
+      case "discard":
         actionState = handleDiscardCard(gameState, 0, cardIndex);
         break;
     }
 
-    console.log('Game log before gameLoop:', actionState?.gameLog);
+    console.log("Game log before gameLoop:", actionState?.gameLog);
 
     // Then, run the game loop with the updated state
     if (actionState) {
       const updatedState = gameLoop(actionState, true);
-      console.log('Game log after gameLoop:', updatedState.gameLog);
+      console.log("Game log after gameLoop:", updatedState.gameLog);
       setGameState(updatedState);
     }
   };
@@ -149,6 +149,14 @@ const Main = () => {
     });
   }, [gameState]);
 
+  // Add this to handle play again
+  const handlePlayAgain = () => {
+    setGamePhase("home");
+    setGameState(null);
+    setAiPlayerCount(0);
+    setIsChoosingWonder(false);
+  };
+
   // Loading screen
   if (isLoading) {
     return (
@@ -160,20 +168,41 @@ const Main = () => {
 
   switch (gamePhase) {
     case "playing":
-      if (isChoosingWonder) {
+      if (gameState?.age === 4) {
         return (
-          <WonderSelector
-            onWonderSelected={(selectedWonder) => {
-              const initializedGame = initializeGame(
-                aiPlayerCount,
-                selectedWonder
-              );
-              setGameState(initializedGame);
-              setIsChoosingWonder(false);
-            }}
+          <EndgameRanking
+            players={gameState.players}
+            onPlayAgain={handlePlayAgain}
           />
         );
       }
+
+      console.log(
+        "Game phase is 'playing', isChoosingWonder:",
+        isChoosingWonder
+      ); // Debug log
+
+      if (isChoosingWonder) {
+        return (
+          <div className="min-h-screen bg-gray-900">
+            <WonderSelector
+              onWonderSelected={(selectedWonder) => {
+                try {
+                  const initializedGame = initializeGame(aiPlayerCount, selectedWonder);
+                  setGameState(initializedGame);
+                  setGamePhase("playing");
+                  setIsChoosingWonder(false);
+                } catch (error) {
+                  console.error("Error initializing game with selected wonder:", error);
+                  setGamePhase("home");
+                }
+              }}
+              availableWonders={wonders}
+            />
+          </div>
+        );
+      }
+
       return (
         <div className="w-screen h-screen overflow-hidden">
           <GameBoard
@@ -191,9 +220,13 @@ const Main = () => {
               cards={gameState.players[0].playerHand}
               currentWonder={gameState.players[0].wonder}
               gameState={gameState}
-              onCardPlay={(cardIndex) => handlePlayerAction('play', cardIndex)}
-              onWonderBuild={(cardIndex) => handlePlayerAction('wonder', cardIndex)}
-              onCardDiscard={(cardIndex) => handlePlayerAction('discard', cardIndex)}
+              onCardPlay={(cardIndex) => handlePlayerAction("play", cardIndex)}
+              onWonderBuild={(cardIndex) =>
+                handlePlayerAction("wonder", cardIndex)
+              }
+              onCardDiscard={(cardIndex) =>
+                handlePlayerAction("discard", cardIndex)
+              }
             />
           )}
         </div>

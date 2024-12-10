@@ -3,7 +3,7 @@ import { Card } from "../data/types/card";
 import { Wonder } from "../data/types/wonder";
 import { ResourceType } from "../data/types/resource";
 import { ProductionChoiceState } from "../data/types/productionChoice";
-import { analyzeTradingOptions } from "./ai/scoring";
+import { analyzeTradingOptions } from "../game-logic/ai/scoring";
 import { tradeResource } from "./utils/tradeResource";
 import { setupPlayers } from "./utils/setupPlayers";
 import { dealCards } from "./utils/dealCards";
@@ -128,11 +128,37 @@ export function gameLoop(
     }
   });
 
+  // Reset temp resources for all players
+  gameState.players.forEach((player) => {
+    player.tempResources = {
+      Wood: 0,
+      Stone: 0,
+      Ore: 0,
+      Clay: 0,
+      Glass: 0,
+      Papyrus: 0,
+      Textile: 0,
+    };
+  });
+
   if (!playerActionTaken) {
     return gameState;
   }
 
   let updatedGameState = { ...gameState };
+
+  if (updatedGameState.age === 4) {
+    console.log("=== GAME END TRIGGERED ===");
+    console.log("Pre-calculation player points:", updatedGameState.players.map(p => ({
+      name: p.name,
+      points: p.victoryPoints
+    })));
+    updatedGameState = handleEndGame(updatedGameState);
+    console.log("Post-calculation player points:", updatedGameState.players.map(p => ({
+      name: p.name,
+      points: p.victoryPoints
+    })));
+  }
 
   // Skip AI processing if this is an automated game
   if (!gameState.isAutomated) {
@@ -159,10 +185,6 @@ export function gameLoop(
       }
     }
   }
-
-  updatedGameState.players.forEach((player) => {
-    displayPlayerState(player);
-  });
 
   // Update turn counter
   updatedGameState = {
@@ -211,24 +233,4 @@ export function gameLoop(
   });
 
   return updatedGameState;
-}
-
-// TODO: This is a function for TESTING PURPOSES ONLY, remove before finalizing
-function displayPlayerState(player: Player) {
-  console.log(`\nPlayer: ${player.name}`);
-  console.log(`Gold: ${player.gold}`);
-  console.log(`Shields: ${player.shields}`);
-  console.log(`Victory Points: ${player.victoryPoints}`);
-  console.log(`Science:`, player.science);
-  console.log(`Resources:`, player.resources);
-  console.log(`Built Structures:`);
-  player.playerBoard.forEach((card) => {
-    console.log(`Structure: ${card.name}`);
-  });
-  console.log(`Wonder Stages:`);
-  player.wonder.wonderStages.forEach((stage, index) => {
-    console.log(
-      `  Stage ${index + 1}: ${stage.isBuilt ? "Built" : "Not Built"}`
-    );
-  });
-}
+} 

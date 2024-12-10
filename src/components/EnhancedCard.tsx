@@ -46,7 +46,13 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
   const canBuildWonder = showActions && currentWonder && gameState ? 
     (() => {
       const nextStageIndex = currentWonder.wonderStages.findIndex(stage => !stage.isBuilt);
-      return nextStageIndex !== -1 && checkResources(gameState.players[0], null, currentWonder.wonderStages[nextStageIndex]);
+      if (nextStageIndex === -1) return false;
+      return checkResources(
+        gameState.players[0], 
+        null, 
+        currentWonder.wonderStages[nextStageIndex],
+        gameState.players[0].tempResources
+      );
     })() : false;
 
   useEffect(() => {
