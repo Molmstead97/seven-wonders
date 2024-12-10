@@ -17,6 +17,13 @@ interface PlayerBoardProps {
   onCardClick: (card: Card, position: CardPosition) => void;
 }
 
+// Add this function to calculate modal width based on cards
+const calculateModalWidth = (maxCardsInRow: number) => {
+  const baseWidth = 250;  // Base width for the container
+  const cardWidth = CARD_OFFSET.horizontal * (maxCardsInRow - 1) + 128; // 128px is the card width
+  return Math.max(baseWidth, cardWidth + 64); // Add padding
+};
+
 export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   player,
   onClose,
@@ -48,6 +55,17 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
     onCardClick(card, position);
   };
 
+  // In your component, before the return statement
+  const nonEmptyColors = CARD_COLORS.filter(color => 
+    cardsByColor[color] && cardsByColor[color].length > 0
+  );
+
+  const maxCardsInRow = Math.max(
+    ...nonEmptyColors.map(color => cardsByColor[color]?.length || 0)
+  );
+
+  const modalWidth = calculateModalWidth(maxCardsInRow);
+
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm"
@@ -58,8 +76,8 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       <div 
         className="bg-gray-900 p-6 rounded-lg border border-white/10 shadow-2xl"
         style={{
-          width: "90vw",
-          maxWidth: "1200px",
+          width: `${modalWidth}px`,
+          maxWidth: "90vw",
           maxHeight: "90vh",
         }}
         onClick={(e) => e.stopPropagation()}
@@ -67,7 +85,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl text-white font-bold">
-            Player Board
+            {player.id === 0 ? "" : `Player ${player.id + 1}`}
           </h2>
           <button
             onClick={onClose}
@@ -80,7 +98,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         {/* Cards Grid */}
         <div className="overflow-auto max-h-[calc(90vh-100px)]">
           <div className="space-y-6">
-            {CARD_COLORS.map(color => (
+            {nonEmptyColors.map(color => (
               <div key={color} className="relative bg-white/5 rounded-lg p-4">
                 <div className="text-white/60 text-sm mb-3 font-semibold">{color}</div>
                 <div className="relative h-48">

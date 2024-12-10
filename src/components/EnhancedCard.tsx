@@ -14,6 +14,7 @@ interface EnhancedCardProps {
   onAnimationStart: () => void;
   onClose: () => void;
   showActions?: boolean;
+  children?: React.ReactNode;
   // These props are only required if showActions is true
   onCardPlay?: () => void;
   onWonderBuild?: () => void;

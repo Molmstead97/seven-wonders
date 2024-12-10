@@ -21,7 +21,7 @@ export const cards: Card[] = [
   {
     name: "Stone Pit",
     description: "Produces 1 Stone per turn.",
-    imagePath: "/images/card-images/brown/stone-pit.jpg",
+    imagePath: "/images/card-images/brown/stone-pit.png",
     production: { Stone: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -36,7 +36,7 @@ export const cards: Card[] = [
   {
     name: "Clay Pool",
     description: "Produces 1 Clay per turn.",
-    imagePath: "/images/card-images/brown/clay-pool.jpg",
+    imagePath: "/images/card-images/brown/clay-pool.png",
     production: { Clay: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -51,7 +51,7 @@ export const cards: Card[] = [
   {
     name: "Ore Vein",
     description: "Produces 1 Ore per turn.",
-    imagePath: "/images/card-images/brown/ore-vein.jpg",
+    imagePath: "/images/card-images/brown/ore-vein.png",
     production: { Ore: 1 },
     playerCount: [
       { minPlayers: 3, copies: 1 },
@@ -96,7 +96,7 @@ export const cards: Card[] = [
   {
     name: "Clay Pit",
     description: "Produces 1 Clay or Ore per turn.",
-    imagePath: "/images/card-images/brown/clay-pit.jpg",
+    imagePath: "/images/card-images/brown/clay-pit.png",
     production: {
       choice: [{ options: ["Clay", "Ore"], amount: 1 }],
     },

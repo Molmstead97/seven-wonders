@@ -1,9 +1,10 @@
 import { Player } from "../data/types/player";
 import { Card } from "../data/types/card";
 import { Wonder } from "../data/types/wonder";
-import { Resource, ResourceType } from "../data/types/resource";
+import { ResourceType } from "../data/types/resource";
 import { ProductionChoiceState } from "../data/types/productionChoice";
-
+import { analyzeTradingOptions } from "./ai/scoring";
+import { tradeResource } from "./utils/tradeResource";
 import { setupPlayers } from "./utils/setupPlayers";
 import { dealCards } from "./utils/dealCards";
 import { ageEnd } from "./utils/ageEnd";
@@ -34,6 +35,22 @@ export function handleAITurn(player: Player, gameState: GameState): {
   action: "play" | "wonder" | "discard";
   cardIndex: number;
 } {
+  // First, check if we need any resources and can trade for them
+  const availableResources = analyzeTradingOptions(player, gameState);
+  
+  // Execute trades for available resources if they're affordable and available
+  availableResources.forEach((tradingOption, resource) => {
+    if (player.gold >= Math.min(tradingOption.leftCost, tradingOption.rightCost) && 
+        tradingOption.availability !== "low") {
+      const tradingNeighbor = tradingOption.leftCost <= tradingOption.rightCost 
+        ? player.leftPlayer 
+        : player.rightPlayer;
+      
+      tradeResource(player, tradingNeighbor!, resource as ResourceType, 1);
+    }
+  });
+
+  // Then proceed with regular turn scoring
   let bestScore = -Infinity;
   let bestAction = {
     action: "discard" as "play" | "wonder" | "discard",

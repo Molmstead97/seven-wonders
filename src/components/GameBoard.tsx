@@ -15,6 +15,7 @@ import { handleTrade } from "../game-logic/gameActions";
 import ProductionChoiceModal from "./ProductionChoiceModal";
 import { ProductionChoiceState } from "../data/types/productionChoice";
 import { PlayerBoard } from "./PlayerBoard";
+import DiscardPile from "./DiscardPile";
 
 interface GameBoardProps {
   playerCount: number;
@@ -42,6 +43,9 @@ const GameBoard = React.memo(
     const [productionChoiceState, setProductionChoiceState] =
       useState<ProductionChoiceState | null>(null);
     const [selectedPlayerBoardIndex, setSelectedPlayerBoardIndex] = useState<number | null>(null);
+    const [isDiscardPileOpen, setIsDiscardPileOpen] = useState(false);
+    const [usedProductionCards, setUsedProductionCards] = useState<Set<string>>(new Set());
+    const previousTurn = useRef<number>(0);
 
     // Three.js refs
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -195,6 +199,8 @@ const GameBoard = React.memo(
     const handleProductionChoice = (resource: ResourceType) => {
       if (!gameState || !productionChoiceState) return;
 
+      setUsedProductionCards(prev => new Set([...prev, productionChoiceState.choices[productionChoiceState.currentChoiceIndex].cardName]));
+
       const updatedGameState = {
         ...gameState,
         players: gameState.players.map((player, index) => {
@@ -228,18 +234,20 @@ const GameBoard = React.memo(
 
     const hasProductionChoiceCard = useMemo(() => {
       if (!gameState) return false;
-      const currentPlayer = gameState.players[0];
-      return Array.from(currentPlayer.playerBoard).some(
-        (card) => card.production && "choice" in card.production
+      const productionCards = Array.from(gameState.players[0].playerBoard).filter(card => 
+        card.production && "choice" in card.production
       );
-    }, [gameState]);
+      return productionCards.length > 0 && productionCards.some(card => !usedProductionCards.has(card.name));
+    }, [gameState, usedProductionCards]);
 
     const openProductionChoiceModal = () => {
       if (!gameState) return;
 
       const currentPlayer = gameState.players[0];
       const choiceCards = Array.from(currentPlayer.playerBoard).filter(
-        (card) => card.production && "choice" in card.production
+        (card) => card.production && 
+        "choice" in card.production && 
+        !usedProductionCards.has(card.name)
       );
 
       const choices = choiceCards.map((card) => {
@@ -261,27 +269,40 @@ const GameBoard = React.memo(
       });
     };
 
+    // Update effect to reset usedProductionCards at the start of each turn
+    useEffect(() => {
+      if (gameState?.turns !== previousTurn.current) {
+        setUsedProductionCards(new Set());
+        previousTurn.current = gameState?.turns ?? 0;
+      }
+    }, [gameState?.turns]);
+
     return (
       <div className="relative w-full h-full">
         <canvas ref={canvasRef} className="w-full h-full" />
 
         {/* Floating UI for players/wonders */}
         {gameState && (
-          <div className="absolute top-4 left-4 space-y-2 bg-gray-700/50">
+          <div className="fixed top-4 left-4 grid grid-cols-2 gap-4 max-w-[calc(100vw-2rem)]">
             {assignedWonders.map((wonder, index) => (
-              <div key={wonder.name} className="text-white rounded-lg shadow-lg border border-gray-700/50">
+              <div
+                key={wonder.name}
+                className="bg-gray-700/50 p-3 rounded-lg shadow-lg backdrop-blur-sm border border-gray-700 flex flex-col"
+              >
                 <div
-                  className="p-4 cursor-pointer hover:bg-black/90 transition-colors"
+                  className="p-2 cursor-pointer hover:bg-black/90 transition-colors flex flex-col items-center flex-grow"
                   onClick={() => setSelectedWonder(wonder)}
                 >
-                  <div className="font-bold">
-                    Player {index + 1} {index === 0 ? "(You)" : ""}
+                  <div className="font-medium text-md text-white">
+                    {index === 0 ? "" : `Player ${index + 1}`}
                   </div>
-                  <div className="text-sm opacity-80">{wonder.name}</div>
+                  <div className="text-md text-white/80 justify-center">
+                    {wonder.name}
+                  </div>
                 </div>
-                {gameState.players[index].playerBoard.size > 0 && (
+                {gameState?.players[index].playerBoard.size > 0 && (
                   <button
-                    className="w-full p-2 text-sm bg-white/10 hover:bg-white/20 transition-colors border-t border-gray-700/50"
+                    className="w-full mt-auto text-xs text-white bg-white/10 hover:bg-white/20 transition-colors border-t border-gray-700/50 p-1.5 text-center"
                     onClick={() => setSelectedPlayerBoardIndex(index)}
                   >
                     View Board
@@ -311,12 +332,17 @@ const GameBoard = React.memo(
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h2 className="text-xl text-white font-bold">
-                    Player{" "}
-                    {assignedWonders.findIndex(
-                      (w) => w.name === selectedWonder.name
-                    ) + 1}
+                    {assignedWonders.findIndex((w) => w.name === selectedWonder.name) === 0 
+                      ? selectedWonder.name
+                      : `Player ${assignedWonders.findIndex((w) => w.name === selectedWonder.name) + 1}`
+                    }
                   </h2>
-                  <h3 className="text-lg text-white/80">{selectedWonder.name}</h3>
+                  <h3 className="text-lg text-white/80">
+                    {assignedWonders.findIndex((w) => w.name === selectedWonder.name) === 0 
+                      ? ""
+                      : selectedWonder.name
+                    }
+                  </h3>
                 </div>
 
                 {assignedWonders.findIndex(
@@ -459,7 +485,7 @@ const GameBoard = React.memo(
         )}
 
         {/* Game Log */}
-        <div className="fixed bottom-4 right-4 w-48 bg-black/80 text-white font-bold text-sm rounded-lg shadow-2xl">
+        <div className="fixed bottom-4 right-4 w-48 bg-black/80 text-white font-bold text-sm rounded-lg shadow-2xl border border-gray-400">
           <div
             className="flex items-center justify-between p-4 cursor-pointer"
             onClick={() => setIsGameLogOpen(!isGameLogOpen)}
@@ -491,10 +517,17 @@ const GameBoard = React.memo(
           )}
         </div>
 
-        {hasProductionChoiceCard && (
+        {hasProductionChoiceCard ? (
           <button
-            className="bg-gray-700/50 border border-gray-500/50 fixed bottom-4 left-16 text-white px-4 py-2 rounded hover:bg-black/90 transition-colors"
+            className="bg-gray-700/50 border border-gray-400 fixed bottom-4 left-8 text-white px-4 py-2 rounded hover:bg-black/90 transition-colors"
             onClick={openProductionChoiceModal}
+          >
+            Choose Production
+          </button>
+        ) : (
+          <button
+            className="bg-gray-500/50 border border-gray-400 fixed bottom-4 left-8 text-white px-4 py-2 rounded cursor-not-allowed"
+            disabled
           >
             Choose Production
           </button>
@@ -502,17 +535,16 @@ const GameBoard = React.memo(
 
         {productionChoiceState && (
           <ProductionChoiceModal
-            card={
-              {
-                name: productionChoiceState.choices[
-                  productionChoiceState.currentChoiceIndex
-                ].cardName,
-                imagePath:
-                  productionChoiceState.choices[
-                    productionChoiceState.currentChoiceIndex
-                  ].cardImage,
-              } as Card
-            }
+            card={{
+              name: productionChoiceState.choices[productionChoiceState.currentChoiceIndex].cardName,
+              imagePath: productionChoiceState.choices[productionChoiceState.currentChoiceIndex].cardImage,
+              production: {
+                choice: [{
+                  options: productionChoiceState.choices[productionChoiceState.currentChoiceIndex].options,
+                  amount: productionChoiceState.choices[productionChoiceState.currentChoiceIndex].amount
+                }]
+              }
+            } as Card}
             onChoiceSelected={handleProductionChoice}
             onClose={() => setProductionChoiceState(null)}
           />
@@ -536,6 +568,23 @@ const GameBoard = React.memo(
             tradingPlayerId={assignedWonders.findIndex(
               (w) => w.name === selectedWonder?.name
             )}
+          />
+        )}
+
+        {/* Discard Pile Button */}
+        <button
+          className="fixed bg-gray-700/50 border border-gray-400 text-white px-4 py-2 rounded hover:bg-black/90 transition-colors top-4 right-4"
+          onClick={() => setIsDiscardPileOpen(true)}
+        >
+          Discard Pile {discardPile.length > 0 && `(${discardPile.length})`}
+        </button>
+
+        {/* Discard Pile Modal */}
+        {isDiscardPileOpen && gameState && (
+          <DiscardPile
+            gameState={gameState}
+            onClose={() => setIsDiscardPileOpen(false)}
+            onCardClick={() => {}} // You can implement card click handling if needed
           />
         )}
       </div>

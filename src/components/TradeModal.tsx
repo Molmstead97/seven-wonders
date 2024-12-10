@@ -66,6 +66,33 @@ const TradeModal: React.FC<TradeModalProps> = ({
     }));
   };
 
+  // Add this function to filter out Wonder-produced resources
+  const getAvailableResources = (player: Player): Record<ResourceType, number> => {
+    const availableResources: Record<ResourceType, number> = {
+      Wood: 0,
+      Stone: 0,
+      Ore: 0,
+      Clay: 0,
+      Glass: 0,
+      Papyrus: 0,
+      Textile: 0,
+    };
+    
+    // Only include resources from cards, not from wonders
+    Array.from(player.playerBoard).forEach(card => {
+      if (card.production && !("choice" in card.production)) {
+        Object.entries(card.production).forEach(([resource, amount]) => {
+          availableResources[resource as ResourceType] += amount as number;
+        });
+      }
+    });
+    
+    return availableResources;
+  };
+
+  // Use this function when displaying tradeable resources
+  const tradeableResources = getAvailableResources(gameState.players[tradingPlayerId]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
       <div className="flex flex-col items-center">
@@ -95,7 +122,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
             <div className="bg-gray-700/50 p-4 rounded-lg shadow-lg backdrop-blur-sm">
               <h3 className="font-bold mb-2 text-md text-white">Available Resources</h3>
               <div className="grid grid-cols-2 gap-2">
-                {Object.entries(gameState.players[tradingPlayerId].resources)
+                {Object.entries(tradeableResources)
                   .filter(([_, count]) => count >= 1)
                   .map(([type, count]) => (
                     <div key={type} className="flex items-center">
