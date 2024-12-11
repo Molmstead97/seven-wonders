@@ -1,5 +1,5 @@
 import { Player } from "../../data/types/player";
-import { Wonder } from "../../data/types/wonder";
+import { Wonder, WonderStage } from "../../data/types/wonder";
 import { Card } from "../../data/types/card";
 import { Resource } from "../../data/types/resource";
 
@@ -21,68 +21,82 @@ export function buildWonder(
   wonder: Wonder,
   card: Card,
   gameState: GameState
-): { updatedPlayer: Player; hasProductionChoice: boolean } {
-  let updatedPlayer = { ...player };
-  const updatedWonder = {
-    ...wonder,
-    wonderStages: wonder.wonderStages.map((stage) => ({ ...stage })),
-  };
-  updatedPlayer.wonder = updatedWonder;
+): { updatedPlayer: Player; hasProductionChoice: boolean; stageBuilt: WonderStage | null } {
+  // First verify this is actually the player's wonder
+  if (wonder.name !== player.wonder.name) {
+    return { updatedPlayer: player, hasProductionChoice: false, stageBuilt: null };
+  }
 
-  const nextStageIndex = updatedWonder.wonderStages.findIndex(
-    (stage) => stage.isBuilt === false
+  let updatedPlayer = {
+    ...player,
+    resources: { ...player.resources },
+    tempResources: { ...player.tempResources },
+    playerHand: [...player.playerHand],
+    playerBoard: new Set([...player.playerBoard]),
+    wonder: {
+      ...wonder,
+      wonderStages: wonder.wonderStages.map((stage) => ({ ...stage })),
+    }
+  };
+
+  const nextStageIndex = updatedPlayer.wonder.wonderStages.findIndex(
+    (stage) => !stage.isBuilt
   );
 
   if (nextStageIndex === -1) {
-    return { updatedPlayer, hasProductionChoice: false };
+    return { updatedPlayer: player, hasProductionChoice: false, stageBuilt: null };
   }
 
-  const nextStage = updatedWonder.wonderStages[nextStageIndex];
-  
-  // Check for production choices before building
-  const hasProductionChoice = nextStage.production ? "choice" in nextStage.production : false;
+  const nextStage = updatedPlayer.wonder.wonderStages[nextStageIndex];
+  const hasProductionChoice = Boolean(nextStage.production && 'choice' in nextStage.production);
 
-  if (checkResources(player, null, nextStage)) {
-    updatedWonder.wonderStages[nextStageIndex].isBuilt = true;
+  // Check resources on updatedPlayer instead of original player
+  if (!checkResources(updatedPlayer, null, nextStage)) {
+    return { 
+      updatedPlayer: updatedPlayer,  // Return updatedPlayer instead of original
+      hasProductionChoice: false, 
+      stageBuilt: null 
+    };
+  }
 
-    // Apply the effects of the built stage
-    if (nextStage.production) {
-      Object.entries(nextStage.production).forEach(([resource, amount]) => {
-        updatedPlayer.resources[resource as keyof Resource] =
-          (updatedPlayer.resources[resource as keyof Resource] || 0) +
-          (amount as number);
-      });
-    }
-    if (nextStage.victoryPoints) {
-      updatedPlayer.victoryPoints += nextStage.victoryPoints;
-    }
-    if (nextStage.gold) {
-      updatedPlayer.gold += nextStage.gold;
-    }
-    if (nextStage.shields) {
-      updatedPlayer.shields += nextStage.shields;
-    }
+  updatedPlayer.wonder.wonderStages[nextStageIndex].isBuilt = true;
 
-    // Apply special effects
-    if (nextStage.specialEffect) {
-      updatedPlayer = applySpecialEffect(
-        updatedPlayer,
-        nextStage.specialEffect,
-        gameState,
-        card
-      );
-    }
+  // Apply the effects of the built stage
+  if (nextStage.production) {
+    Object.entries(nextStage.production).forEach(([resource, amount]) => {
+      if (resource !== "choice") {
+        const resourceKey = resource as keyof Resource;
+        updatedPlayer.resources[resourceKey] = 
+          (updatedPlayer.resources[resourceKey] || 0) + (amount as number);
+      }
+    });
+  }
 
-    // Remove the card from the player's hand
-    updatedPlayer.playerHand = updatedPlayer.playerHand.filter(
-      (c) => c !== card
+  if (nextStage.victoryPoints) {
+    updatedPlayer.victoryPoints += nextStage.victoryPoints;
+  }
+  if (nextStage.gold) {
+    updatedPlayer.gold += nextStage.gold;
+  }
+  if (nextStage.shields) {
+    updatedPlayer.shields += nextStage.shields;
+  }
+
+  // Apply special effects
+  if (nextStage.specialEffect) {
+    updatedPlayer = applySpecialEffect(
+      updatedPlayer,
+      nextStage.specialEffect,
+      gameState,
+      card
     );
-  } else {
-    console.log("Not enough resources to build this stage"); // TODO: Replace with UI
   }
-  return { updatedPlayer, hasProductionChoice };
-}
 
+  // Remove the card used to build the wonder
+  updatedPlayer.playerHand = updatedPlayer.playerHand.filter(c => c !== card);
+
+  return { updatedPlayer, hasProductionChoice, stageBuilt: nextStage };
+}
 function applySpecialEffect(
   player: Player,
   effect: SpecialEffect,
@@ -98,3 +112,4 @@ function applySpecialEffect(
       return player;
   }
 }
+

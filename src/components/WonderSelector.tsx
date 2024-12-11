@@ -156,8 +156,8 @@ const WonderCard: React.FC<WonderCardProps> = ({ wonder, pairWonder, onSelect })
 
 const WonderSelector: React.FC<WonderSelectorProps> = ({ onWonderSelected, availableWonders }) => {
   // Filter out wonders that have their counterpart (A/B) already selected
-  const wonderPairs = wonders.reduce((acc: Record<string, Wonder[]>, wonder) => {
-    const baseName = wonder.name.slice(0, -2); // Remove " A" or " B"
+  const wonderPairs = availableWonders.reduce((acc: Record<string, Wonder[]>, wonder) => {
+    const baseName = wonder.name.replace(/ [AB]$/, '');  // Use same regex as randomizeWonders
     if (!acc[baseName]) {
       acc[baseName] = [];
     }

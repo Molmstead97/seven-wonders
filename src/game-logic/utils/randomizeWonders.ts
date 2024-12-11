@@ -33,14 +33,14 @@ export function randomizeWonders(numPlayers: number, selectedWonder?: Wonder): W
 
   if (selectedWonder) {
     // Remove the chosen wonder's group from available wonders
-    const baseName = selectedWonder.name.slice(0, -2); // Remove the " A" or " B"
+    const baseName = selectedWonder.name.replace(/ [AB]$/, '');  // Remove A or B suffix
     delete groupedWonders[baseName];
 
     // Randomly select remaining wonders for AI players
     const remainingWonderGroups = Object.values(groupedWonders);
     const shuffledGroups = shuffleArray(remainingWonderGroups);
     const aiWonders = shuffledGroups
-      .slice(0, numPlayers - 1)  // -1 because we already have one for the player
+      .slice(0, numPlayers - 1)
       .map(group => group[Math.floor(Math.random() * group.length)]);
 
     return [selectedWonder, ...aiWonders];

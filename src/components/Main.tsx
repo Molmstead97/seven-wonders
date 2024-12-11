@@ -191,12 +191,18 @@ const Main = () => {
             <WonderSelector
               onWonderSelected={(selectedWonder) => {
                 try {
-                  const initializedGame = initializeGame(aiPlayerCount, selectedWonder);
+                  const initializedGame = initializeGame(
+                    aiPlayerCount,
+                    selectedWonder
+                  );
                   setGameState(initializedGame);
                   setGamePhase("playing");
                   setIsChoosingWonder(false);
                 } catch (error) {
-                  console.error("Error initializing game with selected wonder:", error);
+                  console.error(
+                    "Error initializing game with selected wonder:",
+                    error
+                  );
                   setGamePhase("home");
                 }
               }}

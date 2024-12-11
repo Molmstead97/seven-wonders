@@ -310,6 +310,19 @@ const GameBoard = React.memo(
 
     const [showEndgameRanking, setShowEndgameRanking] = useState(false);
 
+    useEffect(() => {
+      if (gameState && selectedWonder) {
+        // Find the matching wonder in the new game state
+        const updatedWonder = gameState.players.find(
+          player => player.wonder.name === selectedWonder.name
+        )?.wonder;
+        
+        if (updatedWonder) {
+          setSelectedWonder(updatedWonder);
+        }
+      }
+    }, [gameState]);
+
     return (
       <div className="relative w-full h-full">
         {/* Age Display */}

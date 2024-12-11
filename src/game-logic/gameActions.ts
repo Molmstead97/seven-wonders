@@ -11,6 +11,7 @@ import { ageEnd } from "./utils/ageEnd";
 import { passHands } from "./utils/passHand";
 import { checkResources } from './utils/resourceCheck';
 import { Card } from "../data/types/card";
+import { dealCards } from "./utils/dealCards";
 
 export const addToGameLog = (gameLog: string[], message: string) => {
   console.log("Adding to game log:", message);
@@ -141,8 +142,10 @@ export function handleBuildWonder(
   playerId: number,
   cardIndex: number
 ): GameState {
-  if (!gameState || !gameState.players[playerId]) {
-    console.error('Invalid game state or player ID');
+  console.log(`Attempting wonder build - Player ${playerId}`);
+  
+  if (!gameState?.players[playerId]) {
+    console.error(`Invalid player ID: ${playerId}`);
     return gameState;
   }
 
@@ -158,55 +161,64 @@ export function handleBuildWonder(
         wonderStages: p.wonder.wonderStages.map(stage => ({ ...stage })),
       } : p.wonder,
     })),
-    gameLog: [...(gameState.gameLog || [])] // Ensure gameLog exists
+    gameLog: [...gameState.gameLog]
   };
 
-  // Get current player and card
   const currentPlayer = newState.players[playerId];
+  console.log(`Player ${playerId} hand:`, currentPlayer.playerHand);
+  console.log(`Attempting to use card at index:`, cardIndex);
+  console.log(`Player wonder:`, currentPlayer.wonder.name);
+  
   const cardToUse = currentPlayer.playerHand[cardIndex];
-
   if (!cardToUse) {
-    console.error('Invalid card index');
+    console.error(`No card found at index ${cardIndex} for player ${playerId}`);
     return gameState;
   }
 
-  // Use buildWonder utility function to handle the wonder building logic
-  const updatedPlayer = buildWonder(
+  const { updatedPlayer, hasProductionChoice, stageBuilt } = buildWonder(
     currentPlayer,
     currentPlayer.wonder,
     cardToUse,
     newState
   );
 
-  // Update the player in the game state
-  newState.players[playerId] = updatedPlayer.updatedPlayer;
+  console.log(`Build wonder result:`, {
+    wonderBuilt: !!stageBuilt,
+    hasProductionChoice,
+    playerUpdated: updatedPlayer !== currentPlayer
+  });
 
-  // Remove card from hand
-  currentPlayer.playerHand.splice(cardIndex, 1);
+  if (!stageBuilt) {
+    console.log(`Wonder build failed for player ${playerId}`);
+    return gameState;
+  }
 
-  // Update the game log
+  // Update player in game state
+  newState.players[playerId] = updatedPlayer;
+
+  // Add to game log
   newState.gameLog = addToGameLog(
     newState.gameLog,
     playerId === 0 
-      ? `You built a Wonder stage`
-      : `Player ${playerId + 1} built a Wonder stage`
+      ? `You built Wonder stage ${stageBuilt.stage}`
+      : `Player ${playerId + 1} built Wonder stage ${stageBuilt.stage}`
   );
 
-  // Check for production choices in the wonder stage
-  const nextStage = currentPlayer.wonder.wonderStages.find(stage => !stage.isBuilt);
-  if (nextStage?.production && "choice" in nextStage.production) {
-    const choices = nextStage.production.choice.map(choice => ({
-      sourceName: `${currentPlayer.wonder.name} Stage ${nextStage.stage}`,
-      sourceImage: currentPlayer.wonder.imagePath,
-      options: choice.options,
-      amount: choice.amount
-    }));
-
+  // Handle production choices if needed
+  if (hasProductionChoice && stageBuilt.production && 'choice' in stageBuilt.production) {
+    const production = stageBuilt.production as { choice: Array<{ options: string[], amount: number }> };
     newState.productionChoiceState = {
-      choices,
+      choices: production.choice.map(choice => ({
+        sourceName: `${newState.players[playerId].wonder.name} Stage ${stageBuilt.stage}`,
+        sourceImage: newState.players[playerId].wonder.imagePath,
+        options: choice.options || [],
+        amount: choice.amount || 1
+      })),
       currentChoiceIndex: 0
     };
   }
+
+  console.log(`Wonder build attempt - Player ${playerId}, Card: ${cardToUse?.name}`);
 
   return newState;
 }
@@ -231,31 +243,43 @@ export function handleTrade(gameState: GameState, tradingPlayerId: number, resou
       index === tradingPlayerId ? updatedTradingPlayer :
       player
     ),
-    gameLog: addToGameLog(
-      gameState.gameLog,
-      `${tradingPlayerId === 0 ? 'You' : `Player ${tradingPlayerId + 1}`} traded ${amount} ${resourceType} for ${amount * 2} gold`
-    ),
   };
   
   return newState;
 }
 
-export function handleAgeEnd(gameState: GameState): GameState {
-  const updatedGameState = ageEnd(gameState.players, gameState);
+export function handleEndAge(gameState: GameState): GameState {
+  addToGameLog(gameState.gameLog, `=== AGE ${gameState.age} END ===`);
+  
+  let updatedGameState = {
+    ...gameState,
+    turns: 0,
+    age: gameState.age + 1,
+    discardPile: [
+      ...gameState.discardPile,
+      ...gameState.players.flatMap((player) => player.playerHand),
+    ],
+  };
 
-  if (updatedGameState.age === 3) {
-    // If the current age is 3, end the game after completing the age
-    return {
-      ...updatedGameState,
-      age: updatedGameState.age + 1, // Increment the age to 4 to signify the end of the game
-    };
-  } else {
-    // Otherwise, increment the age and continue
-    return {
-      ...updatedGameState,
-      age: updatedGameState.age + 1,
-    };
+  // Process age end effects
+  updatedGameState = {
+    ...updatedGameState,
+    ...ageEnd(updatedGameState.players, updatedGameState),
+  };
+
+  // If we're entering Age 4, handle end game
+  if (updatedGameState.age === 4) {
+    return handleEndGame(updatedGameState);
   }
+
+  // Deal new cards if not the end of the game
+  const newCards = dealCards(updatedGameState.players.length, updatedGameState.age);
+  updatedGameState.players = updatedGameState.players.map((player, index) => ({
+    ...player,
+    playerHand: newCards.slice(index * 7, (index + 1) * 7),
+  }));
+
+  return updatedGameState;
 }
 
 export function handleEndGame(gameState: GameState): GameState {
@@ -278,6 +302,7 @@ export function handleEndGame(gameState: GameState): GameState {
     gold: p.gold
   })));
 
+  gameState.finalState = true;
   return finalState;
 }
 

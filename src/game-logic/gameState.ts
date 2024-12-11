@@ -18,6 +18,7 @@ import {
   handleCardPlay,
   handleBuildWonder,
   addToGameLog,
+  handleEndAge,
 } from "./gameActions";
 
 export interface GameState {
@@ -27,7 +28,7 @@ export interface GameState {
   discardPile: Card[];
   gameLog: string[];
   isAutomated?: boolean;
-  finalState: boolean;
+  finalState?: boolean;
   productionChoiceState: ProductionChoiceState
   // ... other game state properties
 }
@@ -148,20 +149,6 @@ export function gameLoop(
   }
 
   let updatedGameState = { ...gameState };
-
-  if (updatedGameState.age === 4) {
-    console.log("=== GAME END TRIGGERED ===");
-    console.log("Pre-calculation player points:", updatedGameState.players.map(p => ({
-      name: p.name,
-      points: p.victoryPoints
-    })));
-    updatedGameState = handleEndGame(updatedGameState);
-    console.log("Post-calculation player points:", updatedGameState.players.map(p => ({
-      name: p.name,
-      points: p.victoryPoints
-    })));
-  }
-
   // Skip AI processing if this is an automated game
   if (!gameState.isAutomated) {
     // Process AI turns after player action
@@ -199,40 +186,8 @@ export function gameLoop(
     console.log("=== PASSING HANDS ===");
     updatedGameState = handlePassHand(updatedGameState);
   } else {
-    addToGameLog(updatedGameState.gameLog, `=== AGE ${updatedGameState.age} END ===`);
-    updatedGameState = {
-      ...updatedGameState,
-      turns: 0, // Reset turns for next age
-      age: updatedGameState.age + 1, // Increment age
-      discardPile: [
-        ...updatedGameState.discardPile,
-        ...updatedGameState.players.flatMap((player) => player.playerHand),
-      ],
-    };
-
-    // Deal new cards if not the end of the game
-    if (updatedGameState.age <= 3) {
-      // First process age end effects
-      updatedGameState = {
-        ...updatedGameState,
-        ...ageEnd(updatedGameState.players, updatedGameState),
-      };
-      
-      // Then deal new cards
-      const newCards = dealCards(updatedGameState.players.length, updatedGameState.age);
-      updatedGameState.players = updatedGameState.players.map((player, index) => ({
-        ...player,
-        playerHand: newCards.slice(index * 7, (index + 1) * 7),
-      }));
-    }
+    updatedGameState = handleEndAge(updatedGameState);
   }
-
-  updatedGameState.players.forEach((player, index) => {
-    console.log(`${player.name}:`, {
-      handSize: player.playerHand.length,
-      cards: player.playerHand.map((c) => c.name),
-    });
-  });
 
   return updatedGameState;
 } 
