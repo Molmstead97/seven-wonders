@@ -34,16 +34,16 @@ const ProductionChoiceModal: React.FC<ProductionChoiceModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full"
+        className="bg-[#F5F5DC] p-6 rounded-lg shadow-xl max-w-md w-full"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-12">
-          <h2 className="text-2xl font-bold text-white text-center w-full">
+          <h2 className="text-2xl font-bold text-[#333333] text-center w-full">
             {card ? card.name : wonder?.name} - Choose {choices[0]?.options.includes('Cog') ? 'Science Symbol' : 'Production'}
           </h2>
           <button 
             onClick={onClose}
-            className="text-gray-400 hover:text-white absolute right-4 top-4"
+            className="text-[#666666] hover:text-[#333333] absolute right-4 top-4"
           >
             ✕
           </button>
@@ -51,8 +51,8 @@ const ProductionChoiceModal: React.FC<ProductionChoiceModalProps> = ({
 
         <div className="space-y-8">
           {choices.map((choice, choiceIndex) => (
-            <div key={choiceIndex} className="bg-gray-700 p-6 rounded-lg">
-              <p className="text-white text-xl text-center mb-6">
+            <div key={choiceIndex} className="bg-[#E0D8C0] p-6 rounded-lg">
+              <p className="text-[#333333] text-xl text-center mb-6">
                 Choose {choice.amount} {choice.options.includes('Cog') ? 'science symbol' : 'resource'}
                 {choice.amount > 1 ? 's' : ''}:
               </p>
@@ -67,7 +67,7 @@ const ProductionChoiceModal: React.FC<ProductionChoiceModalProps> = ({
                   >
                     <div className={`
                       p-2 rounded-lg transition-all duration-200
-                      ${hoveredChoice === option ? 'bg-green-500/20 scale-110' : ''}
+                      ${hoveredChoice === option ? 'bg-[#4682B4]/20 scale-110' : ''}
                       group-hover:animate-bounce
                     `}>
                       <img 
@@ -77,8 +77,8 @@ const ProductionChoiceModal: React.FC<ProductionChoiceModalProps> = ({
                       />
                     </div>
                     <span className={`
-                      text-white text-lg mt-2 font-medium transition-colors duration-200
-                      ${hoveredChoice === option ? 'text-green-400' : ''}
+                      text-[#333333] text-lg mt-2 font-medium transition-colors duration-200
+                      ${hoveredChoice === option ? 'text-[#4682B4]' : ''}
                     `}>
                       {option}
                     </span>

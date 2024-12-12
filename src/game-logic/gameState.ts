@@ -31,6 +31,7 @@ export interface GameState {
   productionChoiceState: ProductionChoiceState;
   showDiscardPile?: boolean;
   waitingForSeventhCard?: boolean;
+  endGameTriggered?: boolean;
   // ... other game state properties
 }
 

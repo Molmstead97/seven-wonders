@@ -38,8 +38,8 @@ const WonderCard: React.FC<WonderCardProps> = ({ wonder, pairWonder, onSelect })
         >
           {/* Front */}
           <div className={`backface-hidden ${isFlipped ? 'invisible' : ''}`}>
-            <div className="bg-gray-800 rounded-lg p-4 space-y-4">
-              <h3 className="text-xl text-white font-bold text-center">
+            <div className="bg-[#F5F5DC] rounded-lg p-4 space-y-4 shadow-md">
+              <h3 className="text-xl text-[#333333] font-bold text-center">
                 {wonder.name}
               </h3>
               <div 
@@ -56,13 +56,13 @@ const WonderCard: React.FC<WonderCardProps> = ({ wonder, pairWonder, onSelect })
               <div className="flex justify-between gap-2">
                 <button
                   onClick={() => setShowConfirmation(true)}
-                  className="flex-1 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+                  className="flex-1 bg-[#E85A3C] text-white px-4 py-2 rounded hover:bg-[#FF6347] transition-colors shadow-sm"
                 >
                   Play Wonder
                 </button>
                 <button
                   onClick={() => setIsFlipped(!isFlipped)}
-                  className="flex-1 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                  className="flex-1 bg-[#3A6B96] text-white px-4 py-2 rounded hover:bg-[#4682B4] transition-colors shadow-sm"
                 >
                   Show B Side
                 </button>
@@ -74,8 +74,8 @@ const WonderCard: React.FC<WonderCardProps> = ({ wonder, pairWonder, onSelect })
           <div 
             className={`backface-hidden absolute inset-0 rotate-x-180 ${!isFlipped ? 'invisible' : ''}`}
           >
-            <div className="bg-gray-800 rounded-lg p-4 space-y-4">
-              <h3 className="text-xl text-white font-bold text-center">
+            <div className="bg-[#F5F5DC] rounded-lg p-4 space-y-4 shadow-md">
+              <h3 className="text-xl text-[#333333] font-bold text-center">
                 {pairWonder.name}
               </h3>
               <div 
@@ -92,13 +92,13 @@ const WonderCard: React.FC<WonderCardProps> = ({ wonder, pairWonder, onSelect })
               <div className="flex justify-between gap-2">
                 <button
                   onClick={() => setShowConfirmation(true)}
-                  className="flex-1 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+                  className="flex-1 bg-[#E85A3C] text-white px-4 py-2 rounded hover:bg-[#FF6347] transition-colors shadow-sm"
                 >
                   Play Wonder
                 </button>
                 <button
                   onClick={() => setIsFlipped(!isFlipped)}
-                  className="flex-1 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                  className="flex-1 bg-[#3A6B96] text-white px-4 py-2 rounded hover:bg-[#4682B4] transition-colors shadow-sm"
                 >
                   Show A Side
                 </button>
@@ -111,7 +111,7 @@ const WonderCard: React.FC<WonderCardProps> = ({ wonder, pairWonder, onSelect })
       {/* Image Modal */}
       {showImageModal && (
         <div 
-          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
           onClick={() => setShowImageModal(false)}
         >
           <div 
@@ -130,21 +130,21 @@ const WonderCard: React.FC<WonderCardProps> = ({ wonder, pairWonder, onSelect })
       {/* Confirmation Modal */}
       {showConfirmation && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-black p-6 rounded-lg max-w-sm mx-4">
-            <h3 className="text-xl text-white font-bold mb-4">Confirm Selection</h3>
-            <p className="mb-6 text-white/80">
+          <div className="bg-[#F5F5DC] p-6 rounded-lg max-w-sm mx-4 shadow-lg">
+            <h3 className="text-xl text-[#333333] font-bold mb-4">Confirm Selection</h3>
+            <p className="mb-6 text-[#444444]">
               Are you sure you want to play as {currentWonder.name}?
             </p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setShowConfirmation(false)}
-                className="px-4 py-2 text-white hover:text-red-500"
+                className="px-4 py-2 text-[#666666] hover:text-[#FF6347]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirm}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                className="px-4 py-2 bg-[#FF6347] text-white rounded hover:bg-[#ff7d66]"
               >
                 Confirm
               </button>
@@ -171,8 +171,8 @@ const WonderSelector: React.FC<WonderSelectorProps> = ({ onWonderSelected, avail
   console.log("WonderSelector - Wonder pairs:", wonderPairs);
 
   return (
-    <div className="min-h-screen bg-gray-900 p-8">
-      <h1 className="text-4xl font-bold text-white text-center mb-8">
+    <div className="min-h-screen bg-[#E8E4D0] p-8">
+      <h1 className="text-4xl font-bold text-[#1A1A1A] text-center mb-8">
         Choose Your Wonder
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">

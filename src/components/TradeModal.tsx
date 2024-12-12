@@ -127,7 +127,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
         <div className="flex items-center space-x-24">
           {/* Trading Player Container */}
           <div
-            className="bg-gray-900 p-6 rounded-lg border border-white/10 shadow-2xl"
+            className="bg-[#F5F5DC] p-6 rounded-lg border border-[#666666]/10 shadow-2xl"
             style={{
               width: "500px",
               boxShadow: "0 0 40px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.1)",
@@ -147,21 +147,21 @@ const TradeModal: React.FC<TradeModalProps> = ({
                 }}
               />
             </div>
-            <div className="bg-gray-700/50 p-4 rounded-lg shadow-lg backdrop-blur-sm">
-              <h3 className="font-bold mb-2 text-md text-white">Available Resources</h3>
+            <div className="bg-[#E0D8C0]/50 p-4 rounded-lg shadow-lg backdrop-blur-sm">
+              <h3 className="font-bold mb-2 text-md text-[#333333]">Available Resources</h3>
               <div className="grid grid-cols-2 gap-2">
                 {Object.entries(tradeableResources)
                   .filter(([_, count]) => count >= 1)
                   .map(([type, count]) => (
                     <div key={type} className="flex items-center">
-                      <span className="text-white/80 mr-2">{type}:</span>
+                      <span className="text-[#333333]/80 mr-2">{type}:</span>
                       <input
                         type="number"
                         min="0"
                         max={count}
                         value={selectedResources[type as ResourceType] || 0}
                         onChange={(e) => handleResourceChange(type as ResourceType, parseInt(e.target.value))}
-                        className="w-16 bg-white text-black rounded px-2 py-1"
+                        className="w-16 bg-white text-[#333333] rounded px-2 py-1"
                       />
                     </div>
                   ))}
@@ -174,12 +174,12 @@ const TradeModal: React.FC<TradeModalProps> = ({
             <div className="text-yellow-400 text-2xl font-bold mb-2">
               {goldCost} Gold
             </div>
-            <div className="text-white text-3xl">→</div>
+            <div className="text-[#2fa976] text-3xl">→</div>
           </div>
 
           {/* User Container */}
           <div
-            className="bg-gray-900 p-6 rounded-lg border border-white/10 shadow-2xl"
+            className="bg-[#F5F5DC] p-6 rounded-lg border border-[#666666]/10 shadow-2xl"
             style={{
               width: "500px",
               boxShadow: "0 0 40px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.1)",
@@ -199,13 +199,13 @@ const TradeModal: React.FC<TradeModalProps> = ({
                 }}
               />
             </div>
-            <div className="bg-gray-700/50 p-4 rounded-lg shadow-lg backdrop-blur-sm">
-              <h3 className="font-bold mb-2 text-md text-white">Resources After Trade</h3>
+            <div className="bg-[#E0D8C0]/50 p-4 rounded-lg shadow-lg backdrop-blur-sm">
+              <h3 className="font-bold mb-2 text-md text-[#333333]">Resources After Trade</h3>
               <div className="grid grid-cols-2 gap-2">
                 {Object.entries(selectedResources).map(([type, amount]) => (
                   <div key={type} className="flex items-center">
-                    <span className="text-white/80 mr-2">{type}:</span>
-                    <span className="font-bold text-white">{amount}</span>
+                    <span className="text-[#333333]/80 mr-2">{type}:</span>
+                    <span className="font-bold text-[#333333]">{amount}</span>
                   </div>
                 ))}
               </div>

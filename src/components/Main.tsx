@@ -204,6 +204,7 @@ const Main = () => {
             gameState={gameState}
             gameLog={gameState?.gameLog || []}
             setGameState={setGameState}
+            onPlayAgain={handlePlayAgain}
           />
           {gameState && gameState.age < 4 && (
             <PlayerHand
@@ -227,7 +228,7 @@ const Main = () => {
         <>
           <div ref={backgroundRef} className="fixed inset-0" />
           {gamePhase === "home" && (
-            <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center">
+            <div className="min-h-screen bg-[#F5F5DC] flex flex-col justify-center items-center">
               <div
                 ref={titleRef}
                 className="flex flex-col justify-center items-center space-y-12"
@@ -237,7 +238,7 @@ const Main = () => {
                 </h1>
                 <button
                   onClick={startSetup}
-                  className="bg-neutral-50 bg-opacity-10 text-white font-normal italic text-5xl px-12 py-4 border-3 border-black rounded-3xl shadow-lg text-shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+                  className="bg-[#4682B4] bg-opacity-90 text-white font-normal italic text-5xl px-12 py-4 border-3 border-black rounded-3xl shadow-lg text-shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
                 >
                   Start Game
                 </button>

@@ -99,7 +99,7 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
     >
       <div
         ref={cardRef}
-        className="relative z-50 bg-gray-900 p-6 rounded-lg border border-white/10 shadow-2xl"
+        className="relative z-50 bg-[#D0C8B0] p-6 rounded-lg border border-[#666666]/20 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
         style={{
           width: initialPosition.width,
@@ -113,9 +113,9 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
         />
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300"
+          className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-[#666666]/20 hover:bg-[#666666]/30"
         >
-          ✕
+          <span className="text-[#333333]">✕</span>
         </button>
       </div>
       {showActions && (
@@ -131,8 +131,8 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
             disabled={!hasResources}
             className={`px-4 py-2 rounded ${
               hasResources
-                ? "bg-blue-500 text-white hover:bg-blue-600"
-                : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                ? "bg-[#4682B4] text-white hover:bg-[#5F9EA0]"
+                : "bg-black/40 text-white cursor-not-allowed"
             }`}
           >
             Build
@@ -142,31 +142,30 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
             disabled={!canBuildWonder}
             className={`px-4 py-2 rounded ${
               canBuildWonder
-                ? "bg-purple-500 text-white hover:bg-purple-600"
-                : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                ? "bg-[#9932CC] text-white hover:bg-[#8A2BE2]"
+                : "bg-black/40 text-white cursor-not-allowed"
             }`}
           >
             Construct Wonder
           </button>
           <button
             onClick={onCardDiscard}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            className="px-4 py-2 bg-[#FF6347] text-white rounded hover:bg-[#FF4500]"
           >
             Discard
           </button>
 
-          {/* Free Build Button - only show if effect is triggered and not used */}
+          {/* Free Build Button */}
           {gameState?.players[0].freeBuildPerAge?.isEffectTriggered &&
             !gameState?.players[0].freeBuildPerAge?.usedThisAge && (
               <button
                 onClick={() => {
                   onCardPlay?.();
-                  // Set usedThisAge to true when the card is built
                   if (gameState) {
                     gameState.players[0].freeBuildPerAge.usedThisAge = true;
                   }
                 }}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                className="px-4 py-2 bg-[#2E8B57] text-white rounded hover:bg-[#3CB371]"
               >
                 Build Free
               </button>

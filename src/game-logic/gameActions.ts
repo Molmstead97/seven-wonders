@@ -339,8 +339,12 @@ export function handleEndAge(gameState: GameState): GameState {
   newState = ageEnd(newState.players, newState);
 
   // Handle end of game
-  if (newState.age === 4) {
+  /* if (newState.age === 4) {
     newState = handleScienceChoices(newState);
+    return handleEndGame(newState);
+  } */
+
+  if (newState.endGameTriggered) {
     return handleEndGame(newState);
   }
 
@@ -354,7 +358,6 @@ export function handleEndAge(gameState: GameState): GameState {
       playerHand: newCards.slice(index * 7, (index + 1) * 7),
     })),
     age: newState.age + 1,
-    gameLog: addToGameLog(newState.gameLog, `=== AGE ${newState.age + 1} START ===`),
     turns: 0,
     waitingForSeventhCard: false,
   };

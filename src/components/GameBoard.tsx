@@ -20,7 +20,7 @@ import EndgameRanking from "./EndgameRanking";
 
 import woodTextureUrl from '/assets/textures/wood_texture.jpg';
 import woodNormalUrl from '/assets/textures/wood_normal.jpg';
-import wallTextureUrl from '/assets/textures/wall_texture.jpg';
+import wallTextureUrl from '/assets/textures/821.jpg';
 import floorTextureUrl from '/assets/textures/floor_texture.jpg';
 
 interface GameBoardProps {
@@ -30,6 +30,7 @@ interface GameBoardProps {
   gameState: GameState | null;
   gameLog: string[];
   setGameState: (state: GameState) => void;
+  onPlayAgain: () => void;
 }
 
 const GameBoard = React.memo(
@@ -40,6 +41,7 @@ const GameBoard = React.memo(
     gameState,
     gameLog,
     setGameState,
+    onPlayAgain,
   }: GameBoardProps) => {
     if (!gameState || !gameState.players) {
       return <div>Loading game state...</div>;
@@ -84,19 +86,9 @@ const GameBoard = React.memo(
     );
 
     // Three.js setup functions
-    const createTable = useCallback(() => {
+    const createTable = useCallback((woodTexture: THREE.Texture, woodNormal: THREE.Texture) => {
       const tableGroup = new THREE.Group();
       
-      // Configure wood texture for reuse
-      const woodTexture = textureLoader.load(woodTextureUrl);
-      const woodNormal = textureLoader.load(woodNormalUrl);
-      
-      // Configure texture settings
-      woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
-      woodTexture.repeat.set(2, 2);
-      woodNormal.wrapS = woodNormal.wrapT = THREE.RepeatWrapping;
-      woodNormal.repeat.set(2, 2);
-
       // Create reusable material for both table top and legs
       const woodMaterial = new THREE.MeshStandardMaterial({
         map: woodTexture,
@@ -138,102 +130,124 @@ const GameBoard = React.memo(
     const setupScene = useCallback(() => {
       console.log("Starting scene setup...");
       const scene = new THREE.Scene();
-      
-      // Set a background color so we can see if the scene is rendering at all
       scene.background = new THREE.Color(0x2c2c2c);
       console.log("Scene background set");
-      
-      // Load wall texture
-      console.log("Loading wall texture...");
-      const wallTexture = textureLoader.load(wallTextureUrl, () => {
-        console.log("Wall texture loaded successfully");
-        // Force a re-render when texture loads
+
+      // Create promises for each texture load
+      const woodTexturePromise = new Promise<THREE.Texture>(resolve => {
+        textureLoader.load(woodTextureUrl, resolve);
+      });
+      const woodNormalPromise = new Promise<THREE.Texture>(resolve => {
+        textureLoader.load(woodNormalUrl, resolve);
+      });
+      const wallTexturePromise = new Promise<THREE.Texture>(resolve => {
+        textureLoader.load(wallTextureUrl, resolve);
+      });
+      const floorTexturePromise = new Promise<THREE.Texture>(resolve => {
+        textureLoader.load(floorTextureUrl, resolve);
+      });
+
+      // Wait for all textures to load
+      Promise.all([
+        woodTexturePromise,
+        woodNormalPromise,
+        wallTexturePromise,
+        floorTexturePromise,
+      ]).then(([woodTexture, woodNormal, wallTexture, floorTexture]) => {
+        console.log("All textures loaded");
+
+        // Configure textures
+        woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
+        woodTexture.repeat.set(2, 2);
+        woodNormal.wrapS = woodNormal.wrapT = THREE.RepeatWrapping;
+        woodNormal.repeat.set(2, 2);
+        wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
+        wallTexture.repeat.set(4, 2);
+        floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+        floorTexture.repeat.set(8, 8);
+
+        // Create table and other objects that depend on textures
+        const table = createTable(woodTexture, woodNormal);
+        scene.add(table);
+
+        // Back wall
+        const backWallGeometry = new THREE.PlaneGeometry(200, 100);
+        const wallMaterial = new THREE.MeshStandardMaterial({
+          map: wallTexture,
+          color: 0xcccccc,
+          roughness: 0.9,
+          metalness: 0.1,
+        });
+        
+        const backWall = new THREE.Mesh(backWallGeometry, wallMaterial);
+        backWall.position.set(0, 20, -60);
+        backWall.receiveShadow = true;
+        scene.add(backWall);
+
+        // Floor
+        const floorGeometry = new THREE.PlaneGeometry(200, 200);
+        const floorMaterial = new THREE.MeshStandardMaterial({
+          map: floorTexture,
+          roughness: 0.8,
+          metalness: 0.1,
+        });
+        
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -30;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // Enhanced lighting setup
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        // Main directional light
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        mainLight.position.set(-30, 50, 30);
+        mainLight.castShadow = true;
+
+        // Improve shadow quality
+        mainLight.shadow.mapSize.width = 2048;
+        mainLight.shadow.mapSize.height = 2048;
+        mainLight.shadow.camera.near = 0.5;
+        mainLight.shadow.camera.far = 500;
+        mainLight.shadow.camera.left = -100;
+        mainLight.shadow.camera.right = 100;
+        mainLight.shadow.camera.top = 100;
+        mainLight.shadow.camera.bottom = -100;
+        mainLight.shadow.bias = -0.001;
+        
+        scene.add(mainLight);
+
+        // Add fill lights for softer shadows
+        const fillLight1 = new THREE.PointLight(0xffffff, 0.4);
+        fillLight1.position.set(50, 40, 20);
+        scene.add(fillLight1);
+
+        const fillLight2 = new THREE.PointLight(0xffffff, 0.3);
+        fillLight2.position.set(-50, 40, 20);
+        scene.add(fillLight2);
+
+        // Add subtle bounce light
+        const bounceLight = new THREE.PointLight(0xffffff, 0.2);
+        bounceLight.position.set(0, -20, 0);
+        scene.add(bounceLight);
+
+        // Make sure renderer has shadow mapping enabled
+        if (rendererRef.current) {
+          rendererRef.current.shadowMap.enabled = true;
+          rendererRef.current.shadowMap.type = THREE.PCFSoftShadowMap;
+        }
+
+        console.log("Scene setup complete, objects added:", scene.children.length);
+
+        // Force a render when all textures are loaded
         if (rendererRef.current && stableRefs.scene && stableRefs.camera) {
           rendererRef.current.render(stableRefs.scene, stableRefs.camera);
         }
       });
-      
-      wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
-      wallTexture.repeat.set(4, 2);
 
-      // Back wall
-      const backWallGeometry = new THREE.PlaneGeometry(200, 100);
-      const wallMaterial = new THREE.MeshStandardMaterial({
-        map: wallTexture,
-        color: 0xcccccc,
-        roughness: 0.9,
-        metalness: 0.1,
-      });
-      
-      const backWall = new THREE.Mesh(backWallGeometry, wallMaterial);
-      backWall.position.set(0, 20, -60);
-      backWall.receiveShadow = true;
-      scene.add(backWall);
-
-      // Floor
-      const floorGeometry = new THREE.PlaneGeometry(200, 200);
-      const floorTexture = textureLoader.load(floorTextureUrl);
-      floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-      floorTexture.repeat.set(8, 8);
-      
-      const floorMaterial = new THREE.MeshStandardMaterial({
-        map: floorTexture,
-        roughness: 0.8,
-        metalness: 0.1,
-      });
-      
-      const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-      floor.rotation.x = -Math.PI / 2;
-      floor.position.y = -30;
-      floor.receiveShadow = true;
-      scene.add(floor);
-
-      // Enhanced lighting setup
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-      scene.add(ambientLight);
-
-      // Main directional light
-      const mainLight = new THREE.DirectionalLight(0xffffff, 1.0);
-      mainLight.position.set(-30, 50, 30);
-      mainLight.castShadow = true;
-
-      // Improve shadow quality
-      mainLight.shadow.mapSize.width = 2048;
-      mainLight.shadow.mapSize.height = 2048;
-      mainLight.shadow.camera.near = 0.5;
-      mainLight.shadow.camera.far = 500;
-      mainLight.shadow.camera.left = -100;
-      mainLight.shadow.camera.right = 100;
-      mainLight.shadow.camera.top = 100;
-      mainLight.shadow.camera.bottom = -100;
-      mainLight.shadow.bias = -0.001;
-      
-      scene.add(mainLight);
-
-      // Add fill lights for softer shadows
-      const fillLight1 = new THREE.PointLight(0xffffff, 0.4);
-      fillLight1.position.set(50, 40, 20);
-      scene.add(fillLight1);
-
-      const fillLight2 = new THREE.PointLight(0xffffff, 0.3);
-      fillLight2.position.set(-50, 40, 20);
-      scene.add(fillLight2);
-
-      // Add subtle bounce light
-      const bounceLight = new THREE.PointLight(0xffffff, 0.2);
-      bounceLight.position.set(0, -20, 0);
-      scene.add(bounceLight);
-
-      const table = createTable();
-      scene.add(table);
-
-      // Make sure renderer has shadow mapping enabled
-      if (rendererRef.current) {
-        rendererRef.current.shadowMap.enabled = true;
-        rendererRef.current.shadowMap.type = THREE.PCFSoftShadowMap;
-      }
-
-      console.log("Scene setup complete, objects added:", scene.children.length);
       return scene;
     }, [createTable]);
 
@@ -448,6 +462,17 @@ const GameBoard = React.memo(
       }
     }, [gameState?.productionChoiceState]);
 
+    useEffect(() => {
+      if (gameState?.endGameTriggered) {
+        setShowEndgameRanking(true);
+      }
+    }, [gameState?.endGameTriggered]);
+
+    const handlePlayAgain = () => {
+      setShowEndgameRanking(false);
+      onPlayAgain(); // This should be passed down from Main.tsx
+    };
+
     return (
       <div className="relative w-full h-full">
         <canvas 
@@ -457,25 +482,25 @@ const GameBoard = React.memo(
         />
         {/* Age Display */}
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-gray-800/90 px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm border border-gray-600">
-            <h2 className="text-2xl font-bold text-white text-center">
+          <div className="bg-[#E8E4D0]/90 px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm border border-[#1A1A1A]/20">
+            <h2 className="text-2xl font-bold text-[#1A1A1A] text-center">
               {gameState?.age === 4 ? "Game Over" : `Age ${gameState?.age}`}
             </h2>
             {gameState?.waitingForSeventhCard && (
-              <div className="mt-2 text-center text-yellow-300">
+              <div className="mt-2 text-center text-[#E85A3C]">
                 Take final card action
               </div>
             )}
-            {gameState?.finalState && (
+            {/* {gameState?.finalState && (
               <div className="mt-4 flex justify-center">
                 <button
                   onClick={() => setShowEndgameRanking(true)}
-                  className="px-6 py-3 bg-gray-700/50 border border-gray-400 text-white rounded-lg hover:bg-black/90 transition-colors animate-fadeIn"
+                  className="px-6 py-3 bg-[#3A6B96] text-white rounded-lg hover:bg-[#4682B4] transition-colors shadow-sm border border-[#1A1A1A]/10"
                 >
                   Continue to Rankings
                 </button>
               </div>
-            )}
+            )} */}
           </div>
         </div>
 
@@ -486,13 +511,13 @@ const GameBoard = React.memo(
               wonder ? (
                 <div
                   key={wonder.name}
-                  className="bg-gray-700/50 p-3 rounded-lg shadow-lg backdrop-blur-sm border border-gray-700 flex flex-col"
+                  className="bg-[#E8E4D0]/90 p-3 rounded-lg shadow-lg backdrop-blur-sm border border-[#1A1A1A]/20 flex flex-col"
                 >
                   <div
-                    className="p-2 cursor-pointer hover:bg-black/90 transition-colors flex flex-col items-center flex-grow"
+                    className="p-2 cursor-pointer hover:bg-[#3A6B96]/10 transition-colors flex flex-col items-center flex-grow"
                     onClick={() => setSelectedWonder(wonder)}
                   >
-                    <div className="font-medium text-md text-white">
+                    <div className="font-medium text-md text-[#1A1A1A]">
                       {assignedWonders.findIndex(
                         (w) => w.name === wonder.name
                       ) === 0
@@ -503,7 +528,7 @@ const GameBoard = React.memo(
                             ) + 1
                           }`}
                     </div>
-                    <div className="text-md text-white/80 justify-center">
+                    <div className="text-md text-[#444444] justify-center">
                       {wonder.name}
                     </div>
                   </div>
@@ -511,7 +536,7 @@ const GameBoard = React.memo(
                     (w) => w.name === wonder.name
                   )].playerBoard.size > 0 && (
                     <button
-                      className="w-full mt-auto text-sm text-white bg-white/10 hover:bg-white/20 transition-colors border-t border-gray-700/50 p-1.5 text-center"
+                      className="w-full mt-auto text-sm text-[#1A1A1A] bg-[#3A6B96]/10 hover:bg-[#3A6B96]/20 transition-colors border-t border-[#1A1A1A]/20 p-1.5 text-center"
                       onClick={() => setSelectedPlayerBoardIndex(assignedWonders.findIndex(
                         (w) => w.name === wonder.name
                       ))}
@@ -532,18 +557,18 @@ const GameBoard = React.memo(
             onClick={() => setSelectedWonder(null)}
           >
             <div
-              className="bg-gray-900 p-6 rounded-lg border border-white/10 shadow-2xl"
+              className="bg-[#E8E4D0] p-6 rounded-lg border border-[#5F9EA0]/30 shadow-2xl"
               style={{
                 width: "750px",
                 boxShadow:
-                  "0 0 40px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.1)",
+                  "0 0 40px rgba(0, 0, 0, 0.5), 0 0 15px rgba(95, 158, 160, 0.2)",
               }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-xl text-white font-bold">
+                  <h2 className="text-xl text-[#1A1A1A] font-bold">
                     {assignedWonders.findIndex(
                       (w) => w.name === selectedWonder.name
                     ) === 0
@@ -554,7 +579,7 @@ const GameBoard = React.memo(
                           ) + 1
                         }`}
                   </h2>
-                  <h3 className="text-lg text-white/80">
+                  <h3 className="text-lg text-[#444444]">
                     {assignedWonders.findIndex(
                       (w) => w.name === selectedWonder.name
                     ) === 0
@@ -567,10 +592,10 @@ const GameBoard = React.memo(
                   (w) => w.name === selectedWonder.name
                 ) !== 0 && (
                   <button
-                    className={`rounded-xl p-4 text-white text-md bg-white/10 hover:bg-white/20 transition-colors border border-gray-700/50 shadow-lg ${
+                    className={`rounded-xl p-4 text-white text-md transition-colors border border-[#5F9EA0]/50 shadow-lg ${
                       gameState?.finalState
-                        ? "bg-gray-600 cursor-not-allowed"
-                        : "bg-white/10 hover:bg-white/20"
+                        ? "bg-[#5F9EA0]/50 cursor-not-allowed"
+                        : "bg-[#5F9EA0] hover:bg-[#4f8789]"
                     }`}
                     onClick={() => setIsTradeModalOpen(true)}
                     disabled={gameState?.finalState}
@@ -581,32 +606,29 @@ const GameBoard = React.memo(
 
                 <button
                   onClick={() => setSelectedWonder(null)}
-                  className="rounded-full p-2 bg-white/10 hover:bg-white/20 transition-colors"
+                  className="rounded-full p-2 bg-[#5F9EA0]/10 hover:bg-[#5F9EA0]/20 transition-colors"
                 >
-                  <span className="text-white/80 text-xl">×</span>
+                  <span className="text-[#1A1A1A] text-xl">×</span>
                 </button>
               </div>
 
               {/* Wonder Image */}
-              <div className="relative rounded-lg overflow-hidden mb-6">
+              <div className="relative rounded-lg overflow-hidden mb-6 shadow-lg border border-[#5F9EA0]/20">
                 <img
                   src={selectedWonder.imagePath}
                   alt={selectedWonder.name}
-                  className="rounded shadow-2xl"
+                  className="w-full h-auto"
                   style={{
-                    width: "auto",
-                    height: "auto",
-                    objectFit: "cover",
-                    filter: "drop-shadow(0 0 10px rgba(0, 0, 0, 0.5))",
+                    filter: "drop-shadow(0 0 10px rgba(95, 158, 160, 0.2))",
                   }}
                 />
               </div>
 
               {gameState && (
-                <div className="grid grid-cols-2 gap-4 text-white/80 text-sm">
-                  {/* Permanent Resources Panel */}
-                  <div className="bg-gray-700/50 p-4 rounded-lg shadow-lg backdrop-blur-sm">
-                    <h3 className="font-bold mb-2 text-md">Resources</h3>
+                <div className="grid grid-cols-2 gap-4 text-[#444444] text-sm">
+                  {/* Resource Panels */}
+                  <div className="bg-[#5F9EA0]/10 p-4 rounded-lg shadow-lg backdrop-blur-sm border border-[#5F9EA0]/20">
+                    <h3 className="font-bold mb-2 text-md text-[#1A1A1A]">Resources</h3>
                     <div className="grid grid-cols-2 gap-2">
                       {Object.entries(
                         gameState.players[
@@ -618,8 +640,8 @@ const GameBoard = React.memo(
                         .filter(([type]) => type !== "choice")
                         .map(([type, count]) => (
                           <div key={type} className="flex items-center">
-                            <span className="text-white/80 mr-2">{type}:</span>
-                            <span className="font-bold text-white">
+                            <span className="text-[#444444] mr-2">{type}:</span>
+                            <span className="font-bold text-[#B8860B] text-md">
                               {count}
                             </span>
                           </div>
@@ -627,11 +649,8 @@ const GameBoard = React.memo(
                     </div>
                   </div>
 
-                  {/* Temporary Resources Panel */}
-                  <div className="bg-gray-700/50 p-4 rounded-lg shadow-lg backdrop-blur-sm">
-                    <h3 className="font-bold mb-2 text-md">
-                      Temporary Resources
-                    </h3>
+                  <div className="bg-[#5F9EA0]/10 p-4 rounded-lg shadow-lg backdrop-blur-sm border border-[#5F9EA0]/20">
+                    <h3 className="font-bold mb-2 text-md text-[#1A1A1A]">Temporary Resources</h3>
                     <div className="grid grid-cols-2 gap-2">
                       {Object.entries(
                         gameState.players[
@@ -641,27 +660,24 @@ const GameBoard = React.memo(
                         ].tempResources
                       ).map(([type, count]) => (
                         <div key={type} className="flex items-center">
-                          <span className="text-white/80 mr-2">{type}:</span>
-                          <span className="font-bold text-white">{count}</span>
+                          <span className="text-[#444444] mr-2">{type}:</span>
+                          <span className="font-bold text-[#B8860B] text-md">
+                            {count}
+                          </span>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Wonder Stages */}
-                  <div className="bg-gray-700/50 p-4 rounded-lg shadow-lg backdrop-blur-sm">
-                    <h3 className="font-bold mb-2 text-md">Wonder Stages</h3>
+                  <div className="bg-[#5F9EA0]/10 p-4 rounded-lg shadow-lg backdrop-blur-sm border border-[#5F9EA0]/20">
+                    <h3 className="font-bold mb-2 text-md text-[#1A1A1A]">Wonder Stages</h3>
                     <div className="space-y-2">
                       {selectedWonder.wonderStages.map((stage, index) => (
                         <div key={index} className="flex items-center">
-                          <span className="text-white/80">
-                            Stage {index + 1}:{" "}
-                          </span>
-                          <span
-                            className={`ml-2 font-bold text-md ${
-                              stage.isBuilt ? "text-green-400" : "text-red-400"
-                            }`}
-                          >
+                          <span className="text-[#444444]">Stage {index + 1}: </span>
+                          <span className={`ml-2 font-bold text-md ${
+                            stage.isBuilt ? "text-[#3A6B96]" : "text-[#E85A3C]"
+                          }`}>
                             {stage.isBuilt ? "Built" : "Not Built"}
                           </span>
                         </div>
@@ -669,48 +685,37 @@ const GameBoard = React.memo(
                     </div>
                   </div>
 
-                  {/* Player Stats */}
-                  <div className="bg-gray-700/50 p-4 rounded-lg shadow-lg backdrop-blur-sm">
-                    <h3 className="font-bold mb-2 text-md">Other Resources</h3>
+                  <div className="bg-[#5F9EA0]/10 p-4 rounded-lg shadow-lg backdrop-blur-sm border border-[#5F9EA0]/20">
+                    <h3 className="font-bold mb-2 text-md text-[#1A1A1A]">Other Resources</h3>
                     <div className="space-y-2">
                       <div className="flex items-center">
-                        <span className="text-white/80 mr-2">Gold:</span>
-                        <span className="font-bold text-yellow-400 text-md">
-                          {
-                            gameState.players[
-                              assignedWonders.findIndex(
-                                (w) => w.name === selectedWonder.name
-                              )
-                            ].gold
-                          }
+                        <span className="text-[#444444] mr-2">Gold:</span>
+                        <span className="font-bold text-[#B8860B] text-md">
+                          {gameState.players[
+                            assignedWonders.findIndex(
+                              (w) => w.name === selectedWonder.name
+                            )
+                          ].gold}
                         </span>
                       </div>
                       <div className="flex items-center">
-                        <span className="text-white/80 mr-2">
-                          Victory Points:
-                        </span>
-                        <span className="font-bold text-blue-400 text-md">
-                          {
-                            gameState.players[
-                              assignedWonders.findIndex(
-                                (w) => w.name === selectedWonder.name
-                              )
-                            ].victoryPoints
-                          }
+                        <span className="text-[#444444] mr-2">Victory Points:</span>
+                        <span className="font-bold text-[#3A6B96] text-md">
+                          {gameState.players[
+                            assignedWonders.findIndex(
+                              (w) => w.name === selectedWonder.name
+                            )
+                          ].victoryPoints}
                         </span>
                       </div>
                       <div className="flex items-center">
-                        <span className="text-white/80 mr-2">
-                          Military Shields:
-                        </span>
-                        <span className="font-bold text-red-400 text-md">
-                          {
-                            gameState.players[
-                              assignedWonders.findIndex(
-                                (w) => w.name === selectedWonder.name
-                              )
-                            ].shields
-                          }
+                        <span className="text-[#444444] mr-2">Military Shields:</span>
+                        <span className="font-bold text-[#E85A3C] text-md">
+                          {gameState.players[
+                            assignedWonders.findIndex(
+                              (w) => w.name === selectedWonder.name
+                            )
+                          ].shields}
                         </span>
                       </div>
                     </div>
@@ -723,12 +728,12 @@ const GameBoard = React.memo(
 
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-white">Loading game board...</p>
+            <p className="text-[#1A1A1A]">Loading game board...</p>
           </div>
         )}
 
         {/* Game Log */}
-        <div className="fixed bottom-4 right-4 w-48 bg-black/80 text-white font-bold text-sm rounded-lg shadow-2xl border border-gray-400">
+        <div className="fixed bottom-4 right-4 w-48 bg-[#E8E4D0]/90 text-[#1A1A1A] font-bold text-sm rounded-lg shadow-lg border border-[#1A1A1A]/20">
           <div
             className="flex items-center justify-between p-4 cursor-pointer"
             onClick={() => setIsGameLogOpen(!isGameLogOpen)}
@@ -752,7 +757,7 @@ const GameBoard = React.memo(
               }}
             >
               {displayedGameLog.map((log, index) => (
-                <div key={index} className="opacity-80">
+                <div key={index} className="text-[#444444]">
                   {log}
                 </div>
               ))}
@@ -762,14 +767,14 @@ const GameBoard = React.memo(
 
         {(!gameState?.finalState || gameState?.productionChoiceState?.choices[0]?.sourceType === 'science') && hasProductionChoiceCard ? (
           <button
-            className="bg-gray-700/50 border border-gray-400 fixed bottom-4 left-8 text-white px-4 py-2 rounded hover:bg-black/90 transition-colors"
+            className="bg-[#3A6B96] border border-[#1A1A1A]/20 fixed bottom-4 left-8 text-white px-4 py-2 rounded hover:bg-[#4682B4] transition-colors shadow-sm"
             onClick={openProductionChoiceModal}
           >
             Choose Production
           </button>
         ) : (
           <button
-            className="bg-gray-500/50 border border-gray-400 fixed bottom-4 left-8 text-white px-4 py-2 rounded cursor-not-allowed"
+            className="bg-[#3A6B96]/50 border border-[#1A1A1A]/20 fixed bottom-4 left-8 text-white px-4 py-2 rounded cursor-not-allowed shadow-sm"
             disabled
           >
             Choose Production
@@ -831,7 +836,7 @@ const GameBoard = React.memo(
 
         {/* Discard Pile Button */}
         <button
-          className="fixed bg-gray-700/50 border border-gray-400 text-white px-4 py-2 rounded hover:bg-black/90 transition-colors top-4 right-4"
+          className="fixed bg-[#3A6B96] border border-[#1A1A1A]/20 text-white px-4 py-2 rounded hover:bg-[#4682B4] transition-colors top-4 right-4"
           onClick={() => setIsDiscardPileOpen(true)}
         >
           Discard Pile {discardPile.length > 0 && `(${discardPile.length})`}
@@ -878,10 +883,7 @@ const GameBoard = React.memo(
         {showEndgameRanking && (
           <EndgameRanking
             players={gameState?.players ?? []}
-            onPlayAgain={() => {
-              // Reset game state logic here
-              setShowEndgameRanking(false);
-            }}
+            onPlayAgain={handlePlayAgain}
           />
         )}
       </div>

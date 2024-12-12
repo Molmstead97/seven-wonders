@@ -27,6 +27,7 @@ export function ageEnd(players: Player[], gameState: GameState): GameState {
       science: { ...p.science },
     })),
     discardPile: [...gameState.discardPile],
+    endGameTriggered: gameState.age === 3
   };
 
   // Calculate military points based on age

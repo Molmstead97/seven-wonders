@@ -65,7 +65,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       }}
     >
       <div 
-        className="bg-gray-900 p-6 rounded-lg border border-white/10 shadow-2xl w-1/2"
+        className="bg-[#F5F5DC] p-6 rounded-lg border border-[#666666]/10 shadow-2xl w-1/2"
         style={{
           maxWidth: "90vw",
           maxHeight: "90vh",
@@ -74,14 +74,14 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl text-white font-bold">
+          <h2 className="text-xl text-[#333333] font-bold">
             {player.id === 0 ? "" : `Player ${player.id + 1}`}
           </h2>
           <button
             onClick={onClose}
-            className="rounded-full p-2 bg-white/10 hover:bg-white/20 transition-colors"
+            className="rounded-full p-2 bg-[#666666]/20 hover:bg-[#666666]/30 transition-colors"
           >
-            <span className="text-white/80 text-xl">×</span>
+            <span className="text-[#333333]/80 text-xl">×</span>
           </button>
         </div>
 
@@ -89,8 +89,8 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         <div className="overflow-auto max-h-[calc(90vh-100px)]">
           <div className="space-y-6">
             {nonEmptyColors.map(color => (
-              <div key={color} className="relative bg-white/5 rounded-lg p-4">
-                <div className="text-white/60 text-sm mb-3 font-semibold">{color}</div>
+              <div key={color} className="relative bg-[#666666]/10 rounded-lg p-4">
+                <div className="text-[#333333] text-sm mb-3 font-bold">{color}</div>
                 <div className="relative h-44">
                   {cardsByColor[color]?.map((card, index) => (
                     <div

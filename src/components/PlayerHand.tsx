@@ -27,6 +27,9 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
     return null;
   }
 
+  const CARD_WIDTH = 128;  // 32 * 4 (tailwind w-32)
+  const CARD_HEIGHT = 192; // 48 * 4 (tailwind h-48)
+
   const [prevCards, setPrevCards] = useState(cards);
   const [isDealing, setIsDealing] = useState(false);
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
@@ -151,7 +154,13 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
               }}
               onClick={() => handleCardClick(card, index)}
             >
-              <div className="relative w-32 h-48 rounded-lg overflow-hidden hover:z-10">
+              <div 
+                className="relative rounded-lg overflow-hidden hover:z-10"
+                style={{
+                  width: `${CARD_WIDTH}px`,
+                  height: `${CARD_HEIGHT}px`
+                }}
+              >
                 <img 
                   src={card.imagePath}
                   alt={card.name}

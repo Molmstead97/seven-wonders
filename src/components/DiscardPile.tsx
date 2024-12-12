@@ -66,7 +66,7 @@ export const DiscardPile: React.FC<DiscardPileProps> = ({
   return (
     <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${isCardFromDiscardEffect ? 'animate-fadeIn' : ''}`}>
       <div 
-        className="bg-gray-900 p-6 rounded-lg border border-white/10 shadow-2xl"
+        className="bg-[#F5F5DC] p-6 rounded-lg border border-[#666666]/10 shadow-2xl"
         style={{
           width: `${modalWidth}px`,
           maxWidth: "90vw",
@@ -78,16 +78,16 @@ export const DiscardPile: React.FC<DiscardPileProps> = ({
         <div className="flex items-center justify-end mb-4">
           <button
             onClick={onClose}
-            className="rounded-full p-2 bg-white/10 hover:bg-white/20 transition-colors"
+            className="rounded-full p-2 bg-[#666666]/10 hover:bg-[#666666]/20 transition-colors"
           >
-            <span className="text-white/80 text-xl">×</span>
+            <span className="text-[#333333]/80 text-xl">×</span>
           </button>
         </div>
 
         {/* Cards Grid */}
         <div className="overflow-auto max-h-[calc(90vh-100px)]">
           {discardedCards.length > 0 ? (
-            <div className="relative h-48 bg-white/5 rounded-lg p-4">
+            <div className="relative h-48 bg-[#666666]/5 rounded-lg p-4">
               {discardedCards.map((card, index) => (
                 <div
                   key={`${card.name}-${index}`}
@@ -109,7 +109,7 @@ export const DiscardPile: React.FC<DiscardPileProps> = ({
               ))}
             </div>
           ) : (
-            <div className="text-white/60 text-center py-8">
+            <div className="text-[#333333]/60 text-center py-8">
               No cards have been discarded yet
             </div>
           )}
@@ -132,21 +132,21 @@ export const DiscardPile: React.FC<DiscardPileProps> = ({
       {/* Confirmation Modal */}
       {showConfirmation && selectedCardForConfirmation && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-black p-6 rounded-lg max-w-sm mx-4">
-            <h3 className="text-xl text-white font-bold mb-4">Confirm Selection</h3>
-            <p className="mb-6 text-white/80">
+          <div className="bg-[#F5F5DC] p-6 rounded-lg max-w-sm mx-4">
+            <h3 className="text-xl text-[#333333] font-bold mb-4">Confirm Selection</h3>
+            <p className="mb-6 text-[#333333]/80">
               Are you sure you want to add {selectedCardForConfirmation.card.name} to your city?
             </p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setShowConfirmation(false)}
-                className="px-4 py-2 text-white hover:text-red-500"
+                className="px-4 py-2 text-[#FF6347] hover:text-[#FF6347]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirm}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                className="px-4 py-2 bg-[#4682B4] text-white rounded hover:bg-[#5F9EA0]"
               >
                 Confirm
               </button>
