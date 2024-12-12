@@ -86,16 +86,30 @@ const GameBoard = React.memo(
     // Three.js setup functions
     const createTable = useCallback(() => {
       const tableGroup = new THREE.Group();
-    
+      
+      // Configure wood texture for reuse
+      const woodTexture = textureLoader.load(woodTextureUrl);
+      const woodNormal = textureLoader.load(woodNormalUrl);
+      
+      // Configure texture settings
+      woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
+      woodTexture.repeat.set(2, 2);
+      woodNormal.wrapS = woodNormal.wrapT = THREE.RepeatWrapping;
+      woodNormal.repeat.set(2, 2);
+
+      // Create reusable material for both table top and legs
+      const woodMaterial = new THREE.MeshStandardMaterial({
+        map: woodTexture,
+        normalMap: woodNormal,
+        roughness: 0.7,
+        metalness: 0.1,
+        color: 0xffffff,  // Natural wood color
+        aoMapIntensity: 1.0,
+      });
+
       // Table top
       const tableTopGeometry = new THREE.BoxGeometry(80, 2, 80);
-      const tableTopMaterial = new THREE.MeshStandardMaterial({
-        map: textureLoader.load(woodTextureUrl),
-        normalMap: textureLoader.load(woodNormalUrl),
-        roughness: 0.6,
-        metalness: 0.1,
-      });
-      const tableTop = new THREE.Mesh(tableTopGeometry, tableTopMaterial);
+      const tableTop = new THREE.Mesh(tableTopGeometry, woodMaterial);
       tableTop.position.set(0, 0, 0);
       tableTop.castShadow = true;
       tableTop.receiveShadow = true;
@@ -103,7 +117,6 @@ const GameBoard = React.memo(
 
       // Table legs
       const legGeometry = new THREE.CylinderGeometry(2.5, 2.5, 30, 16);
-      const legMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
       const legPositions = [
         { x: -35, z: -35 },
         { x: -35, z: 35 },
@@ -112,7 +125,7 @@ const GameBoard = React.memo(
       ];
 
       legPositions.forEach((pos) => {
-        const leg = new THREE.Mesh(legGeometry, legMaterial);
+        const leg = new THREE.Mesh(legGeometry, woodMaterial);
         leg.position.set(pos.x, -15, pos.z);
         leg.castShadow = true;
         leg.receiveShadow = true;
@@ -147,13 +160,14 @@ const GameBoard = React.memo(
       const backWallGeometry = new THREE.PlaneGeometry(200, 100);
       const wallMaterial = new THREE.MeshStandardMaterial({
         map: wallTexture,
-        color: 0xcccccc,  // Slight tint to make it more realistic
+        color: 0xcccccc,
         roughness: 0.9,
         metalness: 0.1,
       });
       
       const backWall = new THREE.Mesh(backWallGeometry, wallMaterial);
       backWall.position.set(0, 20, -60);
+      backWall.receiveShadow = true;
       scene.add(backWall);
 
       // Floor
@@ -171,28 +185,53 @@ const GameBoard = React.memo(
       const floor = new THREE.Mesh(floorGeometry, floorMaterial);
       floor.rotation.x = -Math.PI / 2;
       floor.position.y = -30;
+      floor.receiveShadow = true;
       scene.add(floor);
 
-      // Enhanced lighting for room
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+      // Enhanced lighting setup
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
       scene.add(ambientLight);
 
-      const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      mainLight.position.set(10, 10, 10);
+      // Main directional light
+      const mainLight = new THREE.DirectionalLight(0xffffff, 1.0);
+      mainLight.position.set(-30, 50, 30);
       mainLight.castShadow = true;
+
+      // Improve shadow quality
+      mainLight.shadow.mapSize.width = 2048;
+      mainLight.shadow.mapSize.height = 2048;
+      mainLight.shadow.camera.near = 0.5;
+      mainLight.shadow.camera.far = 500;
+      mainLight.shadow.camera.left = -100;
+      mainLight.shadow.camera.right = 100;
+      mainLight.shadow.camera.top = 100;
+      mainLight.shadow.camera.bottom = -100;
+      mainLight.shadow.bias = -0.001;
+      
       scene.add(mainLight);
 
-      // Add some accent lights
-      const accentLight1 = new THREE.PointLight(0xffffff, 0.3);
-      accentLight1.position.set(-30, 30, -20);
-      scene.add(accentLight1);
+      // Add fill lights for softer shadows
+      const fillLight1 = new THREE.PointLight(0xffffff, 0.4);
+      fillLight1.position.set(50, 40, 20);
+      scene.add(fillLight1);
 
-      const accentLight2 = new THREE.PointLight(0xffffff, 0.3);
-      accentLight2.position.set(30, 30, -20);
-      scene.add(accentLight2);
+      const fillLight2 = new THREE.PointLight(0xffffff, 0.3);
+      fillLight2.position.set(-50, 40, 20);
+      scene.add(fillLight2);
+
+      // Add subtle bounce light
+      const bounceLight = new THREE.PointLight(0xffffff, 0.2);
+      bounceLight.position.set(0, -20, 0);
+      scene.add(bounceLight);
 
       const table = createTable();
       scene.add(table);
+
+      // Make sure renderer has shadow mapping enabled
+      if (rendererRef.current) {
+        rendererRef.current.shadowMap.enabled = true;
+        rendererRef.current.shadowMap.type = THREE.PCFSoftShadowMap;
+      }
 
       console.log("Scene setup complete, objects added:", scene.children.length);
       return scene;
