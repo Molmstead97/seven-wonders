@@ -8,10 +8,11 @@ import { checkResources } from "./resourceCheck";
 
 import { GameState } from "../gameState";
 
-import { SpecialEffect } from "../../data/types/wonderSpecialEffects";
+import { copyGuildFunction, playSeventhCardFunction, SpecialEffect } from "../../data/types/wonderSpecialEffects";
 import {
   cardFromDiscardFunction,
   freeBuildPerAgeFunction,
+  freeScienceFunction,
 } from "../../data/types/wonderSpecialEffects";
 
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
@@ -50,10 +51,15 @@ export function buildWonder(
   const nextStage = updatedPlayer.wonder.wonderStages[nextStageIndex];
   const hasProductionChoice = Boolean(nextStage.production && 'choice' in nextStage.production);
 
-  // Check resources on updatedPlayer instead of original player
-  if (!checkResources(updatedPlayer, null, nextStage)) {
+  // Pass the player's temporary resources to checkResources
+  if (!checkResources(updatedPlayer, null, nextStage, updatedPlayer.tempResources)) {
+    console.log("Wonder build failed - Insufficient resources:", {
+      required: nextStage.cost,
+      playerResources: updatedPlayer.resources,
+      playerTempResources: updatedPlayer.tempResources
+    });
     return { 
-      updatedPlayer: updatedPlayer,  // Return updatedPlayer instead of original
+      updatedPlayer: updatedPlayer,
       hasProductionChoice: false, 
       stageBuilt: null 
     };
@@ -105,9 +111,16 @@ function applySpecialEffect(
 ): Player {
   switch (effect.type) {
     case "cardFromDiscard":
-      return cardFromDiscardFunction(player, gameState);
+      return cardFromDiscardFunction(player);
     case "freeBuildPerAge":
-      return freeBuildPerAgeFunction(player, gameState, card);
+      return freeBuildPerAgeFunction(player);
+    case "freeScience":
+      freeScienceFunction(player, 'wonder');
+      return player;
+    case "playSeventhCard":
+      return playSeventhCardFunction(player);
+    case "copyGuild":
+      return copyGuildFunction(player);
     default:
       return player;
   }

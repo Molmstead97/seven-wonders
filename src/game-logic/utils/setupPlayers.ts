@@ -14,15 +14,26 @@ export function setupPlayers(aiPlayerCount: number, selectedWonder?: Wonder): Pl
     throw new Error("Invalid number of AI players");
   }
 
+  // Get wonders for all players
+  const aiWonders = randomizeWonders(aiPlayerCount + 1, selectedWonder);
+
+  // Create final wonder array
   const setWonders = selectedWonder 
-    ? [selectedWonder, ...randomizeWonders(aiPlayerCount)] // Only pick AI wonders
-    : randomizeWonders(aiPlayerCount + 1); // Pick all wonders including user's
+    ? [selectedWonder, ...aiWonders]
+    : aiWonders;
+
+  // Debug log
+  console.log("Wonder assignments:", {
+    selectedWonder: selectedWonder?.name,
+    aiWonders: aiWonders.map(w => w.name),
+    finalArray: setWonders.map(w => w.name)
+  });
 
   // Create the user player
   const userPlayer: Player = {
     id: 0,
     name: "User",
-    wonder: setWonders[0],
+    wonder: selectedWonder || setWonders[0],
     playerBoard: new Set<Card>(),
     playerHand: [],
     resources: {
@@ -54,7 +65,16 @@ export function setupPlayers(aiPlayerCount: number, selectedWonder?: Wonder): Pl
     conflictLossTokens: 0,
     leftPlayer: null,
     rightPlayer: null,
-    freeBuildPerAge: {},
+    freeBuildPerAge: {
+      usedThisAge: false,
+      isEffectTriggered: false,
+    },
+    freeScience: {
+      fromWonder: false,
+      fromCard: false,
+    },
+    cardFromDiscard: false,
+    playSeventhCard: false,
   };
 
   userPlayer.resources = {
@@ -115,18 +135,28 @@ export function setupPlayers(aiPlayerCount: number, selectedWonder?: Wonder): Pl
       conflictLossTokens: 0, // Only used for Strategy Guild card
       leftPlayer: null, // Temporarily assign null
       rightPlayer: null, // Temporarily assign null
-      freeBuildPerAge: {}, // Only used if Player is playing Olympia A. // TODO: Might make sense to move this to the wonder struct. Or make this optional as well as other special effects.
+      freeBuildPerAge: {
+        usedThisAge: false,
+        isEffectTriggered: false,
+      },
+      freeScience: {
+        fromWonder: false,
+        fromCard: false,
+      },
+      cardFromDiscard: false,
+      playSeventhCard: false,
     };
 
-    // Apply initial production from the wonder
-    aiPlayer.resources = {
-      ...aiPlayer.resources,
-      ...aiPlayer.wonder.production,
-    };
+    // Apply initial production from the wonder if it exists
+    if (aiPlayer.wonder && aiPlayer.wonder.production) {
+      aiPlayer.resources = {
+        ...aiPlayer.resources,
+        ...aiPlayer.wonder.production,
+      };
+    }
 
-    // Log each AI player's wonder and initial resources
-    console.log(`AI Player ${i} personality: ${personalityType}`);
-    console.log(`AI Player ${i} Wonder: ${aiPlayer.wonder.name}`);
+    console.log(`AI Player ${i} Wonder:`, aiPlayer.wonder?.name);
+    console.log(`AI Player ${i} Initial Resources:`, aiPlayer.resources);
 
     players.push(aiPlayer);
   }
@@ -139,6 +169,18 @@ export function setupPlayers(aiPlayerCount: number, selectedWonder?: Wonder): Pl
 
     currentPlayer.leftPlayer = players[leftIndex];
     currentPlayer.rightPlayer = players[rightIndex];
+  }
+
+  // After creating setWonders
+  console.log("Setup Players - Wonder array:", setWonders.map(w => w.name));
+
+  // After setting up relationships
+  for (let i = 0; i < players.length; i++) {
+    console.log(`Player ${i} relationships:`, {
+      playerName: players[i].name,
+      leftNeighbor: players[i].leftPlayer?.name,
+      rightNeighbor: players[i].rightPlayer?.name
+    });
   }
 
   return players;

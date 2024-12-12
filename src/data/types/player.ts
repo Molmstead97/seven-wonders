@@ -21,5 +21,14 @@ export interface Player {
   conflictLossTokens: number;
   leftPlayer: Player | null;
   rightPlayer: Player | null;
-  freeBuildPerAge: Record<number, boolean>;
+  freeBuildPerAge: {
+    usedThisAge: boolean;
+    isEffectTriggered: boolean;
+  }
+  freeScience: {
+    fromWonder: boolean;
+    fromCard: boolean;
+  }
+  cardFromDiscard: boolean;
+  playSeventhCard: boolean;
 }

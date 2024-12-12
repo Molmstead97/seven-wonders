@@ -3,6 +3,8 @@ import { ResourceType } from '../data/types/resource';
 import { Wonder, WonderStage } from '../data/types/wonder';
 import { GameState } from '../game-logic/gameState';
 import { Player } from '../data/types/player';
+import { tradeResource } from '../game-logic/utils/tradeResource';
+
 interface TradeModalProps {
   onClose: () => void;
   onTrade: (resourceType: ResourceType, amount: number) => void;
@@ -45,9 +47,35 @@ const TradeModal: React.FC<TradeModalProps> = ({
 
   // Calculate gold cost whenever selected resources change
   useEffect(() => {
-    const totalCost = Object.values(selectedResources).reduce((sum, amount) => sum + (amount * 2), 0);
+    // Calculate total cost considering trade discounts
+    const totalCost = Object.entries(selectedResources).reduce((sum, [type, amount]) => {
+      if (amount === 0) return sum;
+      
+      // Create temporary player objects to simulate the trade
+      const tempPlayer = { 
+        ...gameState.players[0],
+        leftPlayer: gameState.players[gameState.players.length - 1],
+        rightPlayer: gameState.players[1]
+      };
+      const tempNeighbor = { 
+        ...gameState.players[tradingPlayerId],
+        leftPlayer: gameState.players[(tradingPlayerId - 1 + gameState.players.length) % gameState.players.length],
+        rightPlayer: gameState.players[(tradingPlayerId + 1) % gameState.players.length]
+      };
+      
+      // Get the trade cost directly
+      const { tradeCost } = tradeResource(
+        tempPlayer,
+        tempNeighbor,
+        type as ResourceType,
+        1  // Calculate for 1 resource to get per-resource cost
+      );
+      
+      return sum + (amount * tradeCost);
+    }, 0);
+
     setGoldCost(totalCost);
-  }, [selectedResources]);
+  }, [selectedResources, gameState.players, tradingPlayerId]);
 
   const handleResourceChange = (type: ResourceType, amount: number) => {
     const tradingPlayer = gameState.players[tradingPlayerId];

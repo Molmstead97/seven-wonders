@@ -7,12 +7,11 @@ import { analyzeTradingOptions } from "../game-logic/ai/scoring";
 import { tradeResource } from "./utils/tradeResource";
 import { setupPlayers } from "./utils/setupPlayers";
 import { dealCards } from "./utils/dealCards";
-import { ageEnd } from "./utils/ageEnd";
+import { DiscardPile } from "../components/DiscardPile";
 
 import { scoreActions, applyProductionChoices } from "./ai/scoring";
 
 import {
-  handleEndGame,
   handlePassHand,
   handleDiscardCard,
   handleCardPlay,
@@ -29,25 +28,34 @@ export interface GameState {
   gameLog: string[];
   isAutomated?: boolean;
   finalState?: boolean;
-  productionChoiceState: ProductionChoiceState
+  productionChoiceState: ProductionChoiceState;
+  showDiscardPile?: boolean;
+  waitingForSeventhCard?: boolean;
   // ... other game state properties
 }
 
-export function handleAITurn(player: Player, gameState: GameState): {
+export function handleAITurn(
+  player: Player,
+  gameState: GameState
+): {
   action: "play" | "wonder" | "discard";
   cardIndex: number;
 } {
   // First, check if we need any resources and can trade for them
   const availableResources = analyzeTradingOptions(player, gameState);
-  
+
   // Execute trades for available resources if they're affordable and available
   availableResources.forEach((tradingOption, resource) => {
-    if (player.gold >= Math.min(tradingOption.leftCost, tradingOption.rightCost) && 
-        tradingOption.availability !== "low") {
-      const tradingNeighbor = tradingOption.leftCost <= tradingOption.rightCost 
-        ? player.leftPlayer 
-        : player.rightPlayer;
-      
+    if (
+      player.gold >=
+        Math.min(tradingOption.leftCost, tradingOption.rightCost) &&
+      tradingOption.availability !== "low"
+    ) {
+      const tradingNeighbor =
+        tradingOption.leftCost <= tradingOption.rightCost
+          ? player.leftPlayer
+          : player.rightPlayer;
+
       tradeResource(player, tradingNeighbor!, resource as ResourceType, 1);
     }
   });
@@ -62,12 +70,16 @@ export function handleAITurn(player: Player, gameState: GameState): {
   // Score each card in hand
   player.playerHand.forEach((card, index) => {
     // Skip scoring if card already exists in player's board
-    if (Array.from(player.playerBoard).some(boardCard => boardCard.name === card.name)) {
+    if (
+      Array.from(player.playerBoard).some(
+        (boardCard) => boardCard.name === card.name
+      )
+    ) {
       return;
     }
 
     const scores = scoreActions(player, card, gameState);
-    
+
     // Find the highest scoring action for this card
     const bestActionForCard = scores.reduce((best, current) =>
       current.score > best.score ? current : best
@@ -89,6 +101,7 @@ export function initializeGame(
   aiPlayerCount: number,
   selectedWonder?: Wonder
 ): GameState {
+  console.log("initializeGame - Received wonder:", selectedWonder?.name);
   const players = setupPlayers(aiPlayerCount, selectedWonder);
   const dealtCards = dealCards(players.length, 1);
 
@@ -122,53 +135,61 @@ export function gameLoop(
   gameState: GameState,
   playerActionTaken: boolean
 ): GameState {
-
-  addToGameLog(gameState.gameLog, `=== TURN ${gameState.turns} ===`);  
-  // Add random resources until UI is added
-  gameState.players.forEach((player, index) => {
-    if (index > 0) { // Skip human player
-      applyProductionChoices(player, gameState);
-    }
-  });
-
-  // Reset temp resources for all players
-  gameState.players.forEach((player) => {
-    player.tempResources = {
-      Wood: 0,
-      Stone: 0,
-      Ore: 0,
-      Clay: 0,
-      Glass: 0,
-      Papyrus: 0,
-      Textile: 0,
-    };
-  });
-
-  if (!playerActionTaken) {
+  if (gameState.finalState) {
     return gameState;
   }
 
-  let updatedGameState = { ...gameState };
-  // Skip AI processing if this is an automated game
-  if (!gameState.isAutomated) {
-    // Process AI turns after player action
-    for (let i = 1; i < updatedGameState.players.length; i++) {
-      const aiPlayer = updatedGameState.players[i];
-      const aiAction = handleAITurn(aiPlayer, updatedGameState);
-      const cardName = aiPlayer.playerHand[aiAction.cardIndex].name; // Get name before action
+  // Create initial new state WITHOUT the turn log message
+  let newState = {
+    ...gameState,
+    players: gameState.players.map(player => ({
+      ...player,
+      tempResources: {
+        Wood: 0,
+        Stone: 0,
+        Ore: 0,
+        Clay: 0,
+        Glass: 0,
+        Papyrus: 0,
+        Textile: 0,
+      }
+    }))
+  };
+
+  // Apply production choices for AI players
+  newState = {
+    ...newState,
+    players: newState.players.map((player, index) => {
+      if (index > 0) {
+        return applyProductionChoices(player, newState);
+      }
+      return player;
+    })
+  };
+
+  if (!playerActionTaken) {
+    return newState;
+  }
+
+  // Process AI turns
+  if (!newState.isAutomated) {
+    for (let i = 1; i < newState.players.length; i++) {
+      const aiPlayer = newState.players[i];
+      const aiAction = handleAITurn(aiPlayer, newState);
+      const cardName = aiPlayer.playerHand[aiAction.cardIndex].name;
 
       // Execute AI action
       switch (aiAction.action) {
         case "play":
-          updatedGameState = handleCardPlay(updatedGameState, i, aiAction.cardIndex);
+          newState = handleCardPlay(newState, i, aiAction.cardIndex);
           console.log(`AI Player ${i} played: ${cardName}`);
           break;
         case "wonder":
-          updatedGameState = handleBuildWonder(updatedGameState, i, aiAction.cardIndex);
+          newState = handleBuildWonder(newState, i, aiAction.cardIndex);
           console.log(`AI Player ${i} built wonder stage using: ${cardName}`);
           break;
         case "discard":
-          updatedGameState = handleDiscardCard(updatedGameState, i, aiAction.cardIndex);
+          newState = handleDiscardCard(newState, i, aiAction.cardIndex);
           console.log(`AI Player ${i} discarded: ${cardName}`);
           break;
       }
@@ -176,18 +197,24 @@ export function gameLoop(
   }
 
   // Update turn counter
-  updatedGameState = {
-    ...updatedGameState,
-    turns: updatedGameState.turns + 1,
+  newState = {
+    ...newState,
+    turns: newState.turns + 1,
   };
 
-  // Handle turn end
-  if (updatedGameState.turns < 6) {
-    console.log("=== PASSING HANDS ===");
-    updatedGameState = handlePassHand(updatedGameState);
-  } else {
-    updatedGameState = handleEndAge(updatedGameState);
-  }
+  // Add debug logging
+  console.log("Game Loop State:", {
+    age: newState.age,
+    turns: newState.turns,
+    finalState: newState.finalState,
+    playerCount: newState.players.length
+  });
 
-  return updatedGameState;
-} 
+  // Handle turn end
+  if (newState.turns < 6) {
+    console.log("=== PASSING HANDS ===");
+    return handlePassHand(newState);
+  } else {
+    return handleEndAge(newState);
+  }
+}

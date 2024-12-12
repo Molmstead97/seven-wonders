@@ -11,12 +11,12 @@ export type Resource = {
   [K in ResourceType]?: number;
 };
 
-export type ProductionChoice = {
+export type ResourceChoice = {
   options: ResourceType[];
   amount: number;
 };
 
-export type Production = Resource | { choice: ProductionChoice[] };
+export type Production = Resource | { choice: ResourceChoice[] };
 
 export type ScienceType = "Cog" | "Compass" | "Tablet";
 

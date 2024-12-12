@@ -62,28 +62,39 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
       animationInProgressRef.current = true;
       setIsDealing(true);
 
-      // Kill any existing animations
-      gsap.killTweensOf(cardRefs.current);
+      // Wait for next frame to ensure refs are populated
+      requestAnimationFrame(() => {
+        // Check if we have valid refs before animating
+        if (cardRefs.current && cardRefs.current.length > 0 && cardRefs.current[0]) {
+          // Kill any existing animations
+          gsap.killTweensOf(cardRefs.current);
 
-      const tl = gsap.timeline({
-        onComplete: () => {
+          const tl = gsap.timeline({
+            onComplete: () => {
+              animationInProgressRef.current = false;
+              setIsDealing(false);
+              console.log("Animation complete");
+            }
+          });
+
+          tl.to(cardRefs.current, {
+            opacity: 0,
+            duration: 0.2,
+            stagger: 0.05,
+            onComplete: () => setPrevCards(cards)
+          })
+          .to(cardRefs.current, {
+            opacity: 1,
+            duration: 0.3,
+            stagger: 0.08,
+            delay: 0.1
+          });
+        } else {
+          // If refs aren't ready, just update the cards without animation
+          setPrevCards(cards);
           animationInProgressRef.current = false;
           setIsDealing(false);
-          console.log("Animation complete");
         }
-      });
-
-      tl.to(cardRefs.current, {
-        opacity: 0,
-        duration: 0.2,
-        stagger: 0.05,
-        onComplete: () => setPrevCards(cards)
-      })
-      .to(cardRefs.current, {
-        opacity: 1,
-        duration: 0.3,
-        stagger: 0.08,
-        delay: 0.1
       });
     }
   }, [cards, prevCards]);

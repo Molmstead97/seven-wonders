@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Wonder } from '../data/types/wonder';
-import { wonders } from '../data/wonders';
 
 interface WonderSelectorProps {
   onWonderSelected: (wonder: Wonder) => void;
@@ -21,6 +20,9 @@ const WonderCard: React.FC<WonderCardProps> = ({ wonder, pairWonder, onSelect })
   const currentWonder = isFlipped ? pairWonder : wonder;
 
   const handleConfirm = () => {
+    console.log("WonderCard - Selected Wonder (full object):", currentWonder);
+    console.log("WonderCard - Selected Wonder name:", currentWonder.name);
+    console.log("WonderCard - onSelect function:", typeof onSelect);
     onSelect(currentWonder);
     setShowConfirmation(false);
   };
@@ -128,15 +130,15 @@ const WonderCard: React.FC<WonderCardProps> = ({ wonder, pairWonder, onSelect })
       {/* Confirmation Modal */}
       {showConfirmation && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-sm mx-4">
-            <h3 className="text-xl font-bold mb-4">Confirm Selection</h3>
-            <p className="mb-6">
+          <div className="bg-black p-6 rounded-lg max-w-sm mx-4">
+            <h3 className="text-xl text-white font-bold mb-4">Confirm Selection</h3>
+            <p className="mb-6 text-white/80">
               Are you sure you want to play as {currentWonder.name}?
             </p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setShowConfirmation(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-white hover:text-red-500"
               >
                 Cancel
               </button>
@@ -164,6 +166,9 @@ const WonderSelector: React.FC<WonderSelectorProps> = ({ onWonderSelected, avail
     acc[baseName].push(wonder);
     return acc;
   }, {});
+
+  console.log("WonderSelector - Available wonders:", availableWonders);
+  console.log("WonderSelector - Wonder pairs:", wonderPairs);
 
   return (
     <div className="min-h-screen bg-gray-900 p-8">

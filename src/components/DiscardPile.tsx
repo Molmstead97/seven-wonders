@@ -11,15 +11,18 @@ interface DiscardPileProps {
   gameState: GameState;
   onClose: () => void;
   onCardClick: (card: Card, position: CardPosition) => void;
+  isCardFromDiscardEffect?: boolean;
 }
-
 export const DiscardPile: React.FC<DiscardPileProps> = ({
   gameState,
   onClose,
   onCardClick,
+  isCardFromDiscardEffect = false,
 }) => {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [selectedCardPosition, setSelectedCardPosition] = useState<CardPosition | null>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [selectedCardForConfirmation, setSelectedCardForConfirmation] = useState<{card: Card, position: CardPosition} | null>(null);
 
   const discardedCards = gameState.discardPile || [];
 
@@ -43,16 +46,25 @@ export const DiscardPile: React.FC<DiscardPileProps> = ({
     
     setSelectedCardPosition(position);
     setSelectedCard(card);
-    onCardClick(card, position);
+
+    if (isCardFromDiscardEffect) {
+      setSelectedCardForConfirmation({card, position});
+      setShowConfirmation(true);
+    } else {
+      onCardClick(card, position);
+    }
+  };
+
+  const handleConfirm = () => {
+    if (selectedCardForConfirmation) {
+      onCardClick(selectedCardForConfirmation.card, selectedCardForConfirmation.position);
+      setShowConfirmation(false);
+      onClose();
+    }
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
+    <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${isCardFromDiscardEffect ? 'animate-fadeIn' : ''}`}>
       <div 
         className="bg-gray-900 p-6 rounded-lg border border-white/10 shadow-2xl"
         style={{
@@ -115,6 +127,32 @@ export const DiscardPile: React.FC<DiscardPileProps> = ({
           }}
           showActions={false}
         />
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirmation && selectedCardForConfirmation && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-black p-6 rounded-lg max-w-sm mx-4">
+            <h3 className="text-xl text-white font-bold mb-4">Confirm Selection</h3>
+            <p className="mb-6 text-white/80">
+              Are you sure you want to add {selectedCardForConfirmation.card.name} to your city?
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setShowConfirmation(false)}
+                className="px-4 py-2 text-white hover:text-red-500"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

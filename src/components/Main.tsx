@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import * as THREE from "three";
+import { useState, useEffect, useRef } from "react";
 
 import { gameLoop, initializeGame, GameState } from "../game-logic/gameState";
 import PlayerHand from "./PlayerHand";
@@ -167,34 +166,18 @@ const Main = () => {
 
   switch (gamePhase) {
     case "playing":
-      if (gameState?.age === 4) {
-        return (
-          <GameBoard
-            playerCount={gameState.players.length}
-            assignedWonders={gameState.players.map((player) => player.wonder)}
-            discardPile={gameState.discardPile}
-            gameState={gameState}
-            gameLog={gameState.gameLog}
-            setGameState={setGameState}
-          />
-        );
-      }
-
-      console.log(
-        "Game phase is 'playing', isChoosingWonder:",
-        isChoosingWonder
-      ); // Debug log
-
       if (isChoosingWonder) {
         return (
           <div className="min-h-screen bg-gray-900">
             <WonderSelector
               onWonderSelected={(selectedWonder) => {
+                console.log("Main - Received selected wonder:", selectedWonder);
                 try {
                   const initializedGame = initializeGame(
                     aiPlayerCount,
                     selectedWonder
                   );
+                  console.log("Main - Game initialized with wonder:", selectedWonder?.name);
                   setGameState(initializedGame);
                   setGamePhase("playing");
                   setIsChoosingWonder(false);
@@ -216,15 +199,13 @@ const Main = () => {
         <div className="w-screen h-screen overflow-hidden">
           <GameBoard
             playerCount={gameState?.players.length ?? 0}
-            assignedWonders={
-              gameState?.players.map((player) => player.wonder) || []
-            }
+            assignedWonders={gameState?.players.map((player) => player.wonder) || []}
             discardPile={gameState?.discardPile || []}
             gameState={gameState}
             gameLog={gameState?.gameLog || []}
             setGameState={setGameState}
           />
-          {gameState && (
+          {gameState && gameState.age < 4 && (
             <PlayerHand
               cards={gameState.players[0].playerHand}
               currentWonder={gameState.players[0].wonder}

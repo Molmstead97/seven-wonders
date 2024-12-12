@@ -10,13 +10,18 @@ import { Wonder } from "../data/types/wonder";
 import { Card } from "../data/types/card";
 import { GameState } from "../game-logic/gameState";
 import TradeModal from "./TradeModal";
-import { ResourceType } from "../data/types/resource";
-import { handleTrade } from "../game-logic/gameActions";
+import { ResourceType, ScienceType } from "../data/types/resource";
+import { handleEndGame, handleTrade } from "../game-logic/gameActions";
 import ProductionChoiceModal from "./ProductionChoiceModal";
 import { ProductionChoiceState } from "../data/types/productionChoice";
 import { PlayerBoard } from "./PlayerBoard";
 import DiscardPile from "./DiscardPile";
 import EndgameRanking from "./EndgameRanking";
+
+import woodTextureUrl from '/assets/textures/wood_texture.jpg';
+import woodNormalUrl from '/assets/textures/wood_normal.jpg';
+import wallTextureUrl from '/assets/textures/wall_texture.jpg';
+import floorTextureUrl from '/assets/textures/floor_texture.jpg';
 
 interface GameBoardProps {
   playerCount: number;
@@ -36,6 +41,10 @@ const GameBoard = React.memo(
     gameLog,
     setGameState,
   }: GameBoardProps) => {
+    if (!gameState || !gameState.players) {
+      return <div>Loading game state...</div>;
+    }
+
     const [isLoading, setIsLoading] = useState(true);
     const [selectedWonder, setSelectedWonder] = useState<Wonder | null>(null);
     const [isGameLogOpen, setIsGameLogOpen] = useState(false);
@@ -58,6 +67,9 @@ const GameBoard = React.memo(
     const mountedRef = useRef(true);
     const initCompletedRef = useRef(false);
 
+    // Declare textureLoader at a higher scope
+    const textureLoader = new THREE.TextureLoader();
+
     const stableRefs = useMemo(
       () => ({
         scene: null as THREE.Scene | null,
@@ -74,11 +86,14 @@ const GameBoard = React.memo(
     // Three.js setup functions
     const createTable = useCallback(() => {
       const tableGroup = new THREE.Group();
-
+    
       // Table top
       const tableTopGeometry = new THREE.BoxGeometry(80, 2, 80);
       const tableTopMaterial = new THREE.MeshStandardMaterial({
-        color: 0x8b4513,
+        map: textureLoader.load(woodTextureUrl),
+        normalMap: textureLoader.load(woodNormalUrl),
+        roughness: 0.6,
+        metalness: 0.1,
       });
       const tableTop = new THREE.Mesh(tableTopGeometry, tableTopMaterial);
       tableTop.position.set(0, 0, 0);
@@ -108,40 +123,78 @@ const GameBoard = React.memo(
     }, []);
 
     const setupScene = useCallback(() => {
+      console.log("Starting scene setup...");
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x000000);
+      
+      // Set a background color so we can see if the scene is rendering at all
+      scene.background = new THREE.Color(0x2c2c2c);
+      console.log("Scene background set");
+      
+      // Load wall texture
+      console.log("Loading wall texture...");
+      const wallTexture = textureLoader.load(wallTextureUrl, () => {
+        console.log("Wall texture loaded successfully");
+        // Force a re-render when texture loads
+        if (rendererRef.current && stableRefs.scene && stableRefs.camera) {
+          rendererRef.current.render(stableRefs.scene, stableRefs.camera);
+        }
+      });
+      
+      wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
+      wallTexture.repeat.set(4, 2);
 
+      // Back wall
+      const backWallGeometry = new THREE.PlaneGeometry(200, 100);
+      const wallMaterial = new THREE.MeshStandardMaterial({
+        map: wallTexture,
+        color: 0xcccccc,  // Slight tint to make it more realistic
+        roughness: 0.9,
+        metalness: 0.1,
+      });
+      
+      const backWall = new THREE.Mesh(backWallGeometry, wallMaterial);
+      backWall.position.set(0, 20, -60);
+      scene.add(backWall);
+
+      // Floor
+      const floorGeometry = new THREE.PlaneGeometry(200, 200);
+      const floorTexture = textureLoader.load(floorTextureUrl);
+      floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+      floorTexture.repeat.set(8, 8);
+      
+      const floorMaterial = new THREE.MeshStandardMaterial({
+        map: floorTexture,
+        roughness: 0.8,
+        metalness: 0.1,
+      });
+      
+      const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+      floor.rotation.x = -Math.PI / 2;
+      floor.position.y = -30;
+      scene.add(floor);
+
+      // Enhanced lighting for room
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
       scene.add(ambientLight);
 
       const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
       mainLight.position.set(10, 10, 10);
       mainLight.castShadow = true;
-
-      mainLight.shadow.mapSize.width = 1024;
-      mainLight.shadow.mapSize.height = 1024;
-      mainLight.shadow.camera.near = 0.5;
-      mainLight.shadow.camera.far = 100;
-      mainLight.shadow.bias = -0.001;
-
-      const shadowSize = 50;
-      mainLight.shadow.camera.left = -shadowSize;
-      mainLight.shadow.camera.right = shadowSize;
-      mainLight.shadow.camera.top = shadowSize;
-      mainLight.shadow.camera.bottom = -shadowSize;
-
       scene.add(mainLight);
 
-      const hemisphereLight = new THREE.HemisphereLight(
-        0xffffff,
-        0x444444,
-        0.3
-      );
-      scene.add(hemisphereLight);
+      // Add some accent lights
+      const accentLight1 = new THREE.PointLight(0xffffff, 0.3);
+      accentLight1.position.set(-30, 30, -20);
+      scene.add(accentLight1);
+
+      const accentLight2 = new THREE.PointLight(0xffffff, 0.3);
+      accentLight2.position.set(30, 30, -20);
+      scene.add(accentLight2);
 
       const table = createTable();
       scene.add(table);
 
+      console.log("Scene setup complete, objects added:", scene.children.length);
       return scene;
     }, [createTable]);
 
@@ -149,19 +202,38 @@ const GameBoard = React.memo(
     useEffect(() => {
       if (!canvasRef.current || initCompletedRef.current) return;
 
+      console.log("Initializing Three.js...");
       const renderer = new THREE.WebGLRenderer({
         canvas: canvasRef.current,
         antialias: true,
       });
+      console.log("Renderer created");
+      
       renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
       rendererRef.current = renderer;
 
       const scene = setupScene();
       stableRefs.scene = scene;
-      stableRefs.camera.position.set(0, 60, 80);
+      stableRefs.camera.position.set(0, 60, 120); // Moved camera back
       stableRefs.camera.lookAt(0, 0, 0);
 
+      console.log("Initial render...");
       renderer.render(scene, stableRefs.camera);
+      
+      // Add animation loop
+      const animate = () => {
+        if (!mountedRef.current) return;
+        
+        if (rendererRef.current && stableRefs.scene && stableRefs.camera) {
+          rendererRef.current.render(stableRefs.scene, stableRefs.camera);
+        }
+        
+        requestAnimationFrame(animate);
+      };
+      
+      animate();
+
       initCompletedRef.current = true;
       setIsLoading(false);
 
@@ -205,23 +277,15 @@ const GameBoard = React.memo(
       setIsTradeModalOpen(false);
     };
 
-    const handleProductionChoice = (resource: ResourceType) => {
+    const handleProductionChoice = (choice: ResourceType | ScienceType) => {
       if (!gameState || !productionChoiceState) return;
 
+      const currentChoice = productionChoiceState.choices[productionChoiceState.currentChoiceIndex];
+
       // Only track used cards if the source name doesn't contain "Stage"
-      if (
-        !productionChoiceState.choices[
-          productionChoiceState.currentChoiceIndex
-        ].sourceName.includes("Stage")
-      ) {
+      if (!currentChoice.sourceName.includes("Stage")) {
         setUsedProductionCards(
-          (prev) =>
-            new Set([
-              ...prev,
-              productionChoiceState.choices[
-                productionChoiceState.currentChoiceIndex
-              ].sourceName,
-            ])
+          (prev) => new Set([...prev, currentChoice.sourceName])
         );
       }
 
@@ -229,22 +293,37 @@ const GameBoard = React.memo(
         ...gameState,
         players: gameState.players.map((player, index) => {
           if (index === 0) {
-            return {
-              ...player,
-              tempResources: {
-                ...player.tempResources,
-                [resource]: (player.tempResources[resource] || 0) + 1,
-              },
-            };
+            if (currentChoice.sourceType === 'science') {
+              // Handle science choice
+              return {
+                ...player,
+                science: {
+                  ...player.science,
+                  [choice]: (player.science[choice as ScienceType] || 0) + 1
+                },
+                // Clear the freeScience flag based on the source
+                freeScience: {
+                  ...player.freeScience,
+                  fromWonder: currentChoice.sourceName === "Babylon" ? false : player.freeScience?.fromWonder,
+                  fromCard: currentChoice.sourceName === "Scientists Guild" ? false : player.freeScience?.fromCard
+                }
+              };
+            } else {
+              // Handle resource choice (existing logic)
+              return {
+                ...player,
+                tempResources: {
+                  ...player.tempResources,
+                  [choice as ResourceType]: (player.tempResources[choice as ResourceType] || 0) + 1,
+                },
+              };
+            }
           }
           return player;
         }),
       };
 
-      if (
-        productionChoiceState.currentChoiceIndex <
-        productionChoiceState.choices.length - 1
-      ) {
+      if (productionChoiceState.currentChoiceIndex < productionChoiceState.choices.length - 1) {
         setProductionChoiceState({
           ...productionChoiceState,
           currentChoiceIndex: productionChoiceState.currentChoiceIndex + 1,
@@ -323,14 +402,31 @@ const GameBoard = React.memo(
       }
     }, [gameState]);
 
+    useEffect(() => {
+      if (gameState?.productionChoiceState?.choices[0]?.sourceType === 'science') {
+        // Automatically open modal for science choices
+        setProductionChoiceState(gameState.productionChoiceState);
+      }
+    }, [gameState?.productionChoiceState]);
+
     return (
       <div className="relative w-full h-full">
+        <canvas 
+          ref={canvasRef} 
+          className="w-full h-full"
+          style={{ position: 'fixed', top: 0, left: 0, zIndex: 0 }}
+        />
         {/* Age Display */}
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
           <div className="bg-gray-800/90 px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm border border-gray-600">
             <h2 className="text-2xl font-bold text-white text-center">
               {gameState?.age === 4 ? "Game Over" : `Age ${gameState?.age}`}
             </h2>
+            {gameState?.waitingForSeventhCard && (
+              <div className="mt-2 text-center text-yellow-300">
+                Take final card action
+              </div>
+            )}
             {gameState?.finalState && (
               <div className="mt-4 flex justify-center">
                 <button
@@ -344,37 +440,49 @@ const GameBoard = React.memo(
           </div>
         </div>
 
-        <canvas ref={canvasRef} className="w-full h-full" />
-
         {/* Floating UI for players/wonders */}
         {gameState && (
           <div className="fixed top-4 left-4 grid grid-cols-2 gap-4 max-w-[calc(100vw-2rem)]">
-            {assignedWonders.map((wonder, index) => (
-              <div
-                key={wonder.name}
-                className="bg-gray-700/50 p-3 rounded-lg shadow-lg backdrop-blur-sm border border-gray-700 flex flex-col"
-              >
+            {assignedWonders?.map((wonder) => 
+              wonder ? (
                 <div
-                  className="p-2 cursor-pointer hover:bg-black/90 transition-colors flex flex-col items-center flex-grow"
-                  onClick={() => setSelectedWonder(wonder)}
+                  key={wonder.name}
+                  className="bg-gray-700/50 p-3 rounded-lg shadow-lg backdrop-blur-sm border border-gray-700 flex flex-col"
                 >
-                  <div className="font-medium text-md text-white">
-                    {index === 0 ? "" : `Player ${index + 1}`}
-                  </div>
-                  <div className="text-md text-white/80 justify-center">
-                    {wonder.name}
-                  </div>
-                </div>
-                {gameState?.players[index].playerBoard.size > 0 && (
-                  <button
-                    className="w-full mt-auto text-sm text-white bg-white/10 hover:bg-white/20 transition-colors border-t border-gray-700/50 p-1.5 text-center"
-                    onClick={() => setSelectedPlayerBoardIndex(index)}
+                  <div
+                    className="p-2 cursor-pointer hover:bg-black/90 transition-colors flex flex-col items-center flex-grow"
+                    onClick={() => setSelectedWonder(wonder)}
                   >
-                    View Board
-                  </button>
-                )}
-              </div>
-            ))}
+                    <div className="font-medium text-md text-white">
+                      {assignedWonders.findIndex(
+                        (w) => w.name === wonder.name
+                      ) === 0
+                        ? ""
+                        : `Player ${
+                            assignedWonders.findIndex(
+                              (w) => w.name === wonder.name
+                            ) + 1
+                          }`}
+                    </div>
+                    <div className="text-md text-white/80 justify-center">
+                      {wonder.name}
+                    </div>
+                  </div>
+                  {gameState?.players[assignedWonders.findIndex(
+                    (w) => w.name === wonder.name
+                  )].playerBoard.size > 0 && (
+                    <button
+                      className="w-full mt-auto text-sm text-white bg-white/10 hover:bg-white/20 transition-colors border-t border-gray-700/50 p-1.5 text-center"
+                      onClick={() => setSelectedPlayerBoardIndex(assignedWonders.findIndex(
+                        (w) => w.name === wonder.name
+                      ))}
+                    >
+                      View Board
+                    </button>
+                  )}
+                </div>
+              ) : null
+            )}
           </div>
         )}
 
@@ -613,7 +721,7 @@ const GameBoard = React.memo(
           )}
         </div>
 
-        {hasProductionChoiceCard && !gameState?.finalState ? (
+        {(!gameState?.finalState || gameState?.productionChoiceState?.choices[0]?.sourceType === 'science') && hasProductionChoiceCard ? (
           <button
             className="bg-gray-700/50 border border-gray-400 fixed bottom-4 left-8 text-white px-4 py-2 rounded hover:bg-black/90 transition-colors"
             onClick={openProductionChoiceModal}
@@ -691,13 +799,42 @@ const GameBoard = React.memo(
         </button>
 
         {/* Discard Pile Modal */}
-        {isDiscardPileOpen && gameState && (
+        {isDiscardPileOpen || gameState?.showDiscardPile ? (
           <DiscardPile
             gameState={gameState}
-            onClose={() => setIsDiscardPileOpen(false)}
-            onCardClick={() => {}} // You can implement card click handling if needed
+            onClose={() => {
+              if (gameState?.showDiscardPile) {
+                // Reset the flags when closing from effect
+                setGameState({
+                  ...gameState,
+                  showDiscardPile: false,
+                  players: gameState.players.map((p, i) => 
+                    i === 0 ? { ...p, cardFromDiscard: false } : p
+                  )
+                });
+              }
+              setIsDiscardPileOpen(false);
+            }}
+            onCardClick={(card, position) => {
+              if (gameState?.showDiscardPile) {
+                setGameState({
+                  ...gameState,
+                  showDiscardPile: false,
+                  players: gameState.players.map((p, i) => 
+                    i === 0 ? {
+                      ...p,
+                      cardFromDiscard: false,
+                      playerBoard: new Set([...p.playerBoard, card])
+                    } : p
+                  ),
+                  discardPile: gameState.discardPile.filter(c => c !== card),
+                  gameLog: [...gameState.gameLog, `You retrieved ${card.name} from the discard pile`]
+                });
+              }
+            }}
+            isCardFromDiscardEffect={gameState?.showDiscardPile}
           />
-        )}
+        ) : null}
 
         {showEndgameRanking && (
           <EndgameRanking

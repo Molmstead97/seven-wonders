@@ -20,11 +20,12 @@ export function scoreActions(
   const scores: ActionScore[] = [];
   const personality = player.aiPersonality!;
 
-  // Score playing the card
-  if (checkResources(player, card, null)) {
+  // Score playing the card - now check for free build
+  if (canPlayCardForFree(player, card) || checkResources(player, card, null)) {
     scores.push({
       action: "play",
-      score: calculatePlayScore(card, player, gameState, personality),
+      score: calculatePlayScore(card, player, gameState, personality) + 
+        (canPlayCardForFree(player, card) ? 5 : 0), // Bonus points for free build
       card,
     });
   }
@@ -267,7 +268,7 @@ function calculateDiscardScore(
 
   // Discourage discarding playable cards
   if (checkResources(player, card, null)) {
-    score -= 10;
+    score -= 15;
   }
 
   // Discourage discarding cards that align with personality
@@ -591,4 +592,9 @@ export function applyProductionChoices(
   });
 
   return updatedPlayer;
+}
+
+export function canPlayCardForFree(player: Player, card: Card): boolean {
+  return player.freeBuildPerAge?.isEffectTriggered && 
+         !player.freeBuildPerAge?.usedThisAge;
 }

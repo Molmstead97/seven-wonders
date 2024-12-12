@@ -2,28 +2,29 @@ import { Player } from "../../data/types/player";
 import { Card } from "../../data/types/card";
 import { Resource, ScienceType } from "../../data/types/resource";
 import { applyGoldVictoryBonus } from "../../data/types/cardSpecialEffects";
+import { freeScienceFunction } from "../../data/types/wonderSpecialEffects";
 
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
 
 export function applyCardEffects(player: Player, card: Card): Partial<Player> {
+  // Create a deep copy of relevant player properties
   const updates: Partial<Player> = {
     resources: { ...player.resources },
     science: { ...player.science },
     victoryPoints: player.victoryPoints,
     gold: player.gold,
     shields: player.shields,
+    freeScience: player.freeScience ? { ...player.freeScience } : { fromWonder: false, fromCard: false }
   };
 
   // Apply resource production
   if (card.production) {
-    // Handle fixed production
     Object.entries(card.production).forEach(([resource, amount]) => {
       const resourceKey = resource as keyof Resource;
       updates.resources![resourceKey] =
         (updates.resources![resourceKey] || 0) + (amount as number);
     });
   }
-  // Note: choice production will be handled by UI
 
   // Apply science
   if (card.science) {
@@ -48,9 +49,20 @@ export function applyCardEffects(player: Player, card: Card): Partial<Player> {
   }
 
   // Handle special effects
-  if (card.specialEffect?.type === "goldVictoryBonus") {
-    const bonusPoints = applyGoldVictoryBonus(player, card.specialEffect, false);
-    updates.victoryPoints! += bonusPoints;
+  if (card.specialEffect) {
+    switch (card.specialEffect.type) {
+      case "goldVictoryBonus":
+        const bonusPoints = applyGoldVictoryBonus(
+          { ...player, ...updates },  // Create a merged copy for the calculation
+          card.specialEffect,
+          false
+        );
+        updates.victoryPoints! += bonusPoints;
+        break;
+      case "freeScience":
+        freeScienceFunction({ ...player, ...updates }, 'card');
+        break;
+    }
   }
 
   return updates;

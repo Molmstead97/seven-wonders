@@ -17,13 +17,6 @@ interface PlayerBoardProps {
   onCardClick: (card: Card, position: CardPosition) => void;
 }
 
-// Add this function to calculate modal width based on cards
-const calculateModalWidth = (maxCardsInRow: number) => {
-  const baseWidth = 250;  // Base width for the container
-  const cardWidth = CARD_OFFSET.horizontal * (maxCardsInRow - 1) + 128; // 128px is the card width
-  return Math.max(baseWidth, cardWidth + 64); // Add padding
-};
-
 export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   player,
   onClose,
@@ -64,8 +57,6 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
     ...nonEmptyColors.map(color => cardsByColor[color]?.length || 0)
   );
 
-  const modalWidth = calculateModalWidth(maxCardsInRow);
-
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm"
@@ -74,9 +65,8 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       }}
     >
       <div 
-        className="bg-gray-900 p-6 rounded-lg border border-white/10 shadow-2xl"
+        className="bg-gray-900 p-6 rounded-lg border border-white/10 shadow-2xl w-1/2"
         style={{
-          width: `${modalWidth}px`,
           maxWidth: "90vw",
           maxHeight: "90vh",
         }}
@@ -101,7 +91,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
             {nonEmptyColors.map(color => (
               <div key={color} className="relative bg-white/5 rounded-lg p-4">
                 <div className="text-white/60 text-sm mb-3 font-semibold">{color}</div>
-                <div className="relative h-48">
+                <div className="relative h-44">
                   {cardsByColor[color]?.map((card, index) => (
                     <div
                       key={card.name}

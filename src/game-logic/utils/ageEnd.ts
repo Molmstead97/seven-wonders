@@ -1,7 +1,6 @@
 import { GameState } from "../gameState";
 
 import { Player } from "../../data/types/player";
-import { cardFromDiscardFunction } from "../../data/types/wonderSpecialEffects";
 
 interface MilitaryResult {
   points: number;
@@ -37,63 +36,77 @@ export function ageEnd(players: Player[], gameState: GameState): GameState {
     3: { win: 5, loss: -1 },
   }[gameState.age] ?? { win: 0, loss: 0 };
 
-  // Process each player
-  newState.players.forEach((player) => {
+  // Process each player immutably
+  newState.players = newState.players.map((player) => {
     console.log(`\nProcessing player: ${player.name}`);
 
+    let updatedPlayer = { ...player };
+
+    // Reset free build per age if it has been used this age
+    if (updatedPlayer.freeBuildPerAge?.isEffectTriggered && updatedPlayer.freeBuildPerAge?.usedThisAge) {
+      updatedPlayer = {
+        ...updatedPlayer,
+        freeBuildPerAge: {
+          ...updatedPlayer.freeBuildPerAge,
+          usedThisAge: false
+        }
+      };
+    }
+
     // Military conflicts
-    const leftNeighbor = player.leftPlayer;
-    const rightNeighbor = player.rightPlayer;
+    const leftNeighbor = updatedPlayer.leftPlayer;
+    const rightNeighbor = updatedPlayer.rightPlayer;
 
     const result: MilitaryResult = {
       points: 0,
       wins: 0,
-      losses: 0
+      losses: 0,
     };
 
     if (leftNeighbor) {
       const leftConflict = resolveMilitaryConflict(
-        player,
+        updatedPlayer,
         leftNeighbor,
         militaryPoints
       );
-      player.victoryPoints += leftConflict.points;
-      player.conflictLossTokens += leftConflict.lossTokens;
       result.points += leftConflict.points;
       result.wins += leftConflict.points > 0 ? 1 : 0;
       result.losses += leftConflict.lossTokens;
+      
+      updatedPlayer = {
+        ...updatedPlayer,
+        victoryPoints: updatedPlayer.victoryPoints + leftConflict.points,
+        conflictLossTokens: updatedPlayer.conflictLossTokens + leftConflict.lossTokens
+      };
     }
 
     if (rightNeighbor) {
       const rightConflict = resolveMilitaryConflict(
-        player,
+        updatedPlayer,
         rightNeighbor,
         militaryPoints
       );
-      player.victoryPoints += rightConflict.points;
-      player.conflictLossTokens += rightConflict.lossTokens;
       result.points += rightConflict.points;
       result.wins += rightConflict.points > 0 ? 1 : 0;
       result.losses += rightConflict.lossTokens;
+      
+      updatedPlayer = {
+        ...updatedPlayer,
+        victoryPoints: updatedPlayer.victoryPoints + rightConflict.points,
+        conflictLossTokens: updatedPlayer.conflictLossTokens + rightConflict.lossTokens
+      };
     }
 
     // Store the results in our map using player name as key
-    militaryResults.set(player.name, result);
-    console.log(`Military results for ${player.name}:`, {
+    militaryResults.set(updatedPlayer.name, result);
+    console.log(`Military results for ${updatedPlayer.name}:`, {
       points: result.points,
       wins: result.wins,
       losses: result.losses,
-      shields: player.shields
+      shields: updatedPlayer.shields,
     });
 
-    // Handle special wonder effects
-    if (
-      player.wonder.name === "Halikarnassós A" &&
-      player.wonder.wonderStages[2].isBuilt &&
-      newState.discardPile.length > 0
-    ) {
-      handleHalikarnassosEffect(player, newState);
-    }
+    return updatedPlayer;
   });
 
   return newState;
@@ -111,18 +124,4 @@ function resolveMilitaryConflict(
     return { points: points.loss, lossTokens: 1 };
   }
   return { points: 0, lossTokens: 0 };
-}
-
-function handleHalikarnassosEffect(player: Player, gameState: GameState) {
-  // Note: This is a placeholder. The actual card selection will be handled by the UI
-  const chosenCard = gameState.discardPile[0];
-  if (chosenCard) {
-    player.playerBoard.add(chosenCard);
-    gameState.discardPile = gameState.discardPile.slice(1);
-
-    console.log("Halikarnassos effect:", {
-      cardTaken: chosenCard.name,
-      remainingDiscardSize: gameState.discardPile.length,
-    });
-  }
 }

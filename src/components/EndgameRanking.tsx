@@ -16,7 +16,7 @@ interface PlayerResultsPanelProps {
   rank: number;
 }
  
-function calculateSciencePoints(science: Science): number {
+export function calculateSciencePoints(science: Science): number {
   
   // Calculate points for each symbol type
   const cogPoints = (science.Cog ?? 0) ** 2;
