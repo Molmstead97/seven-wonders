@@ -27,8 +27,8 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
     return null;
   }
 
-  const CARD_WIDTH = 128;  // 32 * 4 (tailwind w-32)
-  const CARD_HEIGHT = 192; // 48 * 4 (tailwind h-48)
+  const CARD_WIDTH = 175;  // 32 * 4 (tailwind w-32)
+  const CARD_HEIGHT = 260; // 48 * 4 (tailwind h-48)
 
   const [prevCards, setPrevCards] = useState(cards);
   const [isDealing, setIsDealing] = useState(false);
