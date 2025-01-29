@@ -2,8 +2,8 @@ import { Player } from "../../data/types/player";
 import { ResourceType } from "../../data/types/resource";
 import { TradeDiscountEffect } from "../../data/types/wonderSpecialEffects";
 
-export function tradeResource(player: Player, neighbor: Player, resourceType: ResourceType, amount: number): { player: Player, neighbor: Player, tradeCost: number } {
-  let tradeCost = 2; // Default trade cost
+export function tradeResource(player: Player, neighbor: Player, resourceType: ResourceType, amount: number) {
+  let tradeCost = 2;
 
   // Check for trade discount effects from wonders and cards
   const tradeEffects: TradeDiscountEffect[] = [
@@ -30,15 +30,25 @@ export function tradeResource(player: Player, neighbor: Player, resourceType: Re
 
   const totalCost = tradeCost * amount;
 
-  // Check if the player has enough coins and the neighbor has enough resources
+  // Create new objects instead of modifying existing ones
   if (player.gold >= totalCost && (neighbor.resources[resourceType] ?? 0) >= amount) {
-    // Update player's gold and resources
-    player.gold -= totalCost;
-    player.tempResources[resourceType] = (player.tempResources[resourceType] || 0) + amount;
-    
-    // Update neighbor's gold
-    neighbor.gold += totalCost;
+    const updatedPlayer = {
+      ...player,
+      gold: player.gold - totalCost,
+      tempResources: {
+        ...player.tempResources,
+        [resourceType]: (player.tempResources[resourceType] || 0) + amount
+      }
+    };
+
+    const updatedNeighbor = {
+      ...neighbor,
+      gold: neighbor.gold + totalCost
+    };
+
+    return { player: updatedPlayer, neighbor: updatedNeighbor, tradeCost };
   }
 
+  // Return unmodified objects if trade can't be completed
   return { player, neighbor, tradeCost };
 }

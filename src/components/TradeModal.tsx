@@ -7,7 +7,7 @@ import { tradeResource } from '../game-logic/utils/tradeResource';
 
 interface TradeModalProps {
   onClose: () => void;
-  onTrade: (resourceType: ResourceType, amount: number) => void;
+  onTrade: (resources: Record<ResourceType, number>) => void;
   selectedWonder: Wonder;
   userWonder: Wonder;
   gameState: GameState;
@@ -223,11 +223,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
           </button>
           <button
             onClick={() => {
-              Object.entries(selectedResources).forEach(([type, amount]) => {
-                if (amount > 0) {
-                  onTrade(type as ResourceType, amount);
-                }
-              });
+              onTrade(selectedResources);
               onClose();
             }}
             className={`px-4 py-2 rounded transition-colors ${

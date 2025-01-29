@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Player } from '../data/types/player';
 import { Science } from '../data/types/resource';
 import { applyGoldVictoryBonus } from '../data/types/cardSpecialEffects';
+import { CardColor } from '../data/types/card';
 
 interface GameEndResultsProps {
   players: Player[];
@@ -28,6 +29,17 @@ export function calculateSciencePoints(science: Science): number {
   return cogPoints + compassPoints + tabletPoints + setPoints;
 }
 
+const calculateColorPoints = (player: Player, cardColor: CardColor) => {
+  return Array.from(player.playerBoard)
+    .filter(card => card.cardColor === cardColor)
+    .reduce((sum, card) => {
+      if (card.specialEffect?.type === 'goldVictoryBonus') {
+        return sum + applyGoldVictoryBonus(player, card.specialEffect, true);
+      }
+      return sum;
+    }, 0);
+};
+
 const PlayerResultsPanel: React.FC<PlayerResultsPanelProps> = ({ player, isUser, rank }) => {
   // Keep all calculation logic
   const goldPoints = Math.floor(player.gold / 3);
@@ -36,23 +48,8 @@ const PlayerResultsPanel: React.FC<PlayerResultsPanelProps> = ({ player, isUser,
     .filter(card => card.cardColor === 'Blue')
     .reduce((sum, card) => sum + (card.victoryPoints || 0), 0);
   
-  const yellowPoints = Array.from(player.playerBoard)
-    .filter(card => card.cardColor === 'Yellow')
-    .reduce((sum, card) => {
-      if (card.specialEffect?.type === 'goldVictoryBonus') {
-        return sum + applyGoldVictoryBonus(player, card.specialEffect, true);
-      }
-      return sum;
-    }, 0);
-
-  const purplePoints = Array.from(player.playerBoard)
-    .filter(card => card.cardColor === 'Purple')
-    .reduce((sum, card) => {
-      if (card.specialEffect?.type === 'goldVictoryBonus') {
-        return sum + applyGoldVictoryBonus(player, card.specialEffect, true);
-      }
-      return sum;
-    }, 0);
+  const yellowPoints = calculateColorPoints(player, 'Yellow');
+  const purplePoints = calculateColorPoints(player, 'Purple');
 
   const sciencePoints = calculateSciencePoints(player.science);
 
@@ -65,7 +62,7 @@ const PlayerResultsPanel: React.FC<PlayerResultsPanelProps> = ({ player, isUser,
         <h3 className={`text-2xl font-bold ${isUser ? 'text-white' : 'text-[#333333]'}`}>
           {isUser ? (
             rank === 1 ? 
-            'Congratulations! You took won!' : 
+            'Congratulations! You won!' : 
             `You took ${rank}${rankSuffix} place`
           ) : (
             `Player ${rank} took ${rank}${rankSuffix} place`
@@ -80,19 +77,6 @@ const PlayerResultsPanel: React.FC<PlayerResultsPanelProps> = ({ player, isUser,
 };
 
 const GameEndResults: React.FC<GameEndResultsProps> = ({ players, onPlayAgain }) => {
-  const [isCalculated, setIsCalculated] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsCalculated(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!isCalculated) {
-    return <div>Calculating final scores...</div>;
-  }
-
   // Sort players by victory points
   const sortedPlayers = [...players].sort((a, b) => b.victoryPoints - a.victoryPoints);
 

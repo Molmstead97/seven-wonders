@@ -313,20 +313,30 @@ const GameBoard = React.memo(
     }, [gameLog, displayedGameLog]);
 
     // Handler for when a trade is completed through the UI
-    const handleTradeAction = (resourceType: ResourceType, amount: number) => {
+    const handleTradeAction = (resources: Record<ResourceType, number>) => {
       if (!gameState) return;
 
       const tradingPlayerId = assignedWonders.findIndex(
         (w) => w.name === selectedWonder?.name
       );
-      const newState = handleTrade(
-        gameState,
-        tradingPlayerId,
-        resourceType,
-        amount
-      );
 
-      setGameState(newState);
+      // Start with current game state
+      let updatedState = gameState;
+
+      // Apply all trades sequentially to the same state
+      Object.entries(resources).forEach(([resourceType, amount]) => {
+        if (amount > 0) {
+          updatedState = handleTrade(
+            updatedState,
+            tradingPlayerId,
+            resourceType as ResourceType,
+            amount
+          );
+        }
+      });
+
+      // Update state once with all changes
+      setGameState(updatedState);
       setIsTradeModalOpen(false);
     };
 

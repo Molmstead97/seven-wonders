@@ -6,6 +6,7 @@ import { expandZoom } from "./animations/expandZoom";
 import { checkResources } from "../game-logic/utils/resourceCheck";
 import { GameState } from "../game-logic/gameState";
 import { canPlayCard } from "../game-logic/gameActions";
+import { canChainBuild } from '../game-logic/utils/chainCheck';
 
 interface EnhancedCardProps {
   card: Card;
@@ -60,6 +61,11 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
           );
         })()
       : false;
+
+  const canBuildFree = 
+    (gameState?.players[0].freeBuildPerAge?.isEffectTriggered &&
+     !gameState?.players[0].freeBuildPerAge?.usedThisAge) ||
+    (gameState && canChainBuild(gameState.players[0], card));
 
   useEffect(() => {
     if (!cardRef.current || !controlsRef.current) return;
@@ -156,20 +162,20 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
           </button>
 
           {/* Free Build Button */}
-          {gameState?.players[0].freeBuildPerAge?.isEffectTriggered &&
-            !gameState?.players[0].freeBuildPerAge?.usedThisAge && (
-              <button
-                onClick={() => {
-                  onCardPlay?.();
-                  if (gameState) {
-                    gameState.players[0].freeBuildPerAge.usedThisAge = true;
-                  }
-                }}
-                className="px-4 py-2 bg-[#2E8B57] text-white rounded hover:bg-[#3CB371]"
-              >
-                Build Free
-              </button>
-            )}
+          {canBuildFree && (
+            <button
+              onClick={() => {
+                onCardPlay?.();
+                if (gameState?.players[0].freeBuildPerAge?.isEffectTriggered) {
+                  gameState.players[0].freeBuildPerAge.usedThisAge = true;
+                }
+              }}
+              className="px-4 py-2 bg-[#2E8B57] text-white rounded hover:bg-[#3CB371]"
+            >
+              Build Free
+              {canChainBuild(gameState!.players[0], card) && " (Chain)"}
+            </button>
+          )}
         </div>
       )}
     </div>

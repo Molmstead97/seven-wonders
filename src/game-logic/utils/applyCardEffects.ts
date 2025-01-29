@@ -3,19 +3,12 @@ import { Card } from "../../data/types/card";
 import { Resource, ScienceType } from "../../data/types/resource";
 import { applyGoldVictoryBonus } from "../../data/types/cardSpecialEffects";
 import { freeScienceFunction } from "../../data/types/wonderSpecialEffects";
+import { createPlayerPropertyUpdates } from './playerUtils';
 
 // NOTE: NO IDEA IF THIS IS WORKING, CAN'T TEST YET
 
 export function applyCardEffects(player: Player, card: Card): Partial<Player> {
-  // Create a deep copy of relevant player properties
-  const updates: Partial<Player> = {
-    resources: { ...player.resources },
-    science: { ...player.science },
-    victoryPoints: player.victoryPoints,
-    gold: player.gold,
-    shields: player.shields,
-    freeScience: player.freeScience ? { ...player.freeScience } : { fromWonder: false, fromCard: false }
-  };
+  const updates = createPlayerPropertyUpdates(player);
 
   // Apply resource production
   if (card.production) {

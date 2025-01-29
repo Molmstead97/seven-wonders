@@ -48,16 +48,33 @@ export function handleAITurn(
   // Execute trades for available resources if they're affordable and available
   availableResources.forEach((tradingOption, resource) => {
     if (
-      player.gold >=
-        Math.min(tradingOption.leftCost, tradingOption.rightCost) &&
+      player.gold >= Math.min(tradingOption.leftCost, tradingOption.rightCost) &&
       tradingOption.availability !== "low"
     ) {
       const tradingNeighbor =
         tradingOption.leftCost <= tradingOption.rightCost
-          ? player.leftPlayer
-          : player.rightPlayer;
+          ? player.leftPlayer!
+          : player.rightPlayer!;
+      
+      const { player: updatedPlayer, neighbor: updatedNeighbor } = 
+        tradeResource(player, tradingNeighbor, resource as ResourceType, 1);
 
-      tradeResource(player, tradingNeighbor!, resource as ResourceType, 1);
+      // Only update if trade was successful
+      if (updatedPlayer.gold !== player.gold) {
+        // Update the player objects
+        player = updatedPlayer;
+        if (tradingNeighbor.id === player.leftPlayer!.id) {
+          player.leftPlayer = updatedNeighbor;
+        } else {
+          player.rightPlayer = updatedNeighbor;
+        }
+
+        // Log the AI trade
+        gameState.gameLog = addToGameLog(
+          gameState.gameLog,
+          `${player.id === 0 ? "You" : player.wonder.name} bought ${resource} from ${tradingNeighbor.id === 0 ? "You" : tradingNeighbor.wonder.name}`
+        );
+      }
     }
   });
 

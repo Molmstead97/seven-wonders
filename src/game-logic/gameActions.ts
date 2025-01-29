@@ -3,6 +3,7 @@ import { GameState, handleAITurn } from "./gameState";
 import { ResourceType, ScienceType } from "../data/types/resource";
 import { Wonder } from "../data/types/wonder";
 import { ProductionChoice } from "../data/types/productionChoice";
+import { createGameStateCopy } from "./utils/stateUtils";
 
 import { applyCardEffects } from "./utils/applyCardEffects";
 import { buildWonder } from "./utils/buildWonder";
@@ -266,6 +267,14 @@ export function handleTrade(
 
   const { player: updatedUserPlayer, neighbor: updatedTradingPlayer } =
     tradeResource(userPlayer, tradingPlayer, resourceType, amount);
+
+  if (updatedUserPlayer.gold !== userPlayer.gold) {
+    // Add trade to game log
+    gameState.gameLog = addToGameLog(
+      gameState.gameLog,
+      `${userPlayer.wonder.name} bought ${amount} ${resourceType} from ${tradingPlayer.wonder.name}`
+    );
+  }
 
   // Update game state
   const newState: GameState = {
